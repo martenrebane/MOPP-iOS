@@ -862,7 +862,7 @@
 				TargetAttributes = {
 					546E575D1E2E07C7009A568D = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 4YJSF2LF24;
+						DevelopmentTeam = ET847QJV9F;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -871,7 +871,7 @@
 					};
 					E4250CE61E09695100530370 = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = 4YJSF2LF24;
+						DevelopmentTeam = ET847QJV9F;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -1137,7 +1137,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				DEVELOPMENT_TEAM = 4YJSF2LF24;
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				INFOPLIST_FILE = MoppLibTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1156,7 +1156,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				DEVELOPMENT_TEAM = 4YJSF2LF24;
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				INFOPLIST_FILE = MoppLibTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1176,7 +1176,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				"DIGIDOCPP_PATH[sdk=iphoneos*]" = "$(SRCROOT)/MoppLib/libdigidocpp_testenv/libdigidocpp.iphoneos";
 				"DIGIDOCPP_PATH[sdk=iphonesimulator*]" = "$(SRCROOT)/MoppLib/libdigidocpp_testenv/libdigidocpp.iphonesimulator";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1246,7 +1246,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				"DIGIDOCPP_PATH[sdk=iphoneos*]" = "$(SRCROOT)/MoppLib/libdigidocpp_testenv/libdigidocpp.iphoneos";
 				"DIGIDOCPP_PATH[sdk=iphonesimulator*]" = "$(SRCROOT)/MoppLib/libdigidocpp_testenv/libdigidocpp.iphonesimulator";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1420,9 +1420,9 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4YJSF2LF24;
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				"DIGIDOCPP_PATH[sdk=iphoneos*]" = "$(SRCROOT)/MoppLib/libdigidocpp/libdigidocpp.iphoneos";
 				"DIGIDOCPP_PATH[sdk=iphonesimulator*]" = "$(SRCROOT)/MoppLib/libdigidocpp/libdigidocpp.iphonesimulator";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1480,9 +1480,9 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4YJSF2LF24;
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				"DIGIDOCPP_PATH[sdk=iphoneos*]" = "$(SRCROOT)/MoppLib/libdigidocpp/libdigidocpp.iphoneos";
 				"DIGIDOCPP_PATH[sdk=iphonesimulator*]" = "$(SRCROOT)/MoppLib/libdigidocpp/libdigidocpp.iphonesimulator";
 				DYLIB_COMPATIBILITY_VERSION = 1;
