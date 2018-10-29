@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>RIA DigiDoc</string>
+	<string>RIA DigiDoc TestEnv</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
