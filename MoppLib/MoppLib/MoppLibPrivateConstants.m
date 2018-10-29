@@ -23,6 +23,10 @@
 
 #import "MoppLibPrivateConstants.h"
 
+#ifdef TEST_ENV
+NSString *const kRIADigiDocId = @"ee.ria.testenv-digidoc";
+#else
 NSString *const kRIADigiDocId = @"ee.ria.digidoc";
+#endif
 NSString *const kDDSServerUrl = @"https://digidocservice.sk.ee/";
 NSString *const kTestDDSServerUrl = @"https://tsp.demo.sk.ee";
