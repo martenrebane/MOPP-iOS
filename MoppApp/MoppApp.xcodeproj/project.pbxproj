@@ -1804,7 +1804,7 @@
 				INFOPLIST_FILE = TestEnvInfo.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc;
+				PRODUCT_BUNDLE_IDENTIFIER = "ee.ria.testenv-digidoc";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "b913e4d7-5a06-41ef-819b-bff86d89eb1d";
 				PROVISIONING_PROFILE_SPECIFIER = "MOPP iOS Development";
@@ -1842,7 +1842,7 @@
 				INFOPLIST_FILE = TestEnvInfo.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc;
+				PRODUCT_BUNDLE_IDENTIFIER = "ee.ria.testenv-digidoc";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "8802afdf-ea26-49a0-ac6a-fa619cee3bef";
 				PROVISIONING_PROFILE_SPECIFIER = "MOPP iOS App Store";
