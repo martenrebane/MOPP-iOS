@@ -78,10 +78,8 @@ public:
   }
   
   virtual std::string PKCS12Cert() const {
-    std::string certPath = Conf::PKCS12Cert();
-    NSString *encodedCertPath = [NSString stringWithUTF8String:certPath.c_str()];
     NSBundle *bundle = [NSBundle bundleForClass:[MoppLibDigidocManager class]];
-    NSString *path = [bundle pathForResource:encodedCertPath ofType:@""];
+    NSString *path = [bundle pathForResource:@"798.p12" ofType:@""];
     return path.UTF8String;
   }
   
@@ -128,25 +126,6 @@ private:
 - (void)setupWithSuccess:(VoidBlock)success andFailure:(FailureBlock)failure usingTestDigiDocService:(BOOL)useTestDDS andTSUrl:(NSString*)tsUrl {
   
   MoppLibSOAPManager.sharedInstance.useTestDigiDocService = useTestDDS;
-  
-  // Copy initial TSL cache for libdigidocpp if needed.
-  NSString *tslCachePath = [[MLFileManager sharedInstance] tslCachePath];
-  NSString *eeTslCachePath = [NSString stringWithFormat:@"%@/EE.xml", tslCachePath];
-  if (![[MLFileManager sharedInstance] fileExistsAtPath:eeTslCachePath]) {
-    MLLog(@"Copy TSL cache: true");
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSArray *tslCache = @[[bundle pathForResource:@"EE" ofType:@"xml"],
-                          [bundle pathForResource:@"FI" ofType:@"xml"],
-                          [bundle pathForResource:@"tl-mp" ofType:@"xml"]];
-    
-    for (NSString *sourcePath in tslCache) {
-      NSString *destinationPath = [NSString stringWithFormat:@"%@/%@", tslCachePath, [sourcePath lastPathComponent]];
-      [[MLFileManager sharedInstance] copyFileWithPath:sourcePath toPath:destinationPath];
-    }
-  } else {
-    MLLog(@"Copy TSL cache: false");
-  }
-  
   
   // Initialize libdigidocpp.
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
