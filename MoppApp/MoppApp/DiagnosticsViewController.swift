@@ -94,7 +94,7 @@ class DiagnosticsViewController: MoppViewController {
     }
     
     private func configurationToUI() {
-        let decodedConf = SettingsConfiguration().getMoppConfiguration()
+        let decodedConf = getMoppConfiguration()
         
         configURL.text = decodedConf.METAINF.URL
         tslURL.text = decodedConf.TSLURL
@@ -141,10 +141,14 @@ class DiagnosticsViewController: MoppViewController {
         return formatter.string(from: formattedDateTime!)
     }
     
+    private func getMoppConfiguration() -> MOPPConfiguration {
+        return Configuration.getConfiguration()
+    }
+    
     private func getDecodedDefaultMoppConfiguration() throws -> DefaultMoppConfiguration {
         do {
             let defaultConfigData = try String(contentsOfFile: Bundle.main.path(forResource: "defaultConfiguration", ofType: "json")!)
-            return try SettingsConfiguration().decodeDefaultMoppConfiguration(configData: defaultConfigData)
+            return try Decoding().decodeDefaultMoppConfiguration(configData: defaultConfigData)
         } catch {
             MSLog("Unable to decode data: ", error.localizedDescription)
             throw error
