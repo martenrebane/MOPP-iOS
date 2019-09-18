@@ -1,6 +1,7 @@
 //
-//  OpenLdap.h
-//  CryptoLib
+//  MOPPLibConfiguration.m
+//  MoppLib
+//
 /*
  * Copyright 2017 Riigi Infosüsteemide Amet
  *
@@ -20,12 +21,21 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "Addressee.h"
-#import "MoppLdapConfiguration.h"
+#import "MOPPLibConfiguration.h"
 
-@interface OpenLdap : NSObject
-- (NSMutableArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *) moppLdapConfiguration;
+@implementation MoppLibConfiguration
+
+- (id) initWithConfiguration:(NSString *)SIVAURL TSLURL:(NSString *)TSLURL TSLCERTS:(NSArray<NSString*> *)TSLCERTS TSAURL:(NSString *)TSAURL OCSPISSUERS:(NSDictionary *)OCSPISSUERS {
+    self = [super init];
+    if (self) {
+        self.SIVAURL = SIVAURL;
+        self.TSLURL = TSLURL;
+        self.TSLCERTS = TSLCERTS;
+        self.TSAURL = TSAURL;
+        self.OCSPISSUERS = OCSPISSUERS;
+    }
+    
+    return self;
+}
+
 @end
-
-

@@ -1,6 +1,7 @@
 //
-//  OpenLdap.h
-//  CryptoLib
+//  RuntimeError.swift
+//  MoppApp
+//
 /*
  * Copyright 2017 Riigi Infosüsteemide Amet
  *
@@ -20,12 +21,16 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "Addressee.h"
-#import "MoppLdapConfiguration.h"
+import Foundation
 
-@interface OpenLdap : NSObject
-- (NSMutableArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *) moppLdapConfiguration;
-@end
-
-
+struct Exception: Error {
+    let message: String
+    
+    init(_ message: String) {
+        self.message = message
+    }
+    
+    public var description: String {
+        return message
+    }
+}

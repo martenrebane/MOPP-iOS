@@ -1,6 +1,7 @@
 //
-//  OpenLdap.h
-//  CryptoLib
+//  Notification+Additions.swift
+//  MoppApp
+//
 /*
  * Copyright 2017 Riigi Infosüsteemide Amet
  *
@@ -20,12 +21,6 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "Addressee.h"
-#import "MoppLdapConfiguration.h"
-
-@interface OpenLdap : NSObject
-- (NSMutableArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *) moppLdapConfiguration;
-@end
-
-
+extension Notification.Name {
+    static let configurationLoaded = Notification.Name("configurationLoaded")
+}

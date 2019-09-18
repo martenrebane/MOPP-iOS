@@ -1,6 +1,7 @@
 //
-//  OpenLdap.h
+//  MoppLdapConfiguration.h
 //  CryptoLib
+//
 /*
  * Copyright 2017 Riigi Infosüsteemide Amet
  *
@@ -21,11 +22,12 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Addressee.h"
-#import "MoppLdapConfiguration.h"
 
-@interface OpenLdap : NSObject
-- (NSMutableArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *) moppLdapConfiguration;
+@interface MoppLdapConfiguration : NSObject
+
+@property (nonatomic, strong) NSString *LDAPPERSONURL;
+@property (nonatomic, strong) NSString *LDAPCORPURL;
+
+- (id) initWithLdapConfiguration:(NSString *)LDAPPERSONURL LDAPCORPURL:(NSString *)LDAPCORPURL;
+
 @end
-
-
