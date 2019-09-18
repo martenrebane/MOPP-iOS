@@ -1176,7 +1176,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E4250CDA1E0968D200530370 /* Build configuration list for PBXNativeTarget "MoppApp" */;
 			buildPhases = (
-				DFF3C3AB233230490079458A /* ShellScript */,
+				DFF3C3AB233230490079458A /* Initialize default MOPP configuration setup */,
 				A61DA2EE951A985EAE19BDEB /* [CP] Check Pods Manifest.lock */,
 				E4250CBF1E0968D200530370 /* Sources */,
 				E4250CC01E0968D200530370 /* Frameworks */,
@@ -1496,7 +1496,7 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Fabric/run\" 2d09fce02bca92bd26f18824f9cb302f5ad625e3 fb7f424a3ac43eccda42c76e7f15a400d7b3047945a66a98d0211ec996f584ef";
 		};
-		DFF3C3AB233230490079458A /* ShellScript */ = {
+		DFF3C3AB233230490079458A /* Initialize default MOPP configuration setup */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1505,6 +1505,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Initialize default MOPP configuration setup";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -2044,6 +2045,12 @@
 				DEVELOPMENT_TEAM = ET847QJV9F;
 				ENABLE_BITCODE = NO;
 				GCC_PREFIX_HEADER = MoppApp/PrefixHeader.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"DEFAULT_CENTRAL_CONFIGURATION_URL=$(DEFAULT_CENTRAL_CONFIGURATION_URL)",
+					"DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=$(DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Headers/Public\"",
@@ -2080,6 +2087,12 @@
 				DEVELOPMENT_TEAM = ET847QJV9F;
 				ENABLE_BITCODE = NO;
 				GCC_PREFIX_HEADER = MoppApp/PrefixHeader.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"DEFAULT_CENTRAL_CONFIGURATION_URL=$(DEFAULT_CENTRAL_CONFIGURATION_URL)",
+					"DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=$(DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Headers/Public\"",
