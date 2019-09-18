@@ -1512,7 +1512,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Initializing default MOPP configuration setup script: \"\nswift sh SetupConfiguration/Sources/main.swift ${DEFAULT_CENTRAL_CONFIGURATION_URL} ${DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL}\n";
+			shellScript = "echo \"Initializing default MOPP configuration setup script: \"\nbrew install mxcl/made/swift-sh\nswift sh SetupConfiguration/Sources/main.swift ${DEFAULT_CENTRAL_CONFIGURATION_URL} ${DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL}\n";
 		};
 		E4250D1B1E0AB34400530370 /* Set GH build number to plist */ = {
 			isa = PBXShellScriptBuildPhase;
