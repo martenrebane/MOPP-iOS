@@ -41,7 +41,7 @@ class SettingsFieldCell: UITableViewCell {
     
     func populate(with field:SettingsViewController.Field) {
         titleLabel.text = field.title
-        textField.placeholder = field.placeholderText
+        textField.attributedPlaceholder = field.placeholderText
         textField.text = field.value
         self.field = field
     }
