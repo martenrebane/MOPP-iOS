@@ -52,7 +52,7 @@
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Settings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K3i-bD-xmf">
-                                                    <rect key="frame" x="15" y="19" width="345" height="24.5"/>
+                                                    <rect key="frame" x="67" y="19" width="241" height="25"/>
                                                     <fontDescription key="fontDescription" name="Roboto-Bold" family="Roboto" pointSize="21"/>
                                                     <color key="textColor" name="MoppTitle"/>
                                                     <nil key="highlightedColor"/>
@@ -60,14 +60,15 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="K3i-bD-xmf" firstAttribute="top" secondItem="cRF-oI-BcV" secondAttribute="topMargin" constant="8" id="6HJ-gt-iqz"/>
-                                                <constraint firstItem="K3i-bD-xmf" firstAttribute="leading" secondItem="cRF-oI-BcV" secondAttribute="leadingMargin" id="DOV-we-ulu"/>
+                                                <constraint firstItem="K3i-bD-xmf" firstAttribute="leading" secondItem="cRF-oI-BcV" secondAttribute="leadingMargin" constant="52" id="DOV-we-ulu"/>
                                                 <constraint firstItem="a1t-M9-oGI" firstAttribute="top" secondItem="cRF-oI-BcV" secondAttribute="topMargin" id="F5F-Bx-ncu"/>
-                                                <constraint firstItem="K3i-bD-xmf" firstAttribute="trailing" secondItem="cRF-oI-BcV" secondAttribute="trailingMargin" id="FwT-go-BLy"/>
+                                                <constraint firstItem="K3i-bD-xmf" firstAttribute="trailing" secondItem="cRF-oI-BcV" secondAttribute="trailingMargin" constant="-52" id="FwT-go-BLy"/>
                                                 <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="K3i-bD-xmf" secondAttribute="bottom" constant="32" id="Nug-kx-h9w"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="a1t-M9-oGI" secondAttribute="trailing" id="jst-3w-e4K"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="dismissButton" destination="a1t-M9-oGI" id="TDp-NH-Vw5"/>
                                             <outlet property="titleLabel" destination="K3i-bD-xmf" id="soL-H3-nHb"/>
                                         </connections>
                                     </tableViewCell>
@@ -79,13 +80,13 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MOBIIL-ID TELEFONINUMBER" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hfZ-Wm-PED">
-                                                    <rect key="frame" x="23" y="11" width="337" height="17.5"/>
+                                                    <rect key="frame" x="23" y="11" width="337" height="18"/>
                                                     <fontDescription key="fontDescription" name="RobotoCondensed-Regular" family="Roboto Condensed" pointSize="15"/>
                                                     <color key="textColor" name="MoppLabel"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Riigikood ja telefoninumber" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="CvN-fs-oAD" customClass="SettingsTextField" customModule="MoppApp" customModuleProvider="target">
-                                                    <rect key="frame" x="15" y="32.5" width="345" height="50"/>
+                                                    <rect key="frame" x="15" y="33" width="345" height="50"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="50" id="RBM-jG-5sa"/>
                                                     </constraints>
@@ -117,13 +118,13 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DEFAULT CONTAINER TYPE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tlZ-VA-EQr">
-                                                    <rect key="frame" x="23" y="11" width="337" height="17.5"/>
+                                                    <rect key="frame" x="23" y="11" width="337" height="18"/>
                                                     <fontDescription key="fontDescription" name="RobotoCondensed-Regular" family="Roboto Condensed" pointSize="15"/>
                                                     <color key="textColor" name="MoppLabel"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SsO-W3-Uvi" customClass="SettingsChoiceView" customModule="MoppApp" customModuleProvider="target">
-                                                    <rect key="frame" x="15" y="32.5" width="345" height="44"/>
+                                                    <rect key="frame" x="15" y="33" width="345" height="44"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="S6z-Zi-ic2">
                                                             <rect key="frame" x="0.0" y="0.0" width="345" height="44"/>
@@ -203,13 +204,13 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time Stamp teenuse URL" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbc-P0-5nz">
-                                                    <rect key="frame" x="23" y="11" width="337" height="17.5"/>
+                                                    <rect key="frame" x="23" y="11" width="337" height="18"/>
                                                     <fontDescription key="fontDescription" name="RobotoCondensed-Regular" family="Roboto Condensed" pointSize="15"/>
                                                     <color key="textColor" name="MoppLabel"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="URL" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="BWD-C2-Ms4" customClass="SettingsTextField" customModule="MoppApp" customModuleProvider="target">
-                                                    <rect key="frame" x="15" y="32.5" width="345" height="50"/>
+                                                    <rect key="frame" x="15" y="33" width="345" height="50"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="50" id="xn0-4h-tGC"/>
                                                     </constraints>
@@ -218,13 +219,13 @@
                                                     <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                                 </textField>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use default" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l3i-7N-WRf">
-                                                    <rect key="frame" x="23" y="93.5" width="280" height="17.5"/>
+                                                    <rect key="frame" x="23" y="93.5" width="280" height="18"/>
                                                     <fontDescription key="fontDescription" name="RobotoCondensed-Regular" family="Roboto Condensed" pointSize="15"/>
                                                     <color key="textColor" name="MoppLabel"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5ZR-f6-fYn">
-                                                    <rect key="frame" x="311" y="86.5" width="51" height="31"/>
+                                                    <rect key="frame" x="311" y="87" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="useDefaultToggled:" destination="oWS-ur-juU" eventType="touchUpInside" id="dc7-Jn-HdF"/>
                                                     </connections>

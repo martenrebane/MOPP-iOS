@@ -43,6 +43,7 @@ class SigningTableViewHeaderView: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         searchTextField._delegate = self
+        self.accessibilityElements = [titleLabel, searchButton]
     }
     
     override func layoutSubviews() {

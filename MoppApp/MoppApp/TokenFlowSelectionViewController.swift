@@ -27,6 +27,8 @@ class TokenFlowSelectionViewController : MoppViewController {
     @IBOutlet var tokenFlowMethodButtons: [UIButton]!
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var tokenNavbar: UIView!
+    @IBOutlet weak var mobileIDButton: UIButton!
+    @IBOutlet weak var idCardButton: UIButton!
     
     var isFlowForDecrypting = false
     weak var mobileIdEditViewControllerDelegate: MobileIDEditViewControllerDelegate!
@@ -45,6 +47,8 @@ class TokenFlowSelectionViewController : MoppViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         localizeButtonTitles()
+        
+        self.accessibilityElements = [mobileIDButton, containerView, idCardButton, containerView]
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
