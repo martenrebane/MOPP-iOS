@@ -216,6 +216,8 @@ class MyeIDInfoManager {
         personalInfo.items.append((type: .citizenship, value: personalData.nationality))
         personalInfo.items.append((type: .documentNumber, value: personalData.documentNumber))
         personalInfo.items.append((type: .expiryDate, value: personalData.expiryDate))
+        
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "")
     }
     
     func organizationDisplayString(_ certOrganization: MoppLibCertificateOrganization) -> String {
