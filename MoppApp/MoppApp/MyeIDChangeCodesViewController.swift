@@ -114,16 +114,21 @@ extension MyeIDChangeCodesViewController: MyeIDChangeCodesViewControllerUIDelega
                 switch strongSelf.model.actionType {
                 case .changePin1:
                     statusText = L(.myEidCodeChangedSuccessMessage, [IdCardCodeName.PIN1.rawValue])
+                    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, statusText)
                 case .changePin2:
                     statusText = L(.myEidCodeChangedSuccessMessage, [IdCardCodeName.PIN2.rawValue])
+                    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, statusText)
                 case .unblockPin1:
                     statusText = L(.myEidCodeUnblockedSuccessMessage, [IdCardCodeName.PIN1.rawValue])
                     strongSelf.infoManager.retryCounts.pin1 = IdCardCodeLengthLimits.maxRetryCount.rawValue
+                    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, statusText)
                 case .unblockPin2:
                     statusText = L(.myEidCodeUnblockedSuccessMessage, [IdCardCodeName.PIN2.rawValue])
                     strongSelf.infoManager.retryCounts.pin2 = IdCardCodeLengthLimits.maxRetryCount.rawValue
+                    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, statusText)
                 case .changePuk:
                     statusText = L(.myEidCodeChangedSuccessMessage, [IdCardCodeName.PUK.rawValue])
+                    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, statusText)
                 }
                 ui.showStatusView(with: statusText)
             }
