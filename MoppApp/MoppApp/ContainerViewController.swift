@@ -294,6 +294,7 @@ extension ContainerViewController : UITableViewDataSource {
         case .dataFiles:
             let cell = tableView.dequeueReusableCell(withType: ContainerFileCell.self, for: indexPath)!
                 cell.delegate = self
+            cell.accessibilityTraits = UIAccessibilityTraitButton
             
             var isRemoveButtonShown = false
             if isAsicContainer {

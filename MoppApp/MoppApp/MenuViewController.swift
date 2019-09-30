@@ -111,6 +111,11 @@ extension MenuViewController : UITableViewDataSource {
             } else {
                 let cell = tableView.dequeueReusableCell(withType: MenuCell.self, for: indexPath)!
                     cell.populate(iconName: iconName, title: title)
+                if id == .help {
+                    cell.accessibilityTraits = UIAccessibilityTraitLink
+                } else {
+                    cell.accessibilityTraits = UIAccessibilityTraitButton
+                }
                 return cell
             }
         }
