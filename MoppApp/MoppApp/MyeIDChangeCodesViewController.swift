@@ -140,14 +140,17 @@ extension MyeIDChangeCodesViewController: MyeIDChangeCodesViewControllerUIDelega
             if invalidCodesError.textFieldIndex == 0 {
                 ui.firstInlineErrorLabel.isHidden = false
                 ui.firstInlineErrorLabel.text = invalidCodesError.message
+                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, ui.firstInlineErrorLabel)
             }
             else if invalidCodesError.textFieldIndex == 1 {
                 ui.secondInlineErrorLabel.isHidden = false
                 ui.secondInlineErrorLabel.text = invalidCodesError.message
+                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, ui.secondInlineErrorLabel)
             }
             else if invalidCodesError.textFieldIndex == 2 {
                 ui.thirdInlineErrorLabel.isHidden = false
                 ui.thirdInlineErrorLabel.text = invalidCodesError.message
+                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, ui.thirdInlineErrorLabel)
             }
             return
         }
