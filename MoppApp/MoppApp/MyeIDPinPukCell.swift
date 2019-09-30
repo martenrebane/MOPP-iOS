@@ -132,6 +132,7 @@ class MyeIDPinPukCell: UITableViewCell {
             } else {
                 showLink(authCertValid && !pukBlocked)
                 linkLabel.attributedText = NSAttributedString(string: pinPukCellInfo.linkText, attributes: [.underlineStyle : NSUnderlineStyle.styleSingle.rawValue])
+                linkButton.accessibilityLabel = L(.myEidInfoPin1LinkText)
                 errorLabel.isHidden = true
                 errorLabel.text = nil
                 showChangeButton(authCertValid, with: pinPukCellInfo.buttonText)
@@ -154,6 +155,7 @@ class MyeIDPinPukCell: UITableViewCell {
             } else {
                 showLink(signCertValid && !pukBlocked)
                 linkLabel.attributedText = NSAttributedString(string: pinPukCellInfo.linkText, attributes: [.underlineStyle : NSUnderlineStyle.styleSingle.rawValue])
+                linkButton.accessibilityLabel = L(.myEidInfoPin2LinkText)
                 showErrorLabel(false)
                 showChangeButton(signCertValid, with: pinPukCellInfo.buttonText)
                 button.backgroundColor = UIColor.moppBase
@@ -164,6 +166,7 @@ class MyeIDPinPukCell: UITableViewCell {
             if pukBlocked {
                 showLink(true)
                 linkLabel.attributedText = NSAttributedString(string: L(.myEidHowToGetCodesMessage), attributes: [.underlineStyle : NSUnderlineStyle.styleSingle.rawValue])
+                linkButton.accessibilityLabel = L(.myEidHowToGetCodesMessage)
                 showErrorLabel(true, with: L(.myEidInfoPukBlockedMessage))
                 showChangeButton(false)
                 button.backgroundColor = UIColor.moppDescriptiveText

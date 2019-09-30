@@ -258,6 +258,22 @@ extension LandingViewController {
             buttonsStackView.removeArrangedSubview(button)
             button.removeFromSuperview()
         }
+        
+        visibleViews.forEach { view in
+            switch view.accessibilityIdentifier {
+            case "signTab":
+                view.accessibilityLabel = selectedTab == .signTab ? "\(L(.tabSelected)), \(L(.tabSignature)), tab 1 of \(visibleViews.count)": "\(L(.tabSignature)) tab 1 of \(visibleViews.count)"
+                break
+            case "cryptoTab":
+                view.accessibilityLabel = selectedTab == .cryptoTab ? "\(L(.tabSelected)), \(L(.tabCrypto)), tab 2 of \(visibleViews.count)": "\(L(.tabCrypto)), tab 2 of \(visibleViews.count)"
+                break
+            case "myeIDTab":
+                view.accessibilityLabel = selectedTab == .myeIDTab ? "\(L(.tabSelected)), \(L(.myEidInfoMyEidAccessibility)), tab 3 of \(visibleViews.count)": "\(L(.myEidInfoMyEidAccessibility)), tab 3 of \(visibleViews.count)"
+                break
+            default:
+                break
+            }
+        }
 
         buttonIDs.forEach { buttonID in
             let button = visibleViews.first(where: { buttonID == TabButtonId(rawValue: $0.accessibilityIdentifier!)! })!

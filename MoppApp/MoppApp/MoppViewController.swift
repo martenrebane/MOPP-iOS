@@ -113,6 +113,7 @@ class MoppViewController : UIViewController {
         navigationItem.titleView = titleLabel
         
         let backBarButtonItem = UIBarButtonItem(image: UIImage(named: "navBarBack"), style: .plain, target: self, action: #selector(backAction))
+        backBarButtonItem.accessibilityLabel = L(.backButton)
         navigationItem.setLeftBarButton(backBarButtonItem, animated: true)
         if !filePath.isEmpty {
             let shareBarButtonItem = WrapperUIBarButtonItem(image: UIImage(named: "navBarShare"), style: .plain, target: self, action: #selector(shareAction(sender:)))
