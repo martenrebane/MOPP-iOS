@@ -117,6 +117,8 @@ class IdCardViewController : MoppViewController {
         
         updateUI(for: state)
         
+        self.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+        
         // Application did become active
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name.UIApplicationDidBecomeActive,
