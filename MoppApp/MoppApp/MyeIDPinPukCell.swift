@@ -137,6 +137,12 @@ class MyeIDPinPukCell: UITableViewCell {
                 errorLabel.text = nil
                 showChangeButton(authCertValid, with: pinPukCellInfo.buttonText)
                 button.backgroundColor = UIColor.moppBase
+                
+                if savedLastFocusElement == .changePIN1 {
+                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, button)
+                } else if savedLastFocusElement == .unblockPIN1 {
+                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, linkButton)
+                }
             }
         }
         else if kind == .pin2 {
@@ -159,6 +165,12 @@ class MyeIDPinPukCell: UITableViewCell {
                 showErrorLabel(false)
                 showChangeButton(signCertValid, with: pinPukCellInfo.buttonText)
                 button.backgroundColor = UIColor.moppBase
+                
+                if savedLastFocusElement == .changePIN2 {
+                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, button)
+                } else if savedLastFocusElement == .unblockPIN2 {
+                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, linkButton)
+                }
             }
         }
         else if kind == .puk {
@@ -175,6 +187,10 @@ class MyeIDPinPukCell: UITableViewCell {
                 showErrorLabel(false)
                 showChangeButton(authCertValid || signCertValid, with: pinPukCellInfo.buttonText)
                 button.backgroundColor = UIColor.moppBase
+                
+                if savedLastFocusElement == .changePUK {
+                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, button)
+                }
             }
         }
         

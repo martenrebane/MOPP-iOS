@@ -50,6 +50,7 @@ class SettingsFieldCell: UITableViewCell {
 extension SettingsFieldCell: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         delegate.didEndEditingField(field.id, with: textField.text ?? String())
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, textField)
     }
 }
 
