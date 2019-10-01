@@ -262,13 +262,13 @@ extension LandingViewController {
         visibleViews.forEach { view in
             switch view.accessibilityIdentifier {
             case "signTab":
-                view.accessibilityLabel = selectedTab == .signTab ? "\(L(.tabSelected)), \(L(.tabSignature)), tab 1 of \(visibleViews.count)": "\(L(.tabSignature)) tab 1 of \(visibleViews.count)"
+                view.accessibilityLabel = selectedTab == .signTab ? "\(L(.tabSelected, ["\(L(.tabSignature))", "1", "\(visibleViews.count)"]))": "\(L(.tabUnselected, ["\(L(.tabSignature))", "1", "\(visibleViews.count)"]))"
                 break
             case "cryptoTab":
-                view.accessibilityLabel = selectedTab == .cryptoTab ? "\(L(.tabSelected)), \(L(.tabCrypto)), tab 2 of \(visibleViews.count)": "\(L(.tabCrypto)), tab 2 of \(visibleViews.count)"
+                view.accessibilityLabel = selectedTab == .cryptoTab ? "\(L(.tabSelected, ["\(L(.tabCrypto))", "2", "\(visibleViews.count)"]))": "\(L(.tabUnselected, ["\(L(.tabCrypto))", "2", "\(visibleViews.count)"]))"
                 break
             case "myeIDTab":
-                view.accessibilityLabel = selectedTab == .myeIDTab ? "\(L(.tabSelected)), \(L(.myEidInfoMyEidAccessibility)), tab 3 of \(visibleViews.count)": "\(L(.myEidInfoMyEidAccessibility)), tab 3 of \(visibleViews.count)"
+                view.accessibilityLabel = selectedTab == .myeIDTab ? "\(L(.tabSelected, ["\(L(.myEidInfoMyEidAccessibility))", "3", "\(visibleViews.count)"]))": "\(L(.tabUnselected, ["\(L(.myEidInfoMyEidAccessibility))", "3", "\(visibleViews.count)"]))"
                 break
             default:
                 break

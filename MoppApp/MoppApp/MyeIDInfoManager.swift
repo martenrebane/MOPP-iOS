@@ -73,7 +73,7 @@ class MyeIDInfoManager {
         }
         
         var itemTitles: [ItemType: String] = [
-            .myeID:         L(.myEidInfoMyEidAccessibility),
+            .myeID:         L(.myEidInfoMyEid),
             .givenNames:    L(.myEidInfoItemGivenNames),
             .surname:       L(.myEidInfoItemSurname),
             .personalCode:  L(.myEidInfoItemPersonalCode),

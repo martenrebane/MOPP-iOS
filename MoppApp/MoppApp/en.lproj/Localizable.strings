@@ -32,7 +32,8 @@
 "tab-decrypt-button" = "DECRYPT";
 "tab-confirm-button" = "CONFIRM SELECTION";
 
-"tab-selected" = "Selected";
+"tab-selected" = "Selected, %@, tab %@ of %@";
+"tab-unselected" = "%@, tab %@ of %@";
 
 // Main menu
 "menu-help" = "HELP";

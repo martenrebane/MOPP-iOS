@@ -32,7 +32,8 @@
 "tab-decrypt-button" = "ДЕШИФРОВАТЬ";
 "tab-confirm-button" = "ПОДВЕРДИТЬ ВЫБОР";
 
-"tab-selected" = "Выбранный";
+"tab-selected" = "Выбрано, %@, вкладка %@ из %@";
+"tab-unselected" = "%@, вкладка %@ из %@";
 
 // Main menu
 "menu-help" = "ПОМОЩЬ";

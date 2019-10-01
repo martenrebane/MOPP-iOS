@@ -32,7 +32,8 @@
 "tab-decrypt-button" = "DEKRÜPTEERI";
 "tab-confirm-button" = "KINNITA VALIK";
 
-"tab-selected" = "Valitud";
+"tab-selected" = "Valitud, %@, vahekaart %@ / %@";
+"tab-unselected" = "%@, vahekaart %@ / %@";
 
 // Main menu
 "menu-help" = "ABI";

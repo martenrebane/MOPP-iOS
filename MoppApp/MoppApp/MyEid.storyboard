@@ -57,6 +57,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="containerView" destination="YJf-b7-e3W" id="5Bt-mJ-bmb"/>
+                        <outlet property="menuButton" destination="0ZJ-7S-wMb" id="D6c-Vq-Cdr"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Xu0-nY-SrI" userLabel="First Responder" sceneMemberID="firstResponder"/>
