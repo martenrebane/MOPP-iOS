@@ -69,7 +69,7 @@ class SearchTextField: UITextField {
     func showClearIndicator(_ show: Bool) {
         if show {
             if rightView == nil {
-                rightViewMode = .whileEditing
+                rightViewMode = UIAccessibilityIsVoiceOverRunning() ? .always : .whileEditing
                 let clearButton = UIButton(frame: CGRect(x: 0, y: 0, width: 56, height: 44))
                     clearButton.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
                     clearButton.setImage(UIImage(named: "DismissPopup"), for: .normal)
@@ -115,7 +115,7 @@ extension SearchTextField: UITextFieldDelegate {
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        showClearIndicator(false)
+        UIAccessibilityIsVoiceOverRunning() ? showClearIndicator(true) : showClearIndicator(false)
         textField.resignFirstResponder()
         return true
     }
