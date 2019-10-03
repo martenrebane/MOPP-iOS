@@ -283,6 +283,7 @@ extension ContainerViewController : UITableViewDataSource {
                 showBottomBorder: row < signingContainerViewDelegate.getSignaturesCount() - 1,
                 showRemoveButton: !isForPreview && signingContainerViewDelegate.isContainerSignable(),
                 signatureIndex: row)
+            cell.removeButton.accessibilityLabel = L(.cryptoRemoveAddresseeButton)
             return cell
         case .missingSignatures:
             let cell = tableView.dequeueReusableCell(withType: ContainerNoSignaturesCell.self, for: indexPath)!
