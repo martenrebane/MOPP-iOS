@@ -70,7 +70,7 @@ class MobileIDChallengeViewController : UIViewController {
             if !isAnnouncementMade {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: { [weak self] in
                     let challengeIdNumbers = Array<Character>(self!.challengeID)
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3])"]))
+                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3]). \(self!.helpLabel.text!)"]))
                     self?.isAnnouncementMade = true
                 })
             }
@@ -102,16 +102,12 @@ class MobileIDChallengeViewController : UIViewController {
         codeLabel.isHidden = false
         titleLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-ok")
         codeLabel.text = L(LocKey.challengeCodeLabel, [challengeID])
-        codeLabel.accessibilityLabel = challengeID
+        
+        let challengeIdNumbers = Array<Character>(challengeID)
+        codeLabel.accessibilityLabel = L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3])"])
         currentProgress = 0.0
         
         sessionTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateSessionProgress), userInfo: nil, repeats: true)
-
-        if UIAccessibilityIsVoiceOverRunning() {
-            let challengeIdNumbers = Array(challengeID)
-            UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, "\(challengeIdNumbers[0]) \(challengeIdNumbers[1]) \(challengeIdNumbers[2]) \(challengeIdNumbers[3])")
-        }
-        
     }
     
     @objc func receiveErrorNotification() {
