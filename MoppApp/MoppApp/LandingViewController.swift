@@ -110,6 +110,9 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
 
     func selectTab(with tabButtonId: TabButtonId) {
         buttonsCollection.forEach {
+            if tabButtonId == TabButtonId.signButton {
+                $0.button.accessibilityIdentifier = "\(L(.tabUnselected, ["\(L(.tabSignature))", "1", "2"]))"
+            }
             $0.setSelected(TabButtonId(rawValue: $0.accessibilityIdentifier!)! == tabButtonId)
         }
     }
@@ -123,6 +126,9 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
         
         buttonsCollection.forEach {
             if $0.kind == .button {
+                if $0.button.accessibilityIdentifier == TabButtonId.signButton.rawValue {
+                    $0.button.accessibilityIdentifier = "\(L(.tabUnselected, ["\(L(.tabSignature))", "1", "2"]))"
+                }
                 $0.button.addTarget(self, action: #selector(tabButtonTapAction), for: .touchUpInside)
             }
         }
@@ -269,6 +275,35 @@ extension LandingViewController {
                 break
             case "myeIDTab":
                 view.accessibilityLabel = selectedTab == .myeIDTab ? "\(L(.tabSelected, ["\(L(.myEidInfoMyEidAccessibility))", "3", "\(visibleViews.count)"]))": "\(L(.tabUnselected, ["\(L(.myEidInfoMyEidAccessibility))", "3", "\(visibleViews.count)"]))"
+                break
+            case "shareButton":
+                if buttonIDs.contains(TabButtonId.decryptButton) && buttonIDs.contains(TabButtonId.shareButton) {
+                    view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabShareButton))", "2", "\(visibleViews.count)"]))"
+                    view.accessibilityTraits = UIAccessibilityTraitButton
+                } else {
+                    view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabShareButton))", "1", "\(visibleViews.count)"]))"
+                    view.accessibilityTraits = UIAccessibilityTraitButton
+                }
+            case "signButton":
+                view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabSignButton))", "2", "\(visibleViews.count)"]))"
+                view.accessibilityTraits = UIAccessibilityTraitButton
+                break
+            case "encryptButton":
+                view.accessibilityLabel = "\(L(.tabEncryptButton))"
+                view.accessibilityTraits = UIAccessibilityTraitButton
+                break
+            case "decryptButton":
+                if buttonIDs.contains(TabButtonId.decryptButton) && buttonIDs.contains(TabButtonId.shareButton) {
+                    view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabDecryptButton))", "1", "\(visibleViews.count)"]))"
+                    view.accessibilityTraits = UIAccessibilityTraitButton
+                } else {
+                    view.accessibilityLabel = "\(L(.tabDecryptButton))"
+                    view.accessibilityTraits = UIAccessibilityTraitButton
+                }
+                break
+            case "confirmButton":
+                view.accessibilityLabel = "\(L(.tabConfirmButton))"
+                view.accessibilityTraits = UIAccessibilityTraitButton
                 break
             default:
                 break

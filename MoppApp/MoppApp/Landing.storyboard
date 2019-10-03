@@ -213,7 +213,9 @@
                                                     </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <accessibility key="accessibilityConfiguration" identifier="shareButton"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="shareButton">
+                                                    <bool key="isElement" value="YES"/>
+                                                </accessibility>
                                                 <constraints>
                                                     <constraint firstAttribute="trailing" secondItem="D7z-3P-MfZ" secondAttribute="trailing" id="1S0-di-AAj"/>
                                                     <constraint firstItem="qmQ-pj-mTP" firstAttribute="leading" secondItem="uIu-AD-w9S" secondAttribute="leading" id="5Wf-ou-4vc"/>
@@ -252,7 +254,9 @@
                                                     </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <accessibility key="accessibilityConfiguration" identifier="signButton"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="signButton">
+                                                    <bool key="isElement" value="YES"/>
+                                                </accessibility>
                                                 <constraints>
                                                     <constraint firstAttribute="bottom" secondItem="flY-yF-y29" secondAttribute="bottom" constant="2" id="23s-bh-yDR"/>
                                                     <constraint firstItem="oD2-eQ-zo1" firstAttribute="top" secondItem="Sai-Rz-wOx" secondAttribute="top" id="8MD-8K-fX8"/>
@@ -292,7 +296,9 @@
                                                     </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <accessibility key="accessibilityConfiguration" identifier="encryptButton"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="encryptButton">
+                                                    <bool key="isElement" value="YES"/>
+                                                </accessibility>
                                                 <constraints>
                                                     <constraint firstItem="rtQ-Jt-Uv9" firstAttribute="top" secondItem="zZy-Vl-dNV" secondAttribute="top" id="4EI-5s-Nzg"/>
                                                     <constraint firstItem="rtQ-Jt-Uv9" firstAttribute="leading" secondItem="zZy-Vl-dNV" secondAttribute="leading" id="ARU-CH-LDM"/>
@@ -332,7 +338,9 @@
                                                     </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <accessibility key="accessibilityConfiguration" identifier="decryptButton"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="decryptButton">
+                                                    <bool key="isElement" value="YES"/>
+                                                </accessibility>
                                                 <constraints>
                                                     <constraint firstItem="kLR-Nc-AUC" firstAttribute="leading" secondItem="fFe-jM-quU" secondAttribute="leading" id="83Z-mE-pYu"/>
                                                     <constraint firstAttribute="bottom" secondItem="kLR-Nc-AUC" secondAttribute="bottom" id="EJ1-IZ-gRu"/>
@@ -372,7 +380,9 @@
                                                     </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <accessibility key="accessibilityConfiguration" identifier="confirmButton"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="confirmButton">
+                                                    <bool key="isElement" value="YES"/>
+                                                </accessibility>
                                                 <constraints>
                                                     <constraint firstItem="wDc-OE-gkF" firstAttribute="leading" secondItem="ASa-w9-Uui" secondAttribute="leading" id="0C7-xh-tGG"/>
                                                     <constraint firstItem="gcr-aT-usx" firstAttribute="leading" secondItem="ASa-w9-Uui" secondAttribute="leading" id="AsI-dQ-kzd"/>
@@ -442,7 +452,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="VMg-vR-sr3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2762.4000000000001" y="1511.6941529235382"/>
+            <point key="canvasLocation" x="-2762.4000000000001" y="1510.7946026986508"/>
         </scene>
         <!--File Import Progress View Controller-->
         <scene sceneID="ZMn-vB-Crc">
