@@ -279,13 +279,17 @@ extension LandingViewController {
             case "shareButton":
                 if buttonIDs.contains(TabButtonId.decryptButton) && buttonIDs.contains(TabButtonId.shareButton) {
                     view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabShareButton))", "2", "\(visibleViews.count)"]))"
-                    view.accessibilityTraits = UIAccessibilityTraitButton
                 } else {
                     view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabShareButton))", "1", "\(visibleViews.count)"]))"
-                    view.accessibilityTraits = UIAccessibilityTraitButton
                 }
+                view.accessibilityTraits = UIAccessibilityTraitButton
+                break
             case "signButton":
-                view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabSignButton))", "2", "\(visibleViews.count)"]))"
+                if buttonIDs.contains(TabButtonId.signButton) && buttonIDs.count == 1 {
+                    view.accessibilityLabel = "\(L(.tabSignButton))"
+                } else {
+                    view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabSignButton))", "2", "\(visibleViews.count)"]))"
+                }
                 view.accessibilityTraits = UIAccessibilityTraitButton
                 break
             case "encryptButton":
@@ -295,11 +299,10 @@ extension LandingViewController {
             case "decryptButton":
                 if buttonIDs.contains(TabButtonId.decryptButton) && buttonIDs.contains(TabButtonId.shareButton) {
                     view.accessibilityLabel = "\(L(.tabUnselected, ["\(L(.tabDecryptButton))", "1", "\(visibleViews.count)"]))"
-                    view.accessibilityTraits = UIAccessibilityTraitButton
                 } else {
                     view.accessibilityLabel = "\(L(.tabDecryptButton))"
-                    view.accessibilityTraits = UIAccessibilityTraitButton
                 }
+                view.accessibilityTraits = UIAccessibilityTraitButton
                 break
             case "confirmButton":
                 view.accessibilityLabel = "\(L(.tabConfirmButton))"
