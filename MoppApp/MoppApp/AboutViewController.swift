@@ -36,7 +36,7 @@ class AboutViewController: MoppViewController {
 
         titleLabel.text = L(.aboutTitle)
         
-        self.view.accessibilityElements = [titleLabel, dismissButton]
+        self.view.accessibilityElements = [titleLabel, dismissButton, webView]
         
         var localizedAboutHtmlPath:String!
         let appLanguageID = DefaultsHelper.moppLanguageID
