@@ -47,10 +47,10 @@ class SettingsViewController: MoppViewController {
         let id: FieldId
         let kind: Kind
         let title: String
-        let placeholderText: String
+        let placeholderText: NSAttributedString
         let value: String
         
-        init(id:FieldId, kind:Kind, title:String, placeholderText:String, value:String) {
+        init(id:FieldId, kind:Kind, title:String, placeholderText:NSAttributedString, value:String) {
             self.id = id
             self.kind = kind
             self.title = title
@@ -66,28 +66,28 @@ class SettingsViewController: MoppViewController {
             id: .phoneNumber,
             kind: .inputField,
             title: L(.settingsPhoneNumberTitle),
-            placeholderText: L(.settingsPhoneNumberPlaceholder),
+            placeholderText: NSMutableAttributedString(string: L(.settingsPhoneNumberPlaceholder), attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)]),
             value: DefaultsHelper.phoneNumber ?? String()
         ),
         Field(
             id: .personalCode,
             kind: .inputField,
             title: L(.settingsIdCodeTitle),
-            placeholderText: L(.settingsIdCodePlaceholder),
+            placeholderText: NSAttributedString(string: L(.settingsIdCodePlaceholder), attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)]),
             value: DefaultsHelper.idCode
         ),
         Field(
             id: .missingId,
             kind: .groupSeparator,
             title: String(),
-            placeholderText: String(),
+            placeholderText: NSAttributedString(string: String(), attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)]),
             value: String()
         ),
         Field(
             id: .timestampUrl,
             kind: .timestamp,
             title: L(.settingsTimestampUrlTitle),
-            placeholderText: L(.settingsTimestampUrlPlaceholder),
+            placeholderText: NSAttributedString(string: L(.settingsTimestampUrlPlaceholder), attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)]),
             value: DefaultsHelper.timestampUrl ?? MoppConfiguration.tsaUrl!
         )
     ]
@@ -134,6 +134,9 @@ extension SettingsViewController: UITableViewDataSource {
                 let fieldCell = tableView.dequeueReusableCell(withType: SettingsFieldCell.self, for: indexPath)!
                     fieldCell.delegate = self
                     fieldCell.populate(with: field)
+                if (field.id == .personalCode) {
+                    fieldCell.textField.addTarget(self, action: #selector(editingChanged(sender:)), for: .editingChanged)
+                }
                 return fieldCell
             case .timestamp:
                 let timeStampCell = tableView.dequeueReusableCell(withType: SettingsTimeStampCell.self, for: indexPath)!
@@ -148,6 +151,13 @@ extension SettingsViewController: UITableViewDataSource {
                 let groupSeparatorCell = tableView.dequeueReusableCell(withIdentifier: "SettingsGroupSeparator", for: indexPath)
                 return groupSeparatorCell
             }
+        }
+    }
+    
+    @objc func editingChanged(sender: UITextField) {
+        let text = sender.text ?? String()
+        if (text.count > 11) {
+            sender.deleteBackward()
         }
     }
 }

@@ -81,6 +81,8 @@ class MobileIDEditViewController : MoppViewController {
         tapGR = UITapGestureRecognizer()
         tapGR.addTarget(self, action: #selector(cancelAction))
         view.addGestureRecognizer(tapGR)
+        
+        self.view.accessibilityElements = [titleLabel, phoneLabel, phoneTextField, idCodeLabel, idCodeTextField, rememberLabel, rememberSwitch, cancelButton, signButton]
     }
     
     @objc func dismissKeyboard(_ notification: NSNotification) {
@@ -119,25 +121,30 @@ class MobileIDEditViewController : MoppViewController {
 
         idCodeTextField.text = DefaultsHelper.idCode
         phoneTextField.text = DefaultsHelper.phoneNumber
+        
+        idCodeTextField.addTarget(self, action: #selector(editingChanged(sender:)), for: .editingChanged)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.view.backgroundColor = UIColor.black.withAlphaComponent(0.0)
     }
+    
+    deinit {
+        idCodeTextField.removeTarget(self, action: #selector(editingChanged(sender:)), for: .editingChanged)
+    }
+    
+    @objc func editingChanged(sender: UITextField) {
+        let text = sender.text ?? String()
+        if (text.count > 11) {
+            sender.deleteBackward()
+        }
+    }
 }
 
 extension MobileIDEditViewController : UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        return true
-    }
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let text = textField.text as NSString? {
-            let textAfterUpdate = text.replacingCharacters(in: range, with: string)
-            return textAfterUpdate.isNumeric || textAfterUpdate.isEmpty
-        }
         return true
     }
 }
