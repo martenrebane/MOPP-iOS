@@ -139,7 +139,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
                 
                 setMoppConfiguration(configuration: decodedData)
                 
-                reloadDigiDocConf(tsUrl: decodedData.TSAURL)
+                reloadDigiDocConf()
                 
             } else {
                 setConfigurationToCache(Date(), forKey: "lastUpdateCheckDate")
@@ -211,7 +211,54 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if getDefaultMoppConfiguration().CENTRALCONFIGURATIONSERVICEURL.contains("test") {
-            completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+            if (challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust) {
+                if let serverTrust = challenge.protectionSpace.serverTrust {
+                    
+                    var secTrustResultType: SecTrustResultType = SecTrustResultType.invalid
+                    SecTrustEvaluate(serverTrust, &secTrustResultType)
+                    
+                    if secTrustResultType == SecTrustResultType.recoverableTrustFailure {
+                        let errorDataReference = SecTrustCopyExceptions(serverTrust)
+                        SecTrustSetExceptions(serverTrust, errorDataReference)
+                        
+                        SecTrustEvaluate(serverTrust, &secTrustResultType)
+                    }
+                    
+                    if (secTrustResultType == SecTrustResultType.proceed || secTrustResultType == SecTrustResultType.unspecified) {
+                        guard let websiteCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) else {
+                            completionHandler(URLSession.AuthChallengeDisposition.cancelAuthenticationChallenge, nil)
+                            return
+                        }
+                        
+                        let serverCertificateData = SecCertificateCopyData(websiteCertificate)
+                        let certificateData = CFDataGetBytePtr(serverCertificateData);
+                        let certificateLength = CFDataGetLength(serverCertificateData);
+                        let webCertData = NSData(bytes: certificateData, length: certificateLength)
+                        var localCert: Data? = Data()
+                        let currentCertPath = Bundle.main.url(forResource: "id.test.eesti.ee", withExtension: "cer")!
+                        if FileManager.default.fileExists(atPath: currentCertPath.path) {
+                            localCert = FileManager.default.contents(atPath: currentCertPath.path)
+                        } else {
+                            print("Certificate pinning failed")
+                            completionHandler(URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust:serverTrust))
+                        }
+                        
+                        
+                        guard let localCertData = localCert else {
+                            completionHandler(URLSession.AuthChallengeDisposition.cancelAuthenticationChallenge, nil)
+                            return
+                        }
+                        
+                        if webCertData.isEqual(to: localCertData as Data) {
+                            print("Successfully pinned certificate")
+                            completionHandler(URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust:serverTrust))
+                        }
+                    } else {
+                        print("Certificate pinning failed. Not trusted")
+                        completionHandler(URLSession.AuthChallengeDisposition.cancelAuthenticationChallenge, nil)
+                    }
+                }
+            }
         }
         else {
             completionHandler(.performDefaultHandling, URLCredential(trust: challenge.protectionSpace.serverTrust!))
@@ -261,10 +308,11 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     }
     
     private func trim(text: String?) -> String? {
-        return text!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        let removedLastNewLine = text!.dropLast(3).appending("\"}")
+        return removedLastNewLine.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
-    private func reloadDigiDocConf(tsUrl: String) {
+    internal func reloadDigiDocConf() {
         #if USE_TEST_DDS
             let useTestDDS = true
         #else
@@ -276,7 +324,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
         }, andFailure: { error in
             MSLog("Failed to reload DigiDocConf")
             fatalError("Failed to reload DigiDocConf")
-        }, usingTestDigiDocService: useTestDDS, andTSUrl: tsUrl,
+        }, usingTestDigiDocService: useTestDDS, andTSUrl: MoppConfiguration.getMoppLibConfiguration().tsaurl,
            withMoppConfiguration: MoppConfiguration.getMoppLibConfiguration())
     }
 }
