@@ -308,8 +308,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     }
     
     private func trim(text: String?) -> String? {
-        let removedLastNewLine = text!.dropLast(3).appending("\"}")
-        return removedLastNewLine.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        return text!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
     internal func reloadDigiDocConf() {

@@ -27,6 +27,7 @@
 #import "MLCertificateHelper.h"
 #import "NSString+Additions.h"
 #import "MoppLibPrivateConstants.h"
+#import "MOPPLibConfiguration.h"
 
 @interface MoppLibNetworkManager ()
 
@@ -38,9 +39,6 @@
 @end
 
 @implementation MoppLibNetworkManager
-
-NSString *kTestServiceNames = @"Testimine";
-NSString *kMessagingModes = @"asynchClientServer";
 
 + (MoppLibNetworkManager *)sharedInstance {
   static dispatch_once_t pred;
@@ -56,7 +54,7 @@ NSString *kMessagingModes = @"asynchClientServer";
  // NSError *error;
   
   BOOL useTestDDS = MoppLibSOAPManager.sharedInstance.useTestDigiDocService;
-  NSURL *url = [NSURL URLWithString:(useTestDDS ? kTestDDSServerUrl : kDDSServerUrl)];
+  NSURL *url = [NSURL URLWithString:(useTestDDS ? PrivateConstants.getCentralConfigurationFromCache[@"MID-SIGN-TEST-URL"] : PrivateConstants.getCentralConfigurationFromCache[@"MID-SIGN-URL"])];
   NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
   NSData *requestBodyData = [xmlBody dataUsingEncoding:NSUTF8StringEncoding];
   [request setURL:url];
@@ -76,12 +74,12 @@ NSString *kMessagingModes = @"asynchClientServer";
 - (void)postDataToTestPathWithXml:(NSString *)xmlBody userData:(NSDictionary *)userData method:(MoppLibNetworkRequestMethod)method success:(ObjectSuccessBlock)success andFailure:(FailureBlock)failure {
     
     NSData *requestBodyData = [xmlBody dataUsingEncoding:NSUTF8StringEncoding];
-        
+    
     NSDictionary *headers = @{ @"Content-Type": @"text/xml",
                                @"Accept-Encoding": @"gzip,deflate" };
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@?IDCode=%@&PhoneNo=%@&Language=%@&ServiceName=%@&MessagingMode=%@", kTestDDSServerUrl, userData[@"idCode"], userData[@"phoneNo"], userData[@"language"], @"Testimine", @"asynchClientServer"]] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:60.0];
+    request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@?IDCode=%@&PhoneNo=%@&Language=%@&ServiceName=%@&MessagingMode=%@", PrivateConstants.getCentralConfigurationFromCache[@"MID-SIGN-TEST-URL"], userData[@"idCode"], userData[@"phoneNo"], userData[@"language"], kTestServiceNames, kMessagingModes]] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:60.0];
     
     [request setHTTPMethod:@"POST"];
     [request setAllHTTPHeaderFields:headers];
@@ -89,62 +87,80 @@ NSString *kMessagingModes = @"asynchClientServer";
     
     NSURLSession *session = [NSURLSession sharedSession];
     
-    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         MLLog(@"Request : %@", request);
-        if (!error) {
-            NSInteger statusCode = [(NSHTTPURLResponse *) response statusCode];
-            if (statusCode != 401) {
-                //  NSError *resultError;
-                [[MoppLibSOAPManager sharedInstance] processResultWithData:data method:method withSuccess:^(NSObject *responseObject) {
-                    success(responseObject);
-                } andFailure:^(NSError *error) {
-                    failure(error);
-                }];
-            } else {
-                NSString *errorDescription = [NSHTTPURLResponse localizedStringForStatusCode:statusCode];
-                failure([NSError errorWithDomain:@"MoppLib" code:statusCode userInfo:@{NSLocalizedDescriptionKey : errorDescription}]);
-            }
-        }else {
-            if (error.code == NSURLErrorCancelled) {
-                failure([MoppLibError urlSessionCanceledError]);
-            } else {
-                failure(error);
-            }
-        }
+        [self postDataRequest:data method:method response:response error:error success:^(NSObject *responseObject) {
+            success(responseObject);
+        } andFailure:^(NSError *error) {
+            failure(error);
+        }];
     }];
-        [dataTask resume];
-    
-        
+    [dataTask resume];
 }
 
 - (void)postDataToPathWithXml:(NSString *)xmlBody method:(MoppLibNetworkRequestMethod)method success:(ObjectSuccessBlock)success andFailure:(FailureBlock)failure {
-  
-  NSURLRequest *request = [self requestWithXMLBody:xmlBody];
-
-  NSURLSessionTask *dataTask = [self.urlSession dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-    MLLog(@"Request : %@", request);
-    if (!error) {
-      NSInteger statusCode = [(NSHTTPURLResponse *) response statusCode];
-      if (statusCode != 401) {
-      //  NSError *resultError;
-        [[MoppLibSOAPManager sharedInstance] processResultWithData:data method:method withSuccess:^(NSObject *responseObject) {
-          success(responseObject);
+    
+    NSURLRequest *request = [self requestWithXMLBody:xmlBody];
+    
+    NSURLSessionTask *dataTask = [self.urlSession dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        MLLog(@"Request : %@", request);
+        [self postDataRequest:data method:method response:response error:error success:^(NSObject *responseObject) {
+            success(responseObject);
         } andFailure:^(NSError *error) {
-          failure(error);
+            failure(error);
         }];
-      } else {
-        NSString *errorDescription = [NSHTTPURLResponse localizedStringForStatusCode:statusCode];
-        failure([NSError errorWithDomain:@"MoppLib" code:statusCode userInfo:@{NSLocalizedDescriptionKey : errorDescription}]);
-      }
+    }];
+    [dataTask resume];
+    
+    
+    
+    //  NSURLSessionTask *dataTask = [self.urlSession dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    //    MLLog(@"Request : %@", request);
+    //    if (!error) {
+    //      NSInteger statusCode = [(NSHTTPURLResponse *) response statusCode];
+    //      if (statusCode != 401) {
+    //      //  NSError *resultError;
+    //        [[MoppLibSOAPManager sharedInstance] processResultWithData:data method:method withSuccess:^(NSObject *responseObject) {
+    //          success(responseObject);
+    //        } andFailure:^(NSError *error) {
+    //          failure(error);
+    //        }];
+    //      } else {
+    //        NSString *errorDescription = [NSHTTPURLResponse localizedStringForStatusCode:statusCode];
+    //        failure([NSError errorWithDomain:@"MoppLib" code:statusCode userInfo:@{NSLocalizedDescriptionKey : errorDescription}]);
+    //      }
+    //    }else {
+    //      if (error.code == NSURLErrorCancelled) {
+    //        failure([MoppLibError urlSessionCanceledError]);
+    //      } else {
+    //        failure(error);
+    //      }
+    //    }
+    //  }];
+    //  [dataTask resume];
+}
+
+- (void)postDataRequest:(NSData * _Nullable)data method:(MoppLibNetworkRequestMethod)method response:(NSURLResponse * _Nullable)response error:(NSError * _Nullable)error success:(ObjectSuccessBlock)success andFailure:(FailureBlock)failure {
+    if (!error) {
+        NSInteger statusCode = [(NSHTTPURLResponse *) response statusCode];
+        if (statusCode != 401) {
+            //  NSError *resultError;
+            [[MoppLibSOAPManager sharedInstance] processResultWithData:data method:method withSuccess:^(NSObject *responseObject) {
+                success(responseObject);
+            } andFailure:^(NSError *error) {
+                failure(error);
+            }];
+        } else {
+            NSString *errorDescription = [NSHTTPURLResponse localizedStringForStatusCode:statusCode];
+            failure([NSError errorWithDomain:@"MoppLib" code:statusCode userInfo:@{NSLocalizedDescriptionKey : errorDescription}]);
+        }
     }else {
-      if (error.code == NSURLErrorCancelled) {
-        failure([MoppLibError urlSessionCanceledError]);
-      } else {
-        failure(error);
-      }
+        if (error.code == NSURLErrorCancelled) {
+            failure([MoppLibError urlSessionCanceledError]);
+        } else {
+            failure(error);
+        }
     }
-  }];
-  [dataTask resume];
 }
 
 - (void)mobileCreateSignatureWithContainer:(MoppLibContainer *)container
