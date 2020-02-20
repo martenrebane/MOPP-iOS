@@ -73,6 +73,8 @@ class IdCardViewController : MoppViewController {
     var initialStateExpirationTimer: Timer? = nil
     var idCardPersonalData: MoppLibPersonalData? = nil
     
+    var accessibilityObjects: [NSObject] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     
@@ -92,7 +94,9 @@ class IdCardViewController : MoppViewController {
         pinTextField.layer.borderWidth = 1.0
         pinTextField.moppPresentDismissButton()
    
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, titleLabel)
+        if #available(iOS 12, *) {
+            UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, titleLabel)
+        }
     }
     
     deinit {
@@ -118,6 +122,11 @@ class IdCardViewController : MoppViewController {
         updateUI(for: state)
         
         self.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+        
+        accessibilityObjects = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+        
+        self.view.accessibilityElements = accessibilityObjects
+        accessibilityElements = accessibilityObjects
         
         // Application did become active
         NotificationCenter.default.addObserver(
@@ -181,6 +190,7 @@ class IdCardViewController : MoppViewController {
             pinTextFieldTitleLabel.textColor = UIColor.moppBaseBackground
             loadingSpinner.show(true)
             titleLabel.text = L(.cardReaderStateInitial)
+            self.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
         case .readerNotFound:
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification,  L(.cardReaderStateReaderNotFound))
             actionButton.isEnabled = false
@@ -288,6 +298,32 @@ class IdCardViewController : MoppViewController {
         }
         
         view.layoutIfNeeded()
+        
+//        if var topController = UIApplication.shared.keyWindow?.rootViewController {
+//            while let presentedViewController = topController.presentedViewController {
+//                topController = presentedViewController
+//            }
+//            topController.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+//            self.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+//            self.view.superview?.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+//            topController.view.superview?.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+//        }
+        
+        for subview in self.view.subviews {
+            if subview.isKind(of: UIView.self) {
+//                self.view.bringSubview(toFront: subview)
+//                self.view.superview?.bringSubview(toFront: subview)
+                self.view.isAccessibilityElement = false
+                subview.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, titleLabel)
+            }
+        }
+//
+//        super.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+//        self.view.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+//        self.view.superview?.accessibilityElements = [titleLabel, pinTextFieldTitleLabel, pinTextField, cancelButton, actionButton]
+        
+        
     }
     
     @IBAction func cancelAction() {
