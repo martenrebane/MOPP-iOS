@@ -321,6 +321,9 @@ extension ContainerViewController : UITableViewDataSource {
         case .header:
             let cell = tableView.dequeueReusableCell(withType: ContainerHeaderCell.self, for: indexPath)!
                 cell.populate(name: containerViewDelegate.getContainerFilename())
+
+            tableView.scrollToTop()
+            
             return cell
         case .search:
             let cell = tableView.dequeueReusableCell(withType: ContainerSearchCell.self, for: indexPath)!
@@ -469,6 +472,7 @@ extension ContainerViewController : UITableViewDelegate {
         }
         
         tableView.reloadData()
+        tableView.scrollToTop()
         
         // Animate away success message if there is any
         if let notificationIndex = notifications.index(where: { $0.0 == true }), sections.contains(.notifications) {

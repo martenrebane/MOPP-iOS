@@ -51,8 +51,12 @@
     return [MoppLibDigidocManager getDataToSign];
 }
 
-+ (BOOL)isSignatureValid:(NSString *)cert signatureValue:(NSString *)signatureValue {
-    return [MoppLibDigidocManager isSignatureValid:cert signatureValue:signatureValue];
++ (BOOL)isSignatureValid:(NSString *)cert signatureValue:(NSString *)signatureValue error:(NSError **)error {
+    return [MoppLibDigidocManager isSignatureValid:cert signatureValue:signatureValue error:error];
+}
+
++ (void)removeSignature:(NSString *)containerPath error:(NSError **)error {
+    [MoppLibDigidocManager removeSignature:containerPath error:error];
 }
 
 - (NSString *)moppLibVersion {

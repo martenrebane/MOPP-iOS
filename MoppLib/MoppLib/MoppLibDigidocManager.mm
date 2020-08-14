@@ -345,7 +345,7 @@ static std::string profile = "time-stamp";
     return currentSignature;
 }
 
-+ (BOOL)isSignatureValid:(NSString *)cert signatureValue:(NSString *)signatureValue {
++ (BOOL)isSignatureValid:(NSString *)cert signatureValue:(NSString *)signatureValue error:(NSError **)error {
     std::string calculatedSignatureBase64 = std::string(base64_decode(signatureValue.UTF8String));
     
     std::vector<unsigned char> vec;
@@ -381,17 +381,25 @@ static std::string profile = "time-stamp";
         currentContainer->save();
         NSLog(@"\nSignature validated at %s!\n", currentSignature->TimeStampTime().c_str());
         
-        return true;
+        return YES;
     } catch(const digidoc::Exception &e) {
         parseException(e);
-        NSError *error;
-        [self removeSignature:docContainerPath signatureId:signatureId error:&error];
+        NSError *signatureError;
+        [self removeSignature:docContainerPath error:&signatureError];
         NSLog(@"\nError validating signature: %s\n", e.msg().c_str());
-        return false;
+        NSString *errorDesc = [NSString stringWithCString:e.msg().c_str() encoding:[NSString defaultCStringEncoding]];
+        if (e.code() == 18) {
+            NSDictionary *errorDict = @{ @"errorCode": @"TSTooManyRequests", @"errorReason": errorDesc };
+            *error = [NSError errorWithDomain:errorDesc code:18 userInfo:errorDict];
+            return nil;
+        } else {
+            *error = [NSError errorWithDomain:errorDesc code:e.code() userInfo:nil];
+            return NO;
+        }   
     }
 }
 
-+ (void)removeSignature:(NSString *)containerPath signatureId:(NSString *)signatureId error:(NSError **)error {
++ (void)removeSignature:(NSString *)containerPath error:(NSError **)error {
     digidoc::Container *doc = digidoc::Container::open(containerPath.UTF8String);
     
     for (int i = 0; i < doc->signatures().size(); i++) {

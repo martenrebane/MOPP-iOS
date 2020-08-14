@@ -55,9 +55,9 @@ class TokenFlowSelectionViewController : MoppViewController {
         }
     }
 
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
+//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+//        return .portrait
+//    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -75,14 +75,14 @@ class TokenFlowSelectionViewController : MoppViewController {
             self.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         }
         
-        centerViewCenterCSTR.priority = .defaultLow
-        centerViewOutofscreenCSTR.priority = .defaultHigh
+//        centerViewCenterCSTR.priority = .defaultLow
+//        centerViewOutofscreenCSTR.priority = .defaultHigh
         
         view.layoutIfNeeded()
         
         UIView.animate(withDuration: 0.35, delay: 0.0, options: .curveEaseOut, animations: {
-            self.centerViewCenterCSTR.priority = .defaultHigh
-            self.centerViewOutofscreenCSTR.priority = .defaultLow
+//            self.centerViewCenterCSTR.priority = .defaultHigh
+//            self.centerViewOutofscreenCSTR.priority = .defaultLow
             self.view.layoutIfNeeded()
         }) { _ in
             

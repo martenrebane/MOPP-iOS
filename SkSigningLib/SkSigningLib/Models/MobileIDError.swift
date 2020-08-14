@@ -39,6 +39,7 @@ public enum MobileIDError: String, Error {
     case parameterNameNull
     case userAuthorizationFailed
     case methodNotAllowed
+    case forbidden
     case internalError
     case hashLengthInvalid
     case hashEncodingInvalid
@@ -76,6 +77,8 @@ extension MobileIDError: LocalizedError {
             return NSLocalizedString("Failed to authorize user", comment: "")
         case .methodNotAllowed:
             return NSLocalizedString("Method not allowed", comment: "")
+        case .forbidden:
+            return NSLocalizedString("Forbidden", comment: "")
         case .internalError:
             return NSLocalizedString("Internal Server Error", comment: "")
         case .hashLengthInvalid:

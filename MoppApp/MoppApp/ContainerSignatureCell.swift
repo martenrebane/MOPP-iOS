@@ -104,6 +104,7 @@ class ContainerSignatureCell: UITableViewCell {
         }
         
         signatureStatusLabel.attributedText = signatureStatus
+        signatureStatusLabel.accessibilityLabel = "\(L(.containerSignatureStatusValid)) \(L(.containerSignatureTestSignatureTitle))"
         checkSignatureValidity(signature: signature)
         
         iconImageView.image = kind == .signature ?
@@ -145,7 +146,7 @@ class ContainerSignatureCell: UITableViewCell {
     private func showTestSignatureLabel() {
         testSignatureLabel.layer.zPosition = 999;
         testSignatureLabel.isHidden = false
-        testSignatureLabel.text = L(LocKey.conatinerSignatureTestSignatureTitle)
+        testSignatureLabel.text = L(LocKey.containerSignatureTestSignatureTitle)
         testSignatureLabel.textColor = .black
         testSignatureLabel.layer.masksToBounds = true
         testSignatureLabel.layer.cornerRadius = 4

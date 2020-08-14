@@ -367,6 +367,12 @@ class IdCardViewController : MoppViewController {
                         self?.pinAttemptsLeft = (nsError.userInfo[kMoppLibUserInfoRetryCount] as? NSNumber)?.uintValue ?? 0
                         self?.state = .wrongPin
                     }
+                } else if nsError.code == Int(MoppLibErrorCode.moppLibErrorNoInternetConnection.rawValue) {
+                    DispatchQueue.main.async {
+                        self?.dismiss(animated: false, completion: {
+                            self?.signDelegate?.idCardSignDidFinished(cancelled: false, success: false, error: nsError)
+                        })
+                    }
                 } else {
                     DispatchQueue.main.async {
                         self?.dismiss(animated: false, completion: {

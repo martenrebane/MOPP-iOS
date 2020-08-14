@@ -25,12 +25,12 @@ import Foundation
 import SkSigningLib
 
 class MobileIDSignature {
-    
+
     static let shared: MobileIDSignature = MobileIDSignature()
-    
+
     // MARK: Creating Mobile ID signature
     func createMobileIDSignature(baseUrl: String, phoneNumber: String, nationalIdentityNumber: String, containerPath: String, hashType: String, language: String) -> Void {
-        
+
         if isUsingTestMode() {
             NSLog("\nUsing phone number: \(phoneNumber.prefix(7))xxxx\n")
             NSLog("\nUsing national identity number: \(nationalIdentityNumber.prefix(6))xxxxx\n")
@@ -55,100 +55,114 @@ class MobileIDSignature {
         // MARK: Get certificate
         NSLog("\nGetting certificate...\n")
         SessionCertificate.shared.getCertificate(baseUrl: baseUrl, phoneNumber: phoneNumber, nationalIdentityNumber: nationalIdentityNumber, trustedCertificates: trustedCertificates) { (sessionCertificate: Result<CertificateResponse, MobileIDError>) in
-            
+
             let certificateResponse: CertificateResponse
-            
+
             do {
                 certificateResponse = try sessionCertificate.getResult()
-                
+
                 NSLog("\nReceived certificate (result): \((certificateResponse.result?.rawValue ?? "Unable to log certificate response result"))\n")
             } catch let certificateError {
-                
+
                 let error: Error = certificateError as? MobileIDError ?? certificateError
-                
+
                 NSLog("\nCertificate error: \((MobileIDError(rawValue: "\(certificateError)")?.mobileIDErrorDescription ?? "\(certificateError)"))\n")
-                
+
                 guard let mobileCertificateError = certificateError as? MobileIDError else {
                     return self.generateError(mobileIDError: certificateError as? MobileIDError ?? MobileIDError(rawValue: "\(certificateError)") ?? .generalError)
                 }
-                
+
                 if self.isCountryCodeError(phoneNumber: phoneNumber, errorDesc: "\(mobileCertificateError)") {
                     NSLog("\nError checking country code\n")
                     return self.generateError(mobileIDError: .parameterNameNull)
                 }
-                
+
                 if let errorObj = error as? MobileIDError {
                     return self.generateError(mobileIDError: errorObj)
                 }
                 return self.errorResult(error: error)
             }
-            
+
             guard let cert = certificateResponse.cert else {
                 return self.generateError(mobileIDError: .generalError)
             }
-            
+
             // MARK: Get hash
             guard let hash: String = self.getHash(cert: cert, containerPath: containerPath) else {
                 NSLog("\nError getting hash. Is 'cert' empty: \(cert.isEmpty). ContainerPath: \(containerPath)\n")
+                self.removeSignature(containerPath: containerPath)
                 return self.generateError(mobileIDError: .generalError)
             }
-            
+
             NSLog("\nHash: \(hash)\n")
-            
+
             // MARK: Get control / verification code
             NSLog("\nGetting control code\n")
             self.setupControlCode()
 
-            completionHandler(hash, cert)
-        }
-    }
+            // MARK: Get session
+            NSLog("\nGetting session...\n")
+            Session.shared.getSession(baseUrl: baseUrl, phoneNumber: phoneNumber, nationalIdentityNumber: nationalIdentityNumber, hash: hash, hashType: hashType, language: language) { (sessionResult: Result<SessionResponse, MobileIDError>) in
 
-    private func getSession(baseUrl: String, phoneNumber: String, nationalIdentityNumber: String, hash: String, hashType: String, language: String, trustedCertificates: [String]?, completionHandler: @escaping (String) -> Void) {
-        // MARK: Get session
-        NSLog("\nGetting session...\n")
-        Session.shared.getSession(baseUrl: baseUrl, phoneNumber: phoneNumber, nationalIdentityNumber: nationalIdentityNumber, hash: hash, hashType: hashType, language: language, trustedCertificates: trustedCertificates) { (sessionResult: Result<SessionResponse, MobileIDError>) in
+                let sessionResponse: SessionResponse
 
-            let sessionResponse: SessionResponse
+                do {
+                    sessionResponse = try sessionResult.getResult()
 
-            do {
-                sessionResponse = try sessionResult.getResult()
-
-                NSLog("\nReceived session (session ID redacted): \(sessionResponse.sessionID?.prefix(13) ?? "Unable to log sessionID")\n")
-            } catch let sessionError {
-                let error: Error = sessionError as? MobileIDError ?? sessionError
-                if let errorObj = error as? MobileIDError {
-                    return self.generateError(mobileIDError: errorObj)
+                    NSLog("\nReceived session (session ID redacted): \(sessionResponse.sessionID?.prefix(13) ?? "Unable to log sessionID")\n")
+                } catch let sessionError {
+                    let error: Error = sessionError as? MobileIDError ?? sessionError
+                    self.removeSignature(containerPath: containerPath)
+                    if let errorObj = error as? MobileIDError {
+                        return self.generateError(mobileIDError: errorObj)
+                    }
+                    return self.errorResult(error: error)
                 }
-                return self.errorResult(error: error)
-            }
 
-            guard let sessionId = sessionResponse.sessionID else {
-                NSLog("\nUnable to get sessionID\n")
+                guard let sessionId = sessionResponse.sessionID else {
+                    NSLog("\nUnable to get sessionID\n")
 
-                return self.generateError(mobileIDError: .generalError)
-            }
+                    self.removeSignature(containerPath: containerPath)
 
-            completionHandler(sessionId)
-        }
-    }
+                    return self.generateError(mobileIDError: .generalError)
+                }
 
-    private func getSessionStatus(baseUrl: String, sessionId: String, cert: String, trustedCertificates: [String]?, completionHandler: @escaping (String) -> Void) {
-        // MARK: Get session status
-        NSLog("\nGetting session status...\n")
-        SessionStatus.shared.getSessionStatus(baseUrl: baseUrl, process: .SIGNING, sessionId: sessionId, timeoutMs: 1000, trustedCertificates: trustedCertificates) { (sessionStatusResult: Result<SessionStatusResponse, MobileIDError>) in
+                // MARK: Get session status
+                NSLog("\nGetting session status...\n")
+                SessionStatus.shared.getSessionStatus(baseUrl: baseUrl, process: .SIGNING, sessionId: sessionId, timeoutMs: 1000) { (sessionStatusResult: Result<SessionStatusResponse, MobileIDError>) in
 
-            let sessionStatus: SessionStatusResponse
+                    let sessionStatus: SessionStatusResponse
 
-            do {
-                sessionStatus = try sessionStatusResult.getResult()
+                    do {
+                        sessionStatus = try sessionStatusResult.getResult()
 
-                NSLog("\nReceived session status: \(sessionStatus.result?.rawValue ?? "Unable to log session status result")\n")
+                        NSLog("\nReceived session status: \(sessionStatus.result?.rawValue ?? "Unable to log session status result")\n")
 
-                if sessionStatus.result != SessionResultCode.OK {
-                    guard let sessionStatusResultString = sessionStatus.result else { return }
-                    NSLog("\nError completing signing: \(self.handleSessionStatusError(sessionResultCode: sessionStatusResultString).mobileIDErrorDescription ?? "Unable to log session status description")\n")
+                        if sessionStatus.result != SessionResultCode.OK {
+                            guard let sessionStatusResultString = sessionStatus.result else { return }
+                            NSLog("\nError completing signing: \(self.handleSessionStatusError(sessionResultCode: sessionStatusResultString).mobileIDErrorDescription ?? "Unable to log session status description")\n")
 
-                    return self.generateError(mobileIDError: self.handleSessionStatusError(sessionResultCode: sessionStatusResultString))
+                            self.removeSignature(containerPath: containerPath)
+
+                            return self.generateError(mobileIDError: self.handleSessionStatusError(sessionResultCode: sessionStatusResultString))
+                        }
+                    } catch let sessionStatusError {
+                        NSLog("\nUnable to get session status: \(sessionStatusError)\n")
+                        self.removeSignature(containerPath: containerPath)
+                        return self.errorResult(error: sessionStatusError)
+                    }
+
+                    guard let signatureValue = sessionStatus.signature?.value else {
+                        NSLog("\nUnable to get signature value\n")
+                        self.removeSignature(containerPath: containerPath)
+                        return self.generateError(mobileIDError: .generalError)
+                    }
+
+                    // MARK: Validate signature
+                    DispatchQueue.main.async {
+                        NSLog("\nValidating signature...\n")
+                        return self.validateSignature(cert: cert, signatureValue: signatureValue)
+                    }
                 }
             } catch let sessionStatusError {
                 NSLog("\nUnable to get session status: \(sessionStatusError)\n")
@@ -163,16 +177,16 @@ class MobileIDSignature {
             completionHandler(signatureValue)
         }
     }
-    
+
     // MARK: Check country code
     private func isCountryCodeError(phoneNumber: String, errorDesc: String) -> Bool {
         return phoneNumber.count <= 8 && MobileIDError.notFound == MobileIDError(rawValue: errorDesc) ? true : false
     }
-    
+
     // MARK: Signature validation
     private func validateSignature(cert: String, signatureValue: String) -> Void {
-        NSLog("\nValidating signature...\n")
-        if MoppLibManager.isSignatureValid(cert, signatureValue: signatureValue) {
+        do {
+            try MoppLibManager.isSignatureValid(cert, signatureValue: signatureValue)
             NSLog("\nSuccessfully validated signature!\n")
             DispatchQueue.main.async {
                 NotificationCenter.default.post(
@@ -180,20 +194,27 @@ class MobileIDSignature {
                     object: nil,
                     userInfo: nil)
             }
-        }
-        else {
-            NSLog("\nError validating signature\n")
-            generateError(mobileIDError: .generalError)
+        } catch let error as NSError? {
+            print(error ?? "")
+            guard let errorCode: String = error?.userInfo["errorCode"] as? String else { NSLog("\nError validating signature: \(error?.localizedDescription ?? "")\n"); return generateError(mobileIDError: .generalError) }
+            if errorCode == "TSTooManyRequests" {
+                guard let errorReason = error?.userInfo["errorReason"] else { NSLog("\nError validating signature: \(error?.localizedDescription ?? "")\n"); return generateError(mobileIDError: .tooManyRequests) }
+                NSLog("\nError validating signature. \(errorReason) \n")
+                generateError(mobileIDError: .tooManyRequests)
+            } else {
+                NSLog("\nError validating signature\n")
+                generateError(mobileIDError: .generalError)
+            }
         }
     }
-    
+
     // MARK: Control / verification code setup
     private func setupControlCode() {
         guard let verificationCode = self.getVerificationCode() else {
             NSLog("\nFailed to get verification code\n")
             return self.generateError(mobileIDError: .generalError)
         }
-        
+
         DispatchQueue.main.async {
             let response: MoppLibMobileCreateSignatureResponse = MoppLibMobileCreateSignatureResponse()
             response.challengeId = verificationCode
@@ -206,13 +227,13 @@ class MobileIDSignature {
             }
         }
     }
-    
+
     // MARK: Error generating
     private func generateError(mobileIDError: MobileIDError) -> Void {
         let error = NSError(domain: "SkSigningLib", code: 10, userInfo: [NSLocalizedDescriptionKey: mobileIDError])
         return self.errorResult(error: error)
     }
-    
+
     // MARK: Get hash
     private func getHash(cert: String, containerPath: String) -> String? {
         guard let hash: String = MoppLibManager.prepareSignature(cert, containerPath: containerPath) else {
@@ -220,10 +241,10 @@ class MobileIDSignature {
             self.generateError(mobileIDError: .generalError)
             return nil
         }
-        
+
         return hash
     }
-    
+
     // MARK: Get verification code
     private func getVerificationCode() -> String? {
         guard let verificationCode: String = ControlCode.shared.getVerificationCode(hash: MoppLibManager.getDataToSign() as! Array<Int>) else {
@@ -232,14 +253,20 @@ class MobileIDSignature {
         }
         return verificationCode
     }
-    
+
+    // MARK: Remove signature
+    private func removeSignature(containerPath: String) -> Void {
+        let error: NSErrorPointer = nil
+        MoppLibManager.removeSignature(containerPath, error: error)
+    }
+
     // MARK: Submit error result
     private func errorResult(error: Error) -> Void {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .errorNotificationName, object: nil, userInfo: [kErrorKey: error])
         }
     }
-    
+
     // MARK: Handle session status error
     private func handleSessionStatusError(sessionResultCode: SessionResultCode) -> MobileIDError {
         switch sessionResultCode {
@@ -261,7 +288,7 @@ class MobileIDSignature {
             return .generalError
         }
     }
-    
+
     // MARK: Test mode check
     private func isUsingTestMode() -> Bool {
         #if USE_TEST_DDS
@@ -269,7 +296,7 @@ class MobileIDSignature {
         #else
             let testMode: Bool = false
         #endif
-        
+
         return testMode
     }
 }

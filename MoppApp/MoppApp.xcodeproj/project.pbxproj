@@ -1245,7 +1245,7 @@
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = ET847QJV9F;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -1260,7 +1260,7 @@
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = ET847QJV9F;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -1586,7 +1586,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Initializing default MOPP configuration setup script: \"\n\nconfigUrl=${DEFAULT_CENTRAL_CONFIGURATION_URL}\nupdateInterval=${DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL}\ntslUrl=${DEFAULT_CENTRAL_CONFIGURATION_TSL_URL}\n\n\nif [ -z \"$configUrl\" ] || [ -z \"$updateInterval\" ] || [ -z \"$tslUrl\" ]; then\n    echo \"No user-defined variables, continuing...\";\nelse\n    # Detect if Homebrew is installed\n    which -s /usr/local/bin/brew\n    if [[ $? != 0 ]] ; then\n        # Install Homebrew\n        ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"\n    else\n        echo \"Brew is already installed\"\n    fi\n\n    # Detect if Swift-sh is installed\n    if /usr/local/bin/brew ls --versions swift-sh > /dev/null; then\n        echo \"Swift-sh is already installed\"\n    else\n        # Install Swift-sh\n        /usr/local/bin/brew install mxcl/made/swift-sh\n    fi\n\n    # Run script with Swift-sh\n    /usr/local/Cellar/swift-sh/*/bin/swift-sh SetupConfiguration/Sources/main.swift ${DEFAULT_CENTRAL_CONFIGURATION_URL} ${DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL} ${DEFAULT_CENTRAL_CONFIGURATION_TSL_URL}\nfi\n";
+			shellScript = "echo \"Initializing default MOPP configuration setup script: \"\n\nconfigUrl=${DEFAULT_CENTRAL_CONFIGURATION_URL}\nupdateInterval=${DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL}\ntslUrl=${DEFAULT_CENTRAL_CONFIGURATION_TSL_URL}\n\n\nif [ -z \"$configUrl\" ] || [ -z \"$updateInterval\" ] || [ -z \"$tslUrl\" ]; then\n    echo \"No user-defined variables, continuing...\";\nelse\n    # Detect if Homebrew is installed\n    which -s /usr/local/bin/brew\n    if [[ $? != 0 ]] ; then\n        # Install Homebrew\n        ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"\n    else\n        echo \"Brew is already installed\"\n    fi\n\n    # Detect if Swift-sh is installed\n    if /usr/local/bin/brew ls --versions swift-sh > /dev/null; then\n        echo \"Swift-sh is already installed\"\n    else\n        # Install Swift-sh\n        /usr/local/bin/brew install mxcl/made/swift-sh\n    fi\n\n    # Run script with Swift-sh\n    # /usr/local/Cellar/swift-sh/*/bin/swift-sh SetupConfiguration/Sources/main.swift ${DEFAULT_CENTRAL_CONFIGURATION_URL} ${DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL} ${DEFAULT_CENTRAL_CONFIGURATION_TSL_URL}\nfi\n";
 		};
 		E4250D1B1E0AB34400530370 /* Set GH build number to plist */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1898,7 +1898,7 @@
 				CODE_SIGN_ENTITLEMENTS = shareExtension/shareExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ET847QJV9F;
 				INFOPLIST_FILE = shareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
@@ -2121,7 +2121,7 @@
 				CODE_SIGN_ENTITLEMENTS = MoppApp/MoppApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_ACTIVITY_MODE = "";
 				"DEBUG_ACTIVITY_MODE[sdk=iphonesimulator*]" = disable;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";

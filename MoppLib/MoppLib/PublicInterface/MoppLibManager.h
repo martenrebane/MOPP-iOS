@@ -50,7 +50,8 @@ typedef NS_ENUM(NSUInteger, EIDType) {
 
 + (NSString *)prepareSignature:(NSString *)cert containerPath:(NSString *)containerPath;
 + (NSArray *)getDataToSign;
-+ (BOOL)isSignatureValid:(NSString *)cert signatureValue:(NSString *)signatureValue;
++ (BOOL)isSignatureValid:(NSString *)cert signatureValue:(NSString *)signatureValue error:(NSError **)error;
++ (void)removeSignature:(NSString *)containerPath error:(NSError **)error;
 
 - (NSString *)moppLibVersion;
 - (NSString *)libdigidocppVersion;

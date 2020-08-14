@@ -90,11 +90,13 @@ enum LocKey : String
     case containerSignatureStatusNonQscd = "container-signature-status-non-qscd";
     case containerSignatureStatusInvalid = "container-signature-status-invalid";
     case containerSignatureStatusUnknown = "container-signature-status-unknown";
-    case conatinerSignatureTestSignatureTitle = "container-signature-test-signature-title";
+    case containerSignatureTestSignatureTitle = "container-signature-test-signature-title";
     case containerTimestampInvalid = "container-timestamp-invalid";
     case challengeCodeLabel = "challenge-code-label"
     case mobileIdTimeoutMessage = "mobile-id-timeout-message"
     case errorAlertTitleGeneral = "error-alert-title-general"
+    case errorAlertOpenLink = "error-alert-open-link"
+    case errorAlertNoInternetConnection = "error-alert-no-internet-connection"
     case signatureRemoveConfirmMessage = "signature-remove-confirm-message"
     case datafileRemoveConfirmMessage = "datafile-remove-confirm-message"
     case mobileIdTitle = "mobile-id-title"

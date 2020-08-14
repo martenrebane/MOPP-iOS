@@ -140,6 +140,8 @@ public class RequestSignature: NSObject, URLSessionDelegate, CertificateRequest 
             return .parameterNameNull
         case 401:
             return .userAuthorizationFailed
+        case 403:
+            return .forbidden
         case 405:
             return .methodNotAllowed
         case 429:

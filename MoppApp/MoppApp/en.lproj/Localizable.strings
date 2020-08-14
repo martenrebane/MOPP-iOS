@@ -134,6 +134,8 @@
 // *** Errors ***
 "mobile-id-timeout-message" = "Mobile-ID request timeout";
 "error-alert-title-general" = "Failure";
+"error-alert-open-link" = "Additional information";
+"error-alert-no-internet-connection" = "Please check your internet connection";
 
 // *** Share Extension ***
 "share-extension-import-title" = "Importing file";

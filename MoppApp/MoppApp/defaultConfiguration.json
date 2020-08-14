@@ -1,0 +1,7 @@
+{
+    "centralConfigurationServiceUrl": "http://repo.ria/config",
+    "updateInterval": 7,
+    "updateDate": "2020-04-01 13:05:23 +0000",
+    "versionSerial": 128,
+    "tslUrl": "http://repo.ria/tsl/trusted-test-mp.xml"
+}

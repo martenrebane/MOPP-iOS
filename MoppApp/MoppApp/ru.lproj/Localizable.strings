@@ -134,6 +134,8 @@
 // *** Errors ***
 "mobile-id-timeout-message" = "Тайм-аут запроса Mobiil-ID";
 "error-alert-title-general" = "Отказ";
+"error-alert-open-link" = "Дополнительная информация";
+"error-alert-no-internet-connection" = "Пожалуйста проверьте подключение к интернету";
 
 // *** Share Extension ***
 "share-extension-import-title" = "Импорт файла";

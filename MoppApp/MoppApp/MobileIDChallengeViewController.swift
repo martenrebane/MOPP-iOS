@@ -104,11 +104,15 @@ class MobileIDChallengeViewController : UIViewController {
     
         codeLabel.isHidden = false
         titleLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-ok")
+        titleLabel.isAccessibilityElement = false
         codeLabel.text = L(LocKey.challengeCodeLabel, [challengeID])
         
         let challengeIdNumbers = Array<Character>(challengeID)
         codeLabel.accessibilityLabel = L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3])"])
         currentProgress = 0.0
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, codeLabel)
+        
+        titleLabel.isAccessibilityElement = true
         
         sessionTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateSessionProgress), userInfo: nil, repeats: true)
     }
