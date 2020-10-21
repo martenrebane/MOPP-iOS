@@ -343,6 +343,8 @@
 		DF3D299D23F5ADB7007181B8 /* MimeTypeExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3D299C23F5ADB7007181B8 /* MimeTypeExtractor.swift */; };
 		DF3D29CF23F6B3CF007181B8 /* SkSigningLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF3D29CE23F6B3CF007181B8 /* SkSigningLib.framework */; };
 		DF3D29D023F6B3CF007181B8 /* SkSigningLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DF3D29CE23F6B3CF007181B8 /* SkSigningLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DF63338D25409989005A1E74 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DF63338C25409988005A1E74 /* GoogleService-Info.plist */; };
+		DF63338E25409989005A1E74 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DF63338C25409988005A1E74 /* GoogleService-Info.plist */; };
 		DF900C972386768F00887385 /* tslFiles.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DF900C94238567CA00887385 /* tslFiles.bundle */; };
 		DFBEF9452434DD0C007A6762 /* UIAlertAction+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBEF9442434DD0C007A6762 /* UIAlertAction+Additions.swift */; };
 		DFBF242E23DB0923008DD8D0 /* LOTLDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBF242C23DB0923008DD8D0 /* LOTLDecoder.swift */; };
@@ -627,6 +629,7 @@
 		DF0075C123324AC600BAB3DE /* MoppConfigurationDecoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoppConfigurationDecoder.swift; sourceTree = "<group>"; };
 		DF3D299C23F5ADB7007181B8 /* MimeTypeExtractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MimeTypeExtractor.swift; sourceTree = "<group>"; };
 		DF3D29CE23F6B3CF007181B8 /* SkSigningLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SkSigningLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF63338C25409988005A1E74 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DF900C94238567CA00887385 /* tslFiles.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = tslFiles.bundle; sourceTree = "<group>"; };
 		DFBEF9442434DD0C007A6762 /* UIAlertAction+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertAction+Additions.swift"; sourceTree = "<group>"; };
 		DFBF242C23DB0923008DD8D0 /* LOTLDecoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LOTLDecoder.swift; sourceTree = "<group>"; };
@@ -1031,6 +1034,7 @@
 			children = (
 				DFF3C3B92332355C0079458A /* config.json */,
 				DFF3C3BB2332355D0079458A /* defaultConfiguration.json */,
+				DF63338C25409988005A1E74 /* GoogleService-Info.plist */,
 				DFF3C3B82332355C0079458A /* publicKey.pub */,
 				DFF3C3BA2332355C0079458A /* signature.rsa */,
 				C5F974E4217733CB00A167C7 /* MoppAppTestEnv.entitlements */,
@@ -1351,6 +1355,7 @@
 				C5EA71612176057A00440F4A /* Roboto-BoldCondensedItalic.ttf in Resources */,
 				C5EA71622176057A00440F4A /* Settings.storyboard in Resources */,
 				C5EA71632176057A00440F4A /* main_about_fonds_en.png in Resources */,
+				DF63338E25409989005A1E74 /* GoogleService-Info.plist in Resources */,
 				C5EA71642176057A00440F4A /* about_ru.html in Resources */,
 				C5EA71652176057A00440F4A /* about_en.html in Resources */,
 				C5EA71662176057A00440F4A /* RobotoCondensed-Regular.ttf in Resources */,
@@ -1402,6 +1407,7 @@
 				C50DCCEF1FC5741900D48E16 /* Roboto-MediumItalic.ttf in Resources */,
 				C50DCCF11FC5741900D48E16 /* RobotoCondensed-LightItalic.ttf in Resources */,
 				C50DCCEA1FC5741900D48E16 /* Roboto-Thin.ttf in Resources */,
+				DF63338D25409989005A1E74 /* GoogleService-Info.plist in Resources */,
 				C55BB1E02091FECD00618AC4 /* licenses.html in Resources */,
 				E4C53F371E2FAE6C00F209BE /* image.jpg in Resources */,
 				E43BD8111E3A121A00F6C39D /* ddocTest.ddoc in Resources */,

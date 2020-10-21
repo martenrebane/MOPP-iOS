@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>616277844521-7j0c4s1052t4lkq6jujarueqo2v6tlpu.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.616277844521-7j0c4s1052t4lkq6jujarueqo2v6tlpu</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDLy7PbOo77ntv8Q_ztAEoq3U9TcmkcrVo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>616277844521</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>ee.ria.digidoc</string>
+	<key>PROJECT_ID</key>
+	<string>ria-digidoc-95e73</string>
+	<key>STORAGE_BUCKET</key>
+	<string>ria-digidoc-95e73.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:616277844521:ios:8a2efcaf0d670d1ac03238</string>
+	<key>DATABASE_URL</key>
+	<string>https://ria-digidoc-95e73.firebaseio.com</string>
+</dict>
+</plist>
