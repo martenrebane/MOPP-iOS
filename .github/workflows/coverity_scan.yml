@@ -11,6 +11,7 @@ jobs:
       - name: Build and send to Coverity
         continue-on-error: true
         run: |
+          export TRAVIS_BRANCH=${GITHUB_REF##*/}
           chmod +x script.sh
           bash script.sh
         env:
