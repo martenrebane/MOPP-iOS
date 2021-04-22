@@ -15,10 +15,8 @@ jobs:
       - name: Build and send to Coverity
         continue-on-error: true
         run: |
-          export TRAVIS_BRANCH=${GITHUB_REF##*/}
-          wget https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh
-          chmod +x travisci_build_coverity_scan.sh
-          bash travisci_build_coverity_scan.sh
+          chmod +x script.sh
+          bash script.sh
         env:
           COVERITY_SCAN_PROJECT_NAME: 'martenrebane/MOPP-iOS'
           COVERITY_SCAN_NOTIFICATION_EMAIL: 'marten.rebane@nortal.com'
