@@ -10,7 +10,11 @@ jobs:
     if: contains(github.repository, 'martenrebane/MOPP-iOS') && contains(github.ref, 'master')
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - name: Download Swift 5.2
+        run: wget -q https://swift.org/builds/swift-5.2-release/ubuntu1804/swift-5.2-RELEASE/swift-5.2-RELEASE-ubuntu18.04.tar.gz
+      - name: Extract Swift 5.2
+        run: tar xzf swift-5.2-RELEASE-ubuntu18.04.tar.gz
       - name: Build and send to Coverity
         continue-on-error: true
         run: |
