@@ -59,8 +59,12 @@ if [ ! -d $TOOL_BASE ]; then
   echo -e "\033[33;1mExtracting Coverity Scan Analysis Tool...\033[0m"
   mkdir -p $TOOL_BASE
   pushd $TOOL_BASE
+  echo "TOOL_URL: "
+  echo $TOOL_URL
+  echo "COVERITY_SCAN_PROJECT_NAME: "
+  echo $COVERITY_SCAN_PROJECT_NAME
   echo "CONTENTS: "
-  echo ls -R
+  ls -R
   echo "TOOL_ARCHIVE: "
   echo $TOOL_ARCHIVE
   tar xzf $TOOL_ARCHIVE
