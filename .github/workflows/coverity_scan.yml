@@ -1,0 +1,23 @@
+name: Coverity scan
+
+on: [push, pull_request]
+jobs:
+  coverity:
+    name: Run Coverity tests
+    if: contains(github.repository, 'martenrebane/MOPP-iOS') && contains(github.ref, 'master')
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build and send to Coverity
+        continue-on-error: true
+        run: |
+          export TRAVIS_BRANCH=${GITHUB_REF##*/}
+          wget https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh
+          chmod +x travisci_build_coverity_scan.sh
+          bash travisci_build_coverity_scan.sh
+        env:
+          COVERITY_SCAN_PROJECT_NAME: 'martenrebane/MOPP-iOS'
+          COVERITY_SCAN_NOTIFICATION_EMAIL: 'marten.rebane@nortal.com'
+          COVERITY_SCAN_BRANCH_PATTERN: 'master'
+          COVERITY_SCAN_BUILD_COMMAND: 'xcodebuild build -workspace MoppApp.xcworkspace -scheme MoppApp'
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
