@@ -3,9 +3,6 @@ name: Coverity scan
 on: [push, pull_request]
 jobs:
   coverity:
-    include:
-        os: osx
-        osx_image: xcode12.2
     name: Run Coverity tests
     if: contains(github.repository, 'martenrebane/MOPP-iOS') && contains(github.ref, 'master')
     runs-on: macOS-latest
