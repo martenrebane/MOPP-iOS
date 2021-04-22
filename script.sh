@@ -24,6 +24,7 @@ if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
 fi
 
 # Verify this branch should run
+echo `'${TRAVIS_BRANCH}'`
 IS_COVERITY_SCAN_BRANCH=`ruby -e "puts '${TRAVIS_BRANCH}' =~ /\\A$COVERITY_SCAN_BRANCH_PATTERN\\z/ ? 1 : 0"`
 if [ "$IS_COVERITY_SCAN_BRANCH" = "1" ]; then
   echo -e "\033[33;1mCoverity Scan configured to run on branch ${TRAVIS_BRANCH}\033[0m"
