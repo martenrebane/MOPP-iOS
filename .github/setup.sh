@@ -31,3 +31,10 @@ echo $COVERITY_SCAN_KEY | gpg --import-ownertrust
 echo "Decrypting tool..."
 gpg --output $COVERITY_TOOL_NAME.sh --decrypt $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
 chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
+
+
+#Test
+
+COV_A=`find $COVERITY_TOOL_DIR -type d -name 'cov-analysis*'`
+
+echo $COV_A
