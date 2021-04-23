@@ -37,3 +37,5 @@ export PATH=$COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME/bin:$PATH
 
 echo "PATH: "
 echo $PATH
+
+cov-build xcodebuild build -workspace MoppApp.xcworkspace -scheme MoppApp
