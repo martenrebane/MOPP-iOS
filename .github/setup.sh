@@ -11,7 +11,7 @@ set -e
 # Create folder
 echo "Creating folder..."
 COVERITY_TOOL_DIR=/tmp/coverity-scan-analysis
-COVERITY_TOOL_NAME=cov-analysis_macosx
+COVERITY_TOOL_NAME=cov-analysis
 COVERITY_TOOL_KEY_NAME=scan_gpg.key
 mkdir $COVERITY_TOOL_DIR
 COVERITY_TOOL_URL=https://scan.coverity.com/download/Darwin
@@ -30,7 +30,8 @@ echo "Import ownertrust..."
 echo $COVERITY_SCAN_KEY | gpg --import-ownertrust
 echo "Decrypting tool..."
 gpg --output $COVERITY_TOOL_NAME.sh --decrypt $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
-chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
+chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME.sh
+bash $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME.sh
 
 
 #Test
