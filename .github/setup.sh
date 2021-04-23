@@ -11,7 +11,7 @@ set -e
 # Create folder
 echo "Creating folder..."
 COVERITY_TOOL_DIR=/tmp/coverity-scan-analysis
-COVERITY_TOOL_NAME=coverity_macosx
+COVERITY_TOOL_NAME=cov-analysis_macosx
 COVERITY_TOOL_KEY_NAME=scan_gpg.key
 mkdir $COVERITY_TOOL_DIR
 COVERITY_TOOL_URL=https://scan.coverity.com/download/Darwin
@@ -34,6 +34,8 @@ chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
 
 
 #Test
+
+ls -R $COVERITY_TOOL_DIR
 
 COV_A=`find $COVERITY_TOOL_DIR -type d -name 'cov-analysis*'`
 
