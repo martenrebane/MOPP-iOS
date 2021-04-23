@@ -5,10 +5,10 @@ jobs:
   coverity:
     name: Run Coverity tests
     if: contains(github.repository, 'martenrebane/MOPP-iOS') && contains(github.ref, 'master')
-    runs-on: ubuntu-18.04
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Swift 4.2
+      - name: Setup Coverity tool
         run: |
           chmod +x ./.github/setup.sh
           bash ./.github/setup.sh
@@ -16,6 +16,7 @@ jobs:
           COVERITY_SCAN_PROJECT_NAME: 'martenrebane/MOPP-iOS'
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
           COVERITY_SCAN_KEY: ${{ secrets.COVERITY_SCAN_KEY }}
+          COVERITY_SCAN_GPG_KEY: ${{ secrets.COVERITY_SCAN_GPG_KEY }}
       - name: Build and send to Coverity
         continue-on-error: true
         run: |
@@ -27,5 +28,5 @@ jobs:
           COVERITY_SCAN_PROJECT_NAME: 'martenrebane/MOPP-iOS'
           COVERITY_SCAN_NOTIFICATION_EMAIL: 'marten.rebane@nortal.com'
           COVERITY_SCAN_BRANCH_PATTERN: 'master'
-          COVERITY_SCAN_BUILD_COMMAND: 'swift build'
+          COVERITY_SCAN_BUILD_COMMAND: 'xcodebuild build -workspace MoppApp.xcworkspace -scheme MoppApp'
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
