@@ -11,16 +11,21 @@ set -e
 echo "Creating folder..."
 COVERITY_TOOL_DIR=/tmp/coverity-scan-analysis
 COVERITY_TOOL_NAME=coverity_macosx
+COVERITY_TOOL_KEY_NAME=scan_gpg.key
 mkdir $COVERITY_TOOL_DIR
 COVERITY_TOOL_URL=https://scan.coverity.com/download/Darwin
 COVERITY_TOOL_KEY_URL=https://scan.coverity.com/download/key
 
 echo "Downloading key..."
-wget -nv -O $COVERITY_TOOL_DIR $COVERITY_TOOL_KEY_URL
+wget -nv -O $COVERITY_TOOL_DIR/$COVERITY_TOOL_KEY_NAME $COVERITY_TOOL_KEY_URL
 
 echo "Downloading tool..."
 wget -nv -O $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME $COVERITY_TOOL_URL --post-data "project=$COVERITY_SCAN_PROJECT_NAME&token=$COVERITY_SCAN_TOKEN"
 
+echo "Import key..."
+gpg --import $COVERITY_TOOL_KEY_NAME
+echo "Import ownertrust..."
 echo $COVERITY_SCAN_KEY | gpg --import-ownertrust
+echo "Decrypting tool..."
 gpg --output $COVERITY_TOOL_NAME.sh --decrypt $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
 chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
