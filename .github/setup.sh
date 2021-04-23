@@ -18,7 +18,8 @@ COVERITY_TOOL_URL=https://scan.coverity.com/download/Darwin
 COVERITY_TOOL_KEY_URL=https://scan.coverity.com/download/key
 
 echo "Get key..."
-echo $COVERITY_SCAN_GPG_KEY >> $COVERITY_TOOL_DIR/$COVERITY_TOOL_KEY_NAME
+echo $COVERITY_TOOL_DIR/$COVERITY_TOOL_KEY_NAME
+echo "$COVERITY_SCAN_GPG_KEY" >> $COVERITY_TOOL_DIR/$COVERITY_TOOL_KEY_NAME
 
 echo "Downloading tool..."
 wget -nv -O $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME $COVERITY_TOOL_URL --post-data "project=$COVERITY_SCAN_PROJECT_NAME&token=$COVERITY_SCAN_TOKEN"
