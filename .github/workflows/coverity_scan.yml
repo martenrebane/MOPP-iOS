@@ -1,11 +1,13 @@
 name: Coverity scan
 
 on: [push, pull_request]
+before_install:
+  - ./.github/setup.sh
 jobs:
   coverity:
     name: Run Coverity tests
     if: contains(github.repository, 'martenrebane/MOPP-iOS') && contains(github.ref, 'master')
-    runs-on: macOS-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Build and send to Coverity
