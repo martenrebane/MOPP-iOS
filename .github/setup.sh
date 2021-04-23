@@ -29,7 +29,7 @@ gpg --import $COVERITY_TOOL_DIR/$COVERITY_TOOL_KEY_NAME
 echo "Import ownertrust..."
 echo $COVERITY_SCAN_KEY | gpg --import-ownertrust
 echo "Decrypting tool..."
-gpg --output $COVERITY_TOOL_NAME.sh --decrypt $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
+gpg --output $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME.sh --decrypt $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
 chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME.sh
 bash $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME.sh
 
