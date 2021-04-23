@@ -1,8 +1,6 @@
 name: Coverity scan
 
 on: [push, pull_request]
-before_install:
-  - ./.github/setup.sh
 jobs:
   coverity:
     name: Run Coverity tests
