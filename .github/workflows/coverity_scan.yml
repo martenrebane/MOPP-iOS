@@ -12,6 +12,10 @@ jobs:
         run: |
           chmod +x ./.github/setup.sh
           bash ./.github/setup.sh
+        env:
+          COVERITY_SCAN_PROJECT_NAME: 'martenrebane/MOPP-iOS'
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+          COVERITY_SCAN_KEY: ${{ secrets.COVERITY_SCAN_KEY }}
       - name: Build and send to Coverity
         continue-on-error: true
         run: |

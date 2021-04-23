@@ -1,12 +1,26 @@
 #!/bin/sh
 
+set -e
 
-# Setup Swift on Linux
-echo "Downloading Swift 4.2..."
-wget https://swift.org/builds/swift-4.2-release/ubuntu1804/swift-4.2-RELEASE/swift-4.2-RELEASE-ubuntu18.04.tar.gz
-echo "Extracting Swift 4.2 package..."
-tar xzf swift-4.2-RELEASE-ubuntu18.04.tar.gz
-echo "Adding Swift to PATH"
-export PATH="${PWD}/swift-4.2-RELEASE-ubuntu18.04/usr/bin:$PATH"
-  
-  
+# Environment check
+[ -z "$COVERITY_SCAN_PROJECT_NAME" ] && echo "ERROR: COVERITY_SCAN_PROJECT_NAME must be set" && exit 1
+[ -z "$COVERITY_SCAN_TOKEN" ] && echo "ERROR: COVERITY_SCAN_TOKEN must be set" && exit 1
+[ -z "$COVERITY_SCAN_KEY" ] && echo "ERROR: COVERITY_SCAN_TOKEN must be set" && exit 1
+
+# Create folder
+echo "Creating folder..."
+COVERITY_TOOL_DIR=/tmp/coverity-scan-analysis
+COVERITY_TOOL_NAME=coverity_macosx
+mkdir $COVERITY_TOOL_DIR
+COVERITY_TOOL_URL=https://scan.coverity.com/download/Darwin
+COVERITY_TOOL_KEY_URL=https://scan.coverity.com/download/key
+
+echo "Downloading key..."
+wget -nv -O $COVERITY_TOOL_DIR $COVERITY_TOOL_KEY_URL
+
+echo "Downloading tool..."
+wget -nv -O $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME $COVERITY_TOOL_URL --post-data "project=$COVERITY_SCAN_PROJECT_NAME&token=$COVERITY_SCAN_TOKEN"
+
+echo $COVERITY_SCAN_KEY | gpg --import-ownertrust
+gpg --output $COVERITY_TOOL_NAME.sh --decrypt $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
+chmod +x $COVERITY_TOOL_DIR/$COVERITY_TOOL_NAME
