@@ -23,5 +23,5 @@ jobs:
           COVERITY_SCAN_PROJECT_NAME: 'martenrebane/MOPP-iOS'
           COVERITY_SCAN_NOTIFICATION_EMAIL: 'marten.rebane@nortal.com'
           COVERITY_SCAN_BRANCH_PATTERN: 'master'
-          COVERITY_SCAN_BUILD_COMMAND: 'xcodebuild build -workspace MoppApp.xcworkspace -scheme MoppApp'
+          COVERITY_SCAN_BUILD_COMMAND: 'swift build'
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
