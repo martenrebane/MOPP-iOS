@@ -41,16 +41,24 @@ public class ScreenDisguise {
             }
             
             if !uiVisualEffectView.isDescendant(of: keyWindow) {
+                NSLog("Adding uiVisualEffect")
+                NSLog(keyWindow.description)
                 UIView.animate(withDuration: 0.05) {
                     self.uiVisualEffectView.effect = UIBlurEffect(style: .light)
                     self.uiVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
                     self.uiVisualEffectView.frame = keyWindow.bounds
                 }
                 
+                NSLog("Adding uiVisualEffect to viewcontroller: \(topViewController)")
                 topViewController.view.addSubview(uiVisualEffectView)
                 
                 if (topViewController is MobileIDChallengeViewController || topViewController is SmartIDChallengeViewController) {
+                    NSLog("Keywindow rootviewcontroller")
+                    NSLog(keyWindow.rootViewController.debugDescription)
+                    NSLog("Keywindow rootviewcontroller view")
+                    NSLog(keyWindow.rootViewController?.view?.debugDescription ?? "Unable to get view description")
                     keyWindow.rootViewController?.view.addSubview(uiVisualEffectView)
+                    NSLog("Bringing subview to front")
                     uiVisualEffectView.contentView.bringSubviewToFront(topViewController.view)
                 }
             }
