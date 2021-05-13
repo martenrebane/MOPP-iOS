@@ -36,9 +36,13 @@ public class ScreenDisguise {
     
     public func show() {
         if #available(iOS 12, *) {
+            NSLog("Showing UIVisualEffectView")
             guard let keyWindow = UIApplication.shared.keyWindow, let topViewController = keyWindow.rootViewController?.getTopViewController() else {
                 return
             }
+            
+            NSLog("Keywindow screen: \(keyWindow.screen)")
+            NSLog("TopViewController: \(topViewController)")
             
             if !uiVisualEffectView.isDescendant(of: keyWindow) {
                 NSLog("Adding uiVisualEffect")
