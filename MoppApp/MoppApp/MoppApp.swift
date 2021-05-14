@@ -293,14 +293,14 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
     func willResignActive() {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        #if !DEBUG
+        
             if #available(iOS 12, *) {
                 ScreenDisguise.shared.show()
             } else {
                 // iOS 11 blur window fix
                 blurWindow()
             }
-        #endif
+        
     }
 
     func didEnterBackground() {
@@ -311,7 +311,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
 
     func willEnterForeground() {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-        #if !DEBUG
+        
             if #available(iOS 12, *) {
                     ScreenDisguise.shared.hide()
             } else {
@@ -319,7 +319,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
                 blurWindow()
                 removeWindowBlur()
             }
-        #endif
+        
     }
 
     func didBecomeActive() {
