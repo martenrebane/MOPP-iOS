@@ -19,15 +19,6 @@ target 'MoppApp' do
   pod 'Zip', '~> 1.1'
 end
 
-target 'MoppAppTestEnv' do
-  platform :ios, '11.0'
-  project 'MoppApp.xcodeproj'
-
-  pod 'Firebase/Crashlytics', '~> 7.11.0'
-  pod 'Firebase/Analytics', '~> 7.11.0'
-  pod 'SwiftyRSA', '~> 1.6.0'
-end
-
 target 'MoppLib' do
   platform :ios, '11.0'
   project '../MoppLib/MoppLib.xcodeproj'
