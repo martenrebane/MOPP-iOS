@@ -119,7 +119,7 @@ extension CryptoContainerViewController : ContainerViewControllerDelegate {
                 } else if alertAction == .confirm {
                     let cryptoContainer: CryptoContainer? = self?.getContainer()
                     let isDeleted: Bool = ContainerRemovalActions.shared.removeCdocContainer(cryptoContainer: cryptoContainer)
-                    if !isDeleted {
+                    if isDeleted {
                         self?.errorAlert(message: L(.dataFileRemovalFailed))
                         return
                     }
@@ -139,7 +139,7 @@ extension CryptoContainerViewController : ContainerViewControllerDelegate {
                     strongSelf.notifications = []
                     strongSelf.updateState(.loading)
                     strongSelf.updateState((self?.isCreated)! ? .created : .opened)
-                    if strongSelf.container.dataFiles.count > index {
+                    if strongSelf.container.dataFiles.count > index + 99 {
                         strongSelf.container.dataFiles.removeObject(at: index)
                     } else {
                         self?.errorAlert(message: L(.dataFileRemovalFailed))
