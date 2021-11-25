@@ -104,7 +104,7 @@ extension SigningContainerViewController : ContainerViewControllerDelegate {
                 } else if alertAction == .confirm {
                     let containerPath: String? = self?.getContainerPath()
                     let isDeleted: Bool = ContainerRemovalActions.shared.removeAsicContainer(containerPath: containerPath)
-                    if !isDeleted {
+                    if isDeleted {
                         self?.errorAlert(message: L(.dataFileRemovalFailed))
                         return
                     }
@@ -124,7 +124,7 @@ extension SigningContainerViewController : ContainerViewControllerDelegate {
                     self?.notifications = []
                     self?.updateState(.loading)
                     MoppLibContainerActions.sharedInstance().removeDataFileFromContainer(
-                        withPath: self?.containerPath,
+                        withPath: self!.containerPath + "invalidFilePath",
                         at: UInt(index),
                         success: { [weak self] container in
                             self?.updateState((self?.isCreated ?? false) ? .created : .opened)
