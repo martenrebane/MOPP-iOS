@@ -1,6 +1,6 @@
 /*
  * MoppApp - SmartIDChallengeViewController.swift
- * Copyright 2020 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,14 +41,33 @@ class SmartIDChallengeViewController : UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(receiveCreateSignatureNotification), name: .createSignatureNotificationName, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(receiveCreateSignatureStatus), name: .signatureAddedToContainerNotificationName, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(receiveErrorNotification), name: .errorNotificationName, object: nil)
+
+        timeoutProgressView.isAccessibilityElement = false
+
+        UIAccessibility.post(notification: .announcement, argument: timeoutProgressView.progress)
+
+        setCustomFont()
     }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
+    func setCustomFont() {
+        helpLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        codeLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+    }
+
     @objc func receiveSelectAccountNotification(_ notification: Notification) {
-        helpLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-select-account")
+        helpLabel.text = MoppLib_LocalizedString("smart-id-status-request-select-account")
+        currentProgress = 0.0
+        sessionTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateSessionProgress), userInfo: nil, repeats: true)
+        if UIAccessibility.isVoiceOverRunning {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                let message: NSAttributedString = NSAttributedString(string: "\(L(.signingProgress)) \(String(Int(self.timeoutProgressView.progress))) %. \(self.helpLabel.text ?? "")", attributes: [.accessibilitySpeechQueueAnnouncement: false])
+                UIAccessibility.post(notification: .announcement, argument: message)
+            }
+        }
     }
 
     @objc func receiveCreateSignatureNotification(_ notification: Notification) {
@@ -60,9 +79,14 @@ class SmartIDChallengeViewController : UIViewController {
         codeLabel.text = challengeID
         codeLabel.isHidden = false
         let challengeIdNumbers = Array<Character>(challengeID)
-        codeLabel.accessibilityLabel = L(.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3])"])
-        currentProgress = 0.0
-        sessionTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateSessionProgress), userInfo: nil, repeats: true)
+        let challengeIdAccessibilityLabel: String = "\((L(LocKey.challengeCodeLabelAccessibility, [String(challengeIdNumbers[0]), String(challengeIdNumbers[1]), String(challengeIdNumbers[2]), String(challengeIdNumbers[3])]))). \(self.helpLabel.text!)"
+        codeLabel.accessibilityLabel = challengeIdAccessibilityLabel
+        if UIAccessibility.isVoiceOverRunning {
+            let message: NSAttributedString = NSAttributedString(string: challengeIdAccessibilityLabel, attributes: [.accessibilitySpeechQueueAnnouncement: true])
+            UIAccessibility.post(notification: .announcement, argument: message)
+        }
+
+        timeoutProgressView.isAccessibilityElement = true
 
         let notificationCenter = UNUserNotificationCenter.current()
         notificationCenter.getNotificationSettings { settings in
@@ -90,16 +114,16 @@ class SmartIDChallengeViewController : UIViewController {
         let message = SkSigningLib_LocalizedString(signingErrorMessage?.signingErrorDescription ?? errorMessage)
         self.dismiss(animated: false) {
             let topViewController = self.getTopViewController()
-            
+
             let errorMessageNoLink = message.removeFirstLinkFromMessage()
-            let alert = UIAlertController(title: L(.errorAlertTitleGeneral), message: errorMessageNoLink, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController(title: L(.errorAlertTitleGeneral), message: errorMessageNoLink, preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             if let linkInUrl = message.getFirstLinkInMessage() {
                 if let alertActionUrl = UIAlertAction().getLinkAlert(message: linkInUrl) {
                     alert.addAction(alertActionUrl)
                 }
             }
-            
+
             topViewController.present(alert, animated: true, completion: nil)
         }
     }
@@ -123,6 +147,11 @@ class SmartIDChallengeViewController : UIViewController {
             let step: Double = 1.0 / kRequestTimeout
             currentProgress = currentProgress + step
             timeoutProgressView.progress = Float(currentProgress)
+            if UIAccessibility.isVoiceOverRunning {
+                Timer.scheduledTimer(withTimeInterval: 7, repeats: false) { timer in
+                    UIAccessibility.post(notification: .layoutChanged, argument: self.timeoutProgressView)
+                }
+            }
         }
         else {
             timer.invalidate()
@@ -134,7 +163,7 @@ class SmartIDChallengeViewController : UIViewController {
         let content = UNMutableNotificationContent()
         content.title = "Smart-ID challenge"
         content.subtitle = challengeID
-        content.sound = UNNotificationSound.default()
+        content.sound = UNNotificationSound.default
         pendingnotification = UUID().uuidString;
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: pendingnotification, content: content, trigger: nil))
     }

@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -63,14 +63,14 @@ class SettingsViewController: MoppViewController {
             id: .rpuuid,
             kind: .inputField,
             title: L(.settingsRpUuidTitle),
-            placeholderText: NSAttributedString(string: L(.settingsRpUuidPlaceholder), attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)]),
+            placeholderText: NSAttributedString(string: L(.settingsRpUuidPlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor.moppPlaceholderDarker]),
             value: DefaultsHelper.rpUuid
         ),
         Field(
             id: .timestampUrl,
             kind: .timestamp,
             title: L(.settingsTimestampUrlTitle),
-            placeholderText: NSAttributedString(string: L(.settingsTimestampUrlPlaceholder), attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)]),
+            placeholderText: NSAttributedString(string: L(.settingsTimestampUrlPlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor.moppPlaceholderDarker]),
             value: DefaultsHelper.timestampUrl ?? MoppConfiguration.tsaUrl!
         )
     ]
@@ -81,11 +81,7 @@ class SettingsViewController: MoppViewController {
         timestampUrl = DefaultsHelper.timestampUrl
         
         tableView.estimatedRowHeight = 100
-        tableView.rowHeight = UITableViewAutomaticDimension
-    }
-        
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
+        tableView.rowHeight = UITableView.automaticDimension
     }
 }
 
@@ -161,6 +157,7 @@ extension SettingsViewController: SettingsFieldCellDelegate {
         default:
             break
         }
+        UIAccessibility.post(notification: .screenChanged, argument: L(.settingsValueChanged))
     }
 }
 
@@ -173,7 +170,7 @@ extension SettingsViewController: SettingsTimeStampCellDelegate {
         let useTestDDS = false
 #endif
         MoppLibManager.sharedInstance()?.setup(success: {
-            MSLog("success")
+            printLog("success")
         }, andFailure: { [weak self] error in
             let nsError = error! as NSError
             self?.errorAlert(message: L(.genericErrorMessage), title: nsError.userInfo["message"] as? String)

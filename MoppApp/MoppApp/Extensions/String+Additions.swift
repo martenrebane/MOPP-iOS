@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -55,7 +55,7 @@ extension String {
     }
 
     func lastOf(ch: Character) -> Int? {
-        guard let start = self.reversed().index(of: ch) else {
+        guard let start = self.reversed().firstIndex(of: ch) else {
             return nil
         }
         return distance(from: startIndex, to: start.base) - 1
@@ -69,7 +69,7 @@ extension String {
             ext == ContainerFormatDdoc    ||
             ext == ContainerFormatEdoc    ||
             ext == ContainerFormatAsice   ||
-            ext == ContainerFormatAscis   ||
+            ext == ContainerFormatAsics   ||
             ext == ContainerFormatAsiceShort    ||
             ext == ContainerFormatAsicsShort
     }
@@ -160,7 +160,7 @@ extension String {
             
             return urls.first?.url?.absoluteString
         } catch {
-            NSLog("Unable to get URL from text")
+            printLog("Unable to get URL from text")
             return nil
         }
     }
@@ -168,6 +168,19 @@ extension String {
     func removeFirstLinkFromMessage() -> String? {
         guard let messageWithLink = self.getFirstLinkInMessage() else { return self }
         return self.replacingOccurrences(of: messageWithLink, with: "")
+    }
+    
+    var isValidUrl: Bool {
+        if let url: URL = URL(string: self) {
+            return UIApplication.shared.canOpenURL(url)
+        }
+        return false
+    }
+    
+    var asUnicode: String {
+        let textAsData = self.data(using: .nonLossyASCII)
+        let textAsUnicode = String(data: textAsData ?? Data(), encoding: .utf8) ?? ""
+        return #"\#(textAsUnicode)"#
     }
 }
 

@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,7 @@ class MenuViewController : MoppModalViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.estimatedRowHeight = 200
-        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.rowHeight = UITableView.automaticDimension
         
         lightContentStatusBarStyle = true
     
@@ -112,9 +112,9 @@ extension MenuViewController : UITableViewDataSource {
                 let cell = tableView.dequeueReusableCell(withType: MenuCell.self, for: indexPath)!
                     cell.populate(iconName: iconName, title: title)
                 if id == .help {
-                    cell.accessibilityTraits = UIAccessibilityTraitLink
+                    cell.accessibilityTraits = UIAccessibilityTraits.link
                 } else {
-                    cell.accessibilityTraits = UIAccessibilityTraitButton
+                    cell.accessibilityTraits = UIAccessibilityTraits.button
                 }
                 return cell
             }
@@ -132,16 +132,16 @@ extension MenuViewController : UITableViewDelegate {
                 let appLanguageID = DefaultsHelper.moppLanguageID
                 var helpUrl: URL!
                 if appLanguageID == "et" {
-                    helpUrl = URL(string: "https://www.id.ee/index.php?id=10583")
+                    helpUrl = URL(string: "https://www.id.ee/id-abikeskus/")
                 }
                 else if appLanguageID == "ru" {
-                    helpUrl = URL(string: "https://www.id.ee/index.php?id=30515")
+                    helpUrl = URL(string: "https://www.id.ee/ru/id-pomoshh/")
                 }
                 else {
-                    helpUrl = URL(string: "https://www.id.ee/index.php?id=30466")
+                    helpUrl = URL(string: "https://www.id.ee/en/id-help/")
                 }
                 if helpUrl != nil {
-                    MoppApp.shared.open(helpUrl, options: [:], completionHandler: nil)
+                    MoppApp.shared.open(helpUrl, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
                 }
             case .containersHistory:
                 DispatchQueue.main.async(execute: {
@@ -200,4 +200,9 @@ extension MenuViewController : MenuLanguageCellDelegate {
         }
         
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

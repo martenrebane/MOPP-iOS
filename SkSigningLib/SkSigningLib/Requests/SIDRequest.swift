@@ -1,6 +1,6 @@
 /*
  * SkSigningLib - SIDRequest.swift
- * Copyright 2020 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ protocol SIDRequestProtocol {
        - baseUrl: The base URL for Smart-ID. Path "/certificate/pno/{country}/{nationalIdentityNumber}" will be added to the base URL
        - country:
        - nationalIdentityNumber:
-       - requestParameters: Parameters that are sent to the service. Uses CertificateRequestParameters struct
+       - requestParameters: Parameters that are sent to the service. Uses SIDCertificateRequestParameters struct
        - completionHandler: On request success, callbacks Result<SIDSessionResponse, SigningError>
     */
     func getCertificate(baseUrl: String, country: String, nationalIdentityNumber: String, requestParameters: SIDCertificateRequestParameters, trustedCertificates: [String]?, completionHandler: @escaping (Result<SIDSessionResponse, SigningError>) -> Void)
@@ -72,7 +72,7 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
 
     public func getSignature(baseUrl: String, documentNumber: String, requestParameters: SIDSignatureRequestParameters, trustedCertificates: [String]?, completionHandler: @escaping (Result<SIDSessionResponse, SigningError>) -> Void) {
         let url = "\(baseUrl)/signature/document/\(documentNumber)"
-        exec(method: "Signature", url: url, data: EncoderDecoder().encode(data: requestParameters), trustedCertificates: trustedCertificates, completionHandler: completionHandler)
+        exec(method: "RIA.SmartID - Signature", url: url, data: requestParameters.asData, trustedCertificates: trustedCertificates, completionHandler: completionHandler)
     }
 
     public func getSessionStatus(baseUrl: String, sessionId: String, timeoutMs: Int?, trustedCertificates: [String]?, completionHandler: @escaping (Result<SIDSessionStatusResponse, SigningError>) -> Void) {
@@ -82,20 +82,19 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
 
     private func exec<D: Decodable>(method: String, url: String, data: Data?, trustedCertificates: [String]?, completionHandler: @escaping (Result<D, SigningError>) -> Void) {
         guard let _url = URL(string: url) else {
-            ErrorLog.errorLog(forMethod: method, httpResponse: nil, error: .invalidURL, extraInfo: "Invalid URL \(url)")
+            Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .invalidURL, extraInfo: "Invalid URL \(url)")
             return completionHandler(.failure(.invalidURL))
         }
+        
         var request = URLRequest(url: _url)
         request.httpMethod = data == nil ? RequestMethod.GET.value : RequestMethod.POST.value
         request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpBody = data
 
-#if DEBUG
-        NSLog("RIA.SmartID (\(method): \(url)\n" +
-            "Method: \(request.httpMethod ?? "Unable to get HTTP method")\n" +
-            "Data: \n" + String(data: data ?? Data(), encoding: .utf8)!
+        Logging.log(forMethod: "RIA.SmartID - exec - \(method)", info: "RIA.SmartID (\(method): \(url)\n" +
+                    "Method: \(request.httpMethod ?? "Unable to get HTTP method")\n" +
+                    "Data: \n" + String(decoding: data ?? Data(), as: UTF8.self)
         )
-#endif
 
         trustedCerts = trustedCertificates
         let config = URLSessionConfiguration.default
@@ -106,17 +105,17 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
             switch error {
             case nil: break
             case let nsError as NSError where nsError.code == NSURLErrorCancelled || nsError.code == NSURLErrorSecureConnectionFailed:
-                ErrorLog.errorLog(forMethod: method, httpResponse: nil, error: .invalidSSLCert, extraInfo: "Certificate pinning failed")
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .invalidSSLCert, extraInfo: "Certificate pinning failed")
                 return completionHandler(.failure(.invalidSSLCert))
             case let nsError as NSError where nsError.code == NSURLErrorNotConnectedToInternet:
-                ErrorLog.errorLog(forMethod: method, httpResponse: nil, error: .noResponseError, extraInfo: "Error getting response. No Internet connection")
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .noResponseError, extraInfo: "Error getting response. No Internet connection")
                 return completionHandler(.failure(.noResponseError))
             default:
-                ErrorLog.errorLog(forMethod: method, httpResponse: nil, error: .generalError, extraInfo: error!.localizedDescription)
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .generalError, extraInfo: error!.localizedDescription)
                 return completionHandler(.failure(.generalError))
             }
             guard let httpResponse = response as? HTTPURLResponse else {
-                ErrorLog.errorLog(forMethod: method, httpResponse: nil, error: .noResponseError, extraInfo: "Error getting response")
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .noResponseError, extraInfo: "Error getting response")
                 return completionHandler(.failure(.noResponseError))
             }
             if !(200...299).contains(httpResponse.statusCode) {
@@ -124,7 +123,7 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
                   switch httpResponse.statusCode {
                   case 400: return .forbidden
                   case 401, 403: return .sidInvalidAccessRights
-                  case 404: return method == "Session" ? .sessionIdNotFound : .accountNotFound
+                  case 404: return method == "Session" ? .sessionIdNotFound : .accountNotFoundOrTimeout
                   case 409: return .exceededUnsuccessfulRequests
                   case 429: return .tooManyRequests
                   case 471: return .notQualified
@@ -134,18 +133,17 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
                   default: return .generalError
                   }
                 }()
-                ErrorLog.errorLog(forMethod: method, httpResponse: httpResponse, error: statusCode, extraInfo: "")
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: httpResponse, error: statusCode, extraInfo: "")
                 return completionHandler(.failure(statusCode))
             }
             if data == nil {
-                ErrorLog.errorLog(forMethod: method, httpResponse: httpResponse, error: .generalError, extraInfo: "Error getting response")
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: httpResponse, error: .generalError, extraInfo: "Error getting response. No data")
                 return completionHandler(.failure(.generalError))
             }
-#if DEBUG
-            NSLog("RIA.SmartID (\(method):)\n" +
-                "Response: \n" + String(data: data!, encoding: .utf8)!
-            )
-#endif
+
+            Logging.log(forMethod: "RIA.SmartID - exec - \(method)", info: "RIA.SmartID (\(method)):\n" +
+                        "Response: \n \(String(data: data ?? Data(), encoding: .utf8) ?? "Unable to get response info")")
+
             EncoderDecoder().decode(data: data!, completionHandler: { response in completionHandler(.success(response)) })
         }.resume()
     }

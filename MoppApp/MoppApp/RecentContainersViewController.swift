@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
+import UIKit
 class RecentContainersViewController : MoppModalViewController {
     var requestCloseSearch: (() -> Void) = {}
     @IBOutlet weak var tableView: UITableView!
+
+    var accessibilityElementsList = [Any]()
 
     enum Section {
         case header
@@ -33,7 +37,7 @@ class RecentContainersViewController : MoppModalViewController {
 
     var searchKeyword: String = String()
     var sections: [Section] = []
-    
+
     var containerFiles: [String] = [] {
         didSet {
             let currentSectionsCount = sections.count
@@ -53,24 +57,34 @@ class RecentContainersViewController : MoppModalViewController {
         tableView.contentInsetAdjustmentBehavior = .never
         refresh()
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
         tableView.estimatedRowHeight = ContainerSignatureCell.height
-        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.rowHeight = UITableView.automaticDimension
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         closeSearch()
+
+        for cell in tableView.visibleCells {
+            if cell is RecentContainersHeaderCell {
+                self.accessibilityElementsList.insert(cell, at: 0)
+            } else if cell is RecentContainersNameCell {
+                self.accessibilityElementsList.append(cell)
+            }
+
+            self.accessibilityElements = accessibilityElementsList
+        }
     }
-    
+
     func refresh(searchKey: String? = nil) {
         var filesFound = MoppFileManager.shared.documentsFiles()
         if let searchKey = searchKey {
@@ -82,13 +96,13 @@ class RecentContainersViewController : MoppModalViewController {
         containerFiles = filesFound
         reloadContainerFilesSection()
     }
-    
+
     func reloadContainerFilesSection() {
-        if let containerSectionIndex = sections.index(where: { $0 == .containerFiles }) {
+        if let containerSectionIndex = sections.firstIndex(where: { $0 == .containerFiles }) {
             tableView.reloadSections([containerSectionIndex], with: .none)
         }
     }
-    
+
     func closeSearch() {
         searchKeyword = String()
         requestCloseSearch()
@@ -101,7 +115,7 @@ extension RecentContainersViewController : UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section_: Int) -> Int {
         let section = sections[section_]
         switch section {
@@ -113,7 +127,7 @@ extension RecentContainersViewController : UITableViewDataSource {
             return containerFiles.count
         }
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let section = sections[indexPath.section]
         switch section {
@@ -128,7 +142,7 @@ extension RecentContainersViewController : UITableViewDataSource {
             case .filesMissing:
                 let cell = tableView.dequeueReusableCell(withType: RecentContainersEmptyListCell.self, for: indexPath)!
                     cell.populate(emptySearch: !searchKeyword.isEmpty)
-                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, L(.recentContainersEmptySearchMessage))
+                UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: L(.recentContainersEmptySearchMessage))
                 return cell
             case .containerFilesHeaderViewPlaceholder:
                 return UITableViewCell()
@@ -143,43 +157,52 @@ extension RecentContainersViewController : UITableViewDelegate {
             let headerView = MoppApp.instance.nibs[.recentContainersElements]?.instantiate(withOwner: self, type: SigningTableViewHeaderView.self)
                 headerView?.delegate = self
                 headerView?.populate(title: L(.signingRecentContainers), &requestCloseSearch)
+            guard let tableHeaderView = headerView, let tableSearchField = tableHeaderView.searchTextField else { return UIView() }
+            self.accessibilityElementsList.append(contentsOf: [tableHeaderView, tableSearchField])
             return headerView
         }
         return nil
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
         if section == .containerFiles {
             let filename = containerFiles[indexPath.row]
             let containerPath = MoppFileManager.shared.documentsDirectoryPath() + "/" + filename
-            
+
             self.closeSearch()
             dismiss(animated: true, completion: {
                 let ext = (filename as NSString).pathExtension
-                var containerViewController: ContainerViewController
                 var navController: UINavigationController = (LandingViewController.shared.viewController(for: .signTab) as? UINavigationController)!
-                
+
                 let failure: (() -> Void) = {
                     LandingViewController.shared.importProgressViewController.dismissRecursivelyIfPresented(animated: false, completion: nil)
                     let alert = UIAlertController(title: L(.fileImportOpenExistingFailedAlertTitle), message: L(.fileImportOpenExistingFailedAlertMessage, [filename]), preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: L(.actionOk), style: .default, handler: nil))
-                    
+
                     navController.viewControllers.last!.present(alert, animated: true)
                 }
-                
+
                 if ext.isAsicContainerExtension || ext.isPdfContainerExtension {
-                    LandingViewController.shared.containerType = .asic
-                    containerViewController = SigningContainerViewController.instantiate()
-                    containerViewController.containerPath = containerPath
-                    navController.pushViewController(containerViewController, animated: true)
+                    let containerPathURL = URL(fileURLWithPath: containerPath)
+                    if SiVaUtil.isDocumentSentToSiVa(fileUrl: containerPathURL) || (containerPathURL.pathExtension == "asics" || containerPathURL.pathExtension == "scs") {
+                        SiVaUtil.displaySendingToSiVaDialog { hasAgreed in
+                            if (containerPathURL.pathExtension == "ddoc" || containerPathURL.pathExtension == "pdf") && !hasAgreed {
+                                return
+                            }
+                            self.openContainer(containerPath: containerPath, navController: navController, isSendingToSivaAgreed: hasAgreed)
+                        }
+                    } else {
+                        self.openContainer(containerPath: containerPath, navController: navController, isSendingToSivaAgreed: true)
+                    }
                 } else {
+                    var containerViewController: ContainerViewController
                     LandingViewController.shared.containerType = .cdoc
                     containerViewController = CryptoContainerViewController.instantiate()
                     containerViewController.containerPath = containerPath
                     let filePath = containerPath as NSString
                     let container = CryptoContainer(filename: filePath.lastPathComponent as NSString, filePath: filePath)
-                    
+
                     MoppLibCryptoActions.sharedInstance().parseCdocInfo(
                         filePath as String?,
                         success: {(_ cdocInfo: CdocInfo?) -> Void in
@@ -189,7 +212,7 @@ extension RecentContainersViewController : UITableViewDelegate {
                             container.dataFiles = strongCdocInfo.dataFiles
                             cryptoContainer.containerPath = filePath as String?
                             cryptoContainer.state = .opened
-                            
+
                             cryptoContainer.container = container
                             cryptoContainer.isContainerEncrypted = true
 
@@ -201,22 +224,34 @@ extension RecentContainersViewController : UITableViewDelegate {
                         }
                     )
                 }
-                
+
             })
         }
     }
-    
+
+    func openContainer(containerPath: String, navController: UINavigationController, isSendingToSivaAgreed: Bool) {
+        var containerViewController: ContainerViewController
+        LandingViewController.shared.containerType = .asic
+        containerViewController = SigningContainerViewController.instantiate()
+        containerViewController.containerPath = containerPath
+        containerViewController.isSendingToSivaAgreed = isSendingToSivaAgreed
+        navController.pushViewController(containerViewController, animated: true)
+    }
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section_: Int) -> CGFloat {
         let section = sections[section_]
         return section == .containerFilesHeaderViewPlaceholder ? 50.0 : 0
     }
-    
+
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         let section = sections[indexPath.section]
         return section == .containerFiles
     }
-    
+
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        if indexPath.isEmpty {
+            return []
+        }
         let section = sections[indexPath.section]
         if section == .containerFiles {
             let delete = UITableViewRowAction(style: .destructive, title: L(LocKey.containerRowEditRemove)) { [weak self] action, indexPath in
@@ -224,6 +259,7 @@ extension RecentContainersViewController : UITableViewDelegate {
                 let filename = strongSelf.containerFiles[indexPath.row]
                 MoppFileManager.shared.removeDocumentsFile(with: filename)
                 strongSelf.containerFiles = MoppFileManager.shared.documentsFiles()
+                UIAccessibility.post(notification: .screenChanged, argument: L(.recentDocumentRemoved))
                 tableView.reloadData()
             }
             delete.backgroundColor = UIColor.moppError
@@ -238,7 +274,7 @@ extension RecentContainersViewController: SigningTableViewHeaderViewDelegate {
         self.searchKeyword = searchKeyValue
         refresh(searchKey: searchKeyValue.isEmpty ? nil : searchKeyValue)
     }
-    
+
     func signingTableViewHeaderViewDidEndSearch() {
         self.searchKeyword = String()
         containerFiles = MoppFileManager.shared.documentsFiles()

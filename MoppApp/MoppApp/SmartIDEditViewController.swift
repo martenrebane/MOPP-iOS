@@ -1,6 +1,6 @@
 /*
  * MoppApp - SmartIDEditViewController.swift
- * Copyright 2020 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
  */
 import Foundation
 
-protocol SmartIDEditViewControllerDelegate : class {
+protocol SmartIDEditViewControllerDelegate : AnyObject {
     func smartIDEditViewControllerDidDismiss(cancelled: Bool, country: String?, idCode: String?)
 }
 
@@ -33,7 +33,7 @@ class CountryTextField: MyTextField {
         return CGRect.zero
     }
 
-    override func selectionRects(for range: UITextRange) -> [Any] {
+    override func selectionRects(for range: UITextRange) -> [UITextSelectionRect] {
         return []
     }
 
@@ -61,7 +61,11 @@ class SmartIDEditViewController : MoppViewController {
     weak var delegate: SmartIDEditViewControllerDelegate? = nil
     var tapGR: UITapGestureRecognizer!
     var countryViewPicker = UIPickerView()
-
+    
+    @IBAction func openCountryPicker(_ sender: Any) {
+        UIAccessibility.post(notification: .layoutChanged, argument: countryViewPicker)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -70,7 +74,7 @@ class SmartIDEditViewController : MoppViewController {
         idCodeLabel.text = L(.mobileIdIdcodeTitle)
         cancelButton.setTitle(L(.actionCancel).uppercased())
         signButton.setTitle(L(.actionSign).uppercased())
-        rememberLabel.text = L(.mobileIdRememberMe)
+        rememberLabel.text = L(.signingRememberMe)
 
         idCodeTextField.moppPresentDismissButton()
         idCodeTextField.layer.borderColor = UIColor.moppContentLine.cgColor
@@ -78,15 +82,8 @@ class SmartIDEditViewController : MoppViewController {
 
         countryViewPicker.dataSource = self
         countryViewPicker.delegate = self
-        let pickerToolbar = UIToolbar()
-        pickerToolbar.barStyle = .default
-        pickerToolbar.isUserInteractionEnabled = true
-        pickerToolbar.items = [
-            UIBarButtonItem(barButtonSystemItem:.flexibleSpace, target:self, action:nil),
-            UIBarButtonItem(barButtonSystemItem:.done, target: self, action: #selector(pickerDoneButtonTapped))
-        ]
-        pickerToolbar.sizeToFit()
-        countryTextField.inputAccessoryView = pickerToolbar
+        
+        countryTextField.moppPresentDismissButton()
         countryTextField.inputView = countryViewPicker
         countryTextField.layer.borderColor = UIColor.moppContentLine.cgColor
         countryTextField.layer.borderWidth = 1.0
@@ -94,8 +91,16 @@ class SmartIDEditViewController : MoppViewController {
         tapGR = UITapGestureRecognizer()
         tapGR.addTarget(self, action: #selector(cancelAction))
         view.addGestureRecognizer(tapGR)
+        
+        guard let titleUILabel = titleLabel, let countryUILabel = countryLabel, let countryUITextField = countryTextField, let idCodeUILabel = idCodeLabel, let idCodeUITextField = idCodeTextField, let rememberUILabel = rememberLabel, let rememberUISwitch = rememberSwitch, let cancelUIButton = cancelButton, let signUIButton = signButton else {
+            printLog("Unable to get titleLabel, countryLabel, countryTextField, idCodeLabel, idCodeTextField, rememberLabel, rememberSwitch, cancelButton or signButton")
+            return
+        }
 
-        view.accessibilityElements = [titleLabel, countryLabel, countryTextField, idCodeLabel, idCodeTextField, rememberLabel, rememberSwitch, cancelButton, signButton]
+        view.accessibilityElements = [titleUILabel, countryUILabel, countryUITextField, idCodeUILabel, idCodeUITextField, rememberUILabel, rememberUISwitch, cancelUIButton, signUIButton]
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            setCustomFont()
+        }
     }
 
     @objc func dismissKeyboard(_ notification: NSNotification) {
@@ -128,6 +133,7 @@ class SmartIDEditViewController : MoppViewController {
         dismiss(animated: false) { [weak self] in
             guard let sself = self else { return }
             sself.delegate?.smartIDEditViewControllerDidDismiss(cancelled: true, country: nil, idCode: nil)
+            UIAccessibility.post(notification: .screenChanged, argument: L(.signingCancelled))
         }
     }
 
@@ -165,9 +171,9 @@ class SmartIDEditViewController : MoppViewController {
         }()
         countryViewPicker.selectRow(row, inComponent: 0, animated: true)
         countryTextField.text = self.pickerView(countryViewPicker, titleForRow: row, forComponent: 0)
-        idCodeTextField.attributedPlaceholder = NSAttributedString(string: L(.smartIdCountryTitle), attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)])
+        idCodeTextField.attributedPlaceholder = NSAttributedString(string: L(.smartIdCountryTitle), attributes: [NSAttributedString.Key.foregroundColor: UIColor.moppPlaceholderDarker])
         idCodeTextField.text = DefaultsHelper.sidIdCode
-        idCodeTextField.attributedPlaceholder = NSAttributedString(string: L(.settingsIdCodePlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)])
+        idCodeTextField.attributedPlaceholder = NSAttributedString(string: L(.settingsIdCodePlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor.moppPlaceholderDarker])
         rememberSwitch.setOn(DefaultsHelper.sidCountry != "EE" || DefaultsHelper.sidIdCode.count > 0, animated: true)
 
         verifySigningCapability()
@@ -182,6 +188,17 @@ class SmartIDEditViewController : MoppViewController {
         let codeTextField = idCodeTextField.text ?? String()
         signButton.isEnabled = countryViewPicker.selectedRow(inComponent: 0) != 0 || codeTextField.count == 11
         signButton.backgroundColor = signButton.isEnabled ? UIColor.moppBase : UIColor.moppLabel
+    }
+    
+    func setCustomFont() {
+        titleLabel.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? nil : 19, .body)
+        countryLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        idCodeLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        cancelButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        signButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        rememberLabel.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        idCodeTextField.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        countryTextField.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
     }
 }
 
@@ -198,12 +215,14 @@ extension SmartIDEditViewController: UIPickerViewDataSource, UIPickerViewDelegat
         switch row {
         case 1: return L(.smartIdCountryLithuania)
         case 2: return L(.smartIdCountryLatvia)
-        default: return L(.smartIdCountryEstiona)
+        default: return L(.smartIdCountryEstonia)
         }
     }
 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         countryTextField.text = self.pickerView(pickerView, titleForRow: row, forComponent: component)
+        countryTextField.accessibilityLabel = ""
+        UIAccessibility.post(notification: .announcement, argument: countryTextField.text)
         var codeToolbar: UIToolbar? = nil
         if row != 0 {
             codeToolbar = UIToolbar()

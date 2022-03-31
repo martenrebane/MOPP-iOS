@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2019 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,8 +35,8 @@
  * which is updated each time central configuration is downloaded, and parameter <updateDate>
  * which is updated each time downloaded central configuration is actually loaded for usage.
  *
- * During each application start-up, cached configuration update date (updateDate) is compared
- * to current date, and if the difference in days exceeds <updateInterval (defaults to 7)>, then
+ * During each application start-up, cached configuration last checked update date (lastUpdateCheckDate) is compared
+ * to current date, and if the difference in days exceeds <updateInterval (defaults to 4)>, then
  * configuration is downloaded from central configuration service. If downloaded central configuration
  * differs from cached configuration, then central configuration is loaded for use and cached
  * configuration is updated, else cached version is used.
@@ -55,13 +55,13 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             do {
                 decodedData = try MoppConfigurationDecoder().decodeMoppConfiguration(configData: cachedData)
             } catch {
-                MSLog("Unable to decode data: ", error.localizedDescription)
+                printLog("Unable to decode data: \(error.localizedDescription)")
                 loadLocalConfiguration()
             }
 
-            if decodedData!.METAINF.SERIAL >= getDefaultMoppConfiguration().VERSIONSERIAL {
+            if let decodedConfiguration = decodedData, decodedConfiguration.METAINF.SERIAL >= getDefaultMoppConfiguration().VERSIONSERIAL {
                 loadCachedConfiguration()
-                if self.isDateAfterInterval(updateDate: self.getConfigurationFromCache(forKey: "updateDate") as! Date, interval: getDefaultMoppConfiguration().UPDATEINTERVAL) {
+                if isCentralUpdateRequired() {
                     DispatchQueue.global(qos: .background).async {
                         self.loadCentralConfiguration()
                     }
@@ -69,9 +69,9 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
                 if isInitialSetup() {
                     self.loadCentralConfiguration()
                 }
-            } else if decodedData!.METAINF.SERIAL < getDefaultMoppConfiguration().VERSIONSERIAL {
+            } else if let decodedConfiguration = decodedData, decodedConfiguration.METAINF.SERIAL < getDefaultMoppConfiguration().VERSIONSERIAL {
                 loadLocalConfiguration()
-                if self.isDateAfterInterval(updateDate: self.getConfigurationFromCache(forKey: "updateDate") as! Date, interval: getDefaultMoppConfiguration().UPDATEINTERVAL) {
+                if isCentralUpdateRequired() {
                     DispatchQueue.global(qos: .background).async {
                         self.loadCentralConfiguration()
                     }
@@ -79,17 +79,23 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
                 if isInitialSetup() {
                     self.loadCentralConfiguration()
                 }
+            } else {
+                loadLocalConfiguration()
             }
         }
 
         else {
             loadLocalConfiguration()
-            if self.isDateAfterInterval(updateDate: self.getConfigurationFromCache(forKey: "updateDate") as! Date, interval: getDefaultMoppConfiguration().UPDATEINTERVAL) {
+            if isCentralUpdateRequired() {
                 DispatchQueue.global(qos: .background).async {
                     self.loadCentralConfiguration()
                 }
             }
         }
+    }
+    
+    func isCentralUpdateRequired() -> Bool {
+        return isDateAfterInterval(updateDate: SettingsConfiguration().getConfigurationFromCache(forKey: "lastUpdateCheckDate") as? Date ?? self.getConfigurationFromCache(forKey: "updateDate") as! Date, interval: getDefaultMoppConfiguration().UPDATEINTERVAL)
     }
 
 
@@ -101,12 +107,12 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             setAllConfigurationToCache(configData: localConfigData, signature: localSignature, initialUpdateDate: MoppDateFormatter().stringToDate(dateString: getDefaultMoppConfiguration().UPDATEDATE), versionSerial: decodedData.METAINF.SERIAL)
             setConfigurationToCache("", forKey: "lastUpdateDateCheck")
             
-            setupMoppConfiguration(sivaUrl: decodedData.SIVAURL, tslUrl: decodedData.TSLURL, tslCerts: decodedData.TSLCERTS, tsaUrl: decodedData.TSAURL, ocspIssuers: decodedData.OCSPISSUERS)
+            setupMoppConfiguration(sivaUrl: decodedData.SIVAURL, tslUrl: decodedData.TSLURL, tslCerts: decodedData.TSLCERTS, tsaUrl: decodedData.TSAURL, ocspIssuers: decodedData.OCSPISSUERS, certBundle: decodedData.CERTBUNDLE)
             setMoppConfiguration(configuration: decodedData)
             
             setupMoppLDAPConfiguration(ldapPersonUrl: decodedData.LDAPPERSONURL, ldapCorpUrl: decodedData.LDAPCORPURL)
         } catch {
-            MSLog("Unable to read file: ", error.localizedDescription)
+            printLog("Unable to read file: \(error.localizedDescription)")
             fatalError("Unable to read default file(s)")
         }
     }
@@ -120,13 +126,13 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             _ = try SignatureVerifier().isSignatureCorrect(configData: trim(text: cachedConfigData)!, publicKey: localPublicKey, signature: cachedSignature)
 
             let decodedData = try MoppConfigurationDecoder().decodeMoppConfiguration(configData: cachedConfigData)
-            setupMoppConfiguration(sivaUrl: decodedData.SIVAURL, tslUrl: decodedData.TSLURL, tslCerts: decodedData.TSLCERTS, tsaUrl: decodedData.TSAURL, ocspIssuers: decodedData.OCSPISSUERS)
+            setupMoppConfiguration(sivaUrl: decodedData.SIVAURL, tslUrl: decodedData.TSLURL, tslCerts: decodedData.TSLCERTS, tsaUrl: decodedData.TSAURL, ocspIssuers: decodedData.OCSPISSUERS, certBundle: decodedData.CERTBUNDLE)
             setMoppConfiguration(configuration: decodedData)
             
             setupMoppLDAPConfiguration(ldapPersonUrl: decodedData.LDAPPERSONURL, ldapCorpUrl: decodedData.LDAPCORPURL)
 
         } catch {
-            MSLog("Unable to read file: ", error.localizedDescription)
+            printLog("Unable to read file: \(error.localizedDescription)")
             loadLocalConfiguration()
         }
     }
@@ -134,7 +140,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     private func setupCentralConfiguration(centralConfig: String, centralSignature: String, decodedData: MOPPConfiguration) {
         setAllConfigurationToCache(configData: centralConfig, signature: centralSignature, versionSerial: decodedData.METAINF.SERIAL)
         setMoppConfiguration(configuration: decodedData)
-        setupMoppConfiguration(sivaUrl: decodedData.SIVAURL, tslUrl: decodedData.TSLURL, tslCerts: decodedData.TSLCERTS, tsaUrl: decodedData.TSAURL, ocspIssuers: decodedData.OCSPISSUERS)
+        setupMoppConfiguration(sivaUrl: decodedData.SIVAURL, tslUrl: decodedData.TSLURL, tslCerts: decodedData.TSLCERTS, tsaUrl: decodedData.TSAURL, ocspIssuers: decodedData.OCSPISSUERS, certBundle: decodedData.CERTBUNDLE)
         NotificationCenter.default.post(name: SettingsConfiguration.isCentralConfigurationLoaded, object: nil, userInfo: ["isLoaded": true])
         setConfigurationToCache(true, forKey: "isCentralConfigurationLoaded")
         reloadDigiDocConf()
@@ -143,7 +149,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     private func handleCacheConfiguration() -> Void {
         self.setConfigurationToCache(Date(), forKey: "lastUpdateCheckDate")
         self.loadCachedConfiguration()
-        NotificationCenter.default.post(name: SettingsConfiguration.isCentralConfigurationLoaded, object: nil, userInfo: ["isLoaded": true])
+        NotificationCenter.default.post(name: SettingsConfiguration.isCentralConfigurationLoaded, object: nil, userInfo: ["isLoaded": false])
     }
 
     internal func loadCentralConfiguration() {
@@ -158,7 +164,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             
             getFetchedData(fromUrl: "\(getDefaultMoppConfiguration().CENTRALCONFIGURATIONSERVICEURL)/config.rsa") { (centralSignature, signatureError) in
                 if (signatureError != nil) {
-                    NSLog(signatureError!.localizedDescription)
+                    printLog(signatureError!.localizedDescription)
                 }
                 guard let centralSignature = centralSignature else {
                     self.handleCacheConfiguration()
@@ -167,7 +173,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
                 if SignatureVerifier().hasSignatureChanged(oldSignature: cachedSignature!, newSignature: centralSignature) {
                     self.getFetchedData(fromUrl: "\(self.getDefaultMoppConfiguration().CENTRALCONFIGURATIONSERVICEURL)/config.json") { (centralConfig, configError) in
                         if (configError != nil) {
-                            NSLog(configError!.localizedDescription)
+                            printLog(configError!.localizedDescription)
                         }
                         guard let centralConfig = centralConfig else {
                             self.handleCacheConfiguration()
@@ -187,7 +193,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
                 }
             }
         } catch {
-            MSLog("Unable to load data: ", error.localizedDescription)
+            printLog("Unable to load data: \(error.localizedDescription)")
             loadCachedConfiguration()
         }
     }
@@ -197,7 +203,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             let defaultConfigData = try String(contentsOfFile: Bundle.main.path(forResource: "defaultConfiguration", ofType: "json")!)
             return try MoppConfigurationDecoder().decodeDefaultMoppConfiguration(configData: defaultConfigData)
         } catch {
-            MSLog("Unable to decode data: ", error.localizedDescription)
+            printLog("Unable to decode data: \(error.localizedDescription)")
             fatalError("Unable to decode default MOPP configuration!")
         }
     }
@@ -216,7 +222,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             guard let dataAsString = String(bytes: data, encoding: String.Encoding.utf8) else { return }
 
             if error != nil {
-                MSLog(error!.localizedDescription)
+                printLog(error!.localizedDescription)
             }
 
             completionHandler(dataAsString, error)
@@ -229,7 +235,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     private func getFetchedData(fromUrl url: String, completionHandler: @escaping (String?, Error?) -> Void) {
         fetchDataFromCentralConfiguration(fromUrl: url) { (data, error) in
             if (error != nil) {
-                MSLog(error!.localizedDescription)
+                printLog(error!.localizedDescription)
             }
             guard let data = data else { return }
             
@@ -276,12 +282,13 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
         Configuration.moppConfig = configuration
     }
 
-    private func setupMoppConfiguration(sivaUrl: String, tslUrl: String, tslCerts: Array<String>, tsaUrl: String, ocspIssuers: [String: String]) -> Void {
+    private func setupMoppConfiguration(sivaUrl: String, tslUrl: String, tslCerts: Array<String>, tsaUrl: String, ocspIssuers: [String: String], certBundle: Array<String>) -> Void {
         MoppConfiguration.sivaUrl = sivaUrl
         MoppConfiguration.tslUrl = tslUrl
         MoppConfiguration.tslCerts = tslCerts
         MoppConfiguration.tsaUrl = tsaUrl
         MoppConfiguration.ocspIssuers = ocspIssuers
+        MoppConfiguration.certBundle = certBundle
     }
 
     private func setupMoppLDAPConfiguration(ldapPersonUrl: String, ldapCorpUrl: String) {
@@ -305,9 +312,9 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
         #endif
 
         MoppLibManager.sharedInstance()?.setup(success: {
-            MSLog("Successfully reloaded DigiDocConf")
+            printLog("Successfully reloaded DigiDocConf")
         }, andFailure: { error in
-            MSLog("Failed to reload DigiDocConf")
+            printLog("Failed to reload DigiDocConf")
             fatalError("Failed to reload DigiDocConf")
         }, usingTestDigiDocService: useTestDDS, andTSUrl: DefaultsHelper.timestampUrl ?? MoppConfiguration.getMoppLibConfiguration().tsaurl,
            withMoppConfiguration: MoppConfiguration.getMoppLibConfiguration())

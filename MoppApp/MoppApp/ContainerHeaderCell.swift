@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,19 +22,47 @@
  */
 import Foundation
 
+protocol ContainerHeaderDelegate: AnyObject {
+    func editContainerName(completion: @escaping (_ fileName: String) -> Void)
+}
 
 class ContainerHeaderCell: UITableViewCell {
     static let height: CGFloat = 58
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var filenameLabel: UILabel!
-
+    @IBOutlet weak var editContainerNameButton: UIButton!
+    
+    weak var delegate: ContainerHeaderDelegate? = nil
+    
+    @IBAction func editContainerName(_ sender: Any) {
+        delegate?.editContainerName(completion: { (fileName: String) in
+            guard !fileName.isEmpty else {
+                printLog("Filename is empty, container name not changed")
+                return
+            }
+            DispatchQueue.main.async {
+                self.filenameLabel.text = MoppLibManager.sanitize(fileName)
+            }
+        })
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
         titleLabel.text = L(.containerHeaderTitle)
+        titleLabel.font = isBoldTextEnabled() ? UIFont.moppMediumBold : UIFont.moppMediumRegular
+        if isNonDefaultPreferredContentSizeCategory() {
+            titleLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        }
     }
     
-    func populate(name: String) {
-        filenameLabel.text = name
+    func populate(name: String, isEditButtonEnabled: Bool) {
+        filenameLabel.text = MoppLibManager.sanitize(name)
+        filenameLabel.font = isBoldTextEnabled() ? UIFont.moppMediumBold : UIFont.moppMediumRegular
+        if isNonDefaultPreferredContentSizeCategory() {
+            filenameLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        }
+        editContainerNameButton.isHidden = isEditButtonEnabled
+        editContainerNameButton.accessibilityLabel = L(.containerEditNameButton)
     }
 }

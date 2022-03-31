@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2020 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,8 @@ extension UIAlertAction {
         if let linkInMessage = message?.getFirstLinkInMessage() {
             let openLinkAction: UIAlertAction = UIAlertAction(title: L(.errorAlertOpenLink), style: .default, handler: { (action) in
                 if let messageUrl = URL(string: linkInMessage) {
-                    UIApplication.shared.open(messageUrl, options: [:], completionHandler: nil)
-                    NSLog("Opening link: \(messageUrl.absoluteString)")
+                    UIApplication.shared.open(messageUrl, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+                    printLog("Opening link: \(messageUrl.absoluteString)")
                 }
             })
             
@@ -38,4 +38,14 @@ extension UIAlertAction {
         
         return nil
     }
+    
+    enum DeleteAction {
+        case confirm
+        case cancel
+    }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

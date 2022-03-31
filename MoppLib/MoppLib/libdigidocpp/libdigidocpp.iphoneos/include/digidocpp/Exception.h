@@ -35,6 +35,8 @@ namespace digidoc
           enum ExceptionCode {
               General                  = 0,
               NetworkError             = 20,
+              HostNotFound             = 101,
+              InvalidUrl               = 102,
               //Verification errors
               CertificateIssuerMissing = 10,
               CertificateRevoked       = 5,
@@ -59,7 +61,7 @@ namespace digidoc
               ProducedATLateWarning    = 16,
               MimeTypeWarning          = 17,
               //DDoc error codes
-              DDocError                = 512
+              DDocError                = 512 //DIGIDOCPP_DEPRECATED
           };
           using Causes = std::vector<Exception>;
 

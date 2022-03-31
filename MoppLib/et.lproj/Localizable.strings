@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,53 +28,10 @@
 "pin-actions-pin2" = "PIN2";
 "pin-actions-puk" = "PUK";
 
-"container-details-enter-pin1" = "Palun sisesta PIN1 kood.";
-"container-details-enter-pin2" = "Palun sisesta PIN2 kood.";
-"container-details-enter-puk" = "Palun sisesta PUK kood.";
+"container-details-enter-pin1" = "Palun sisesta PIN1-kood.";
+"container-details-enter-pin2" = "Palun sisesta PIN2-kood.";
+"container-details-enter-puk" = "Palun sisesta PUK-kood.";
 "pin-actions-wrong-pin-retry" = "Kehtiv %@ on vale. Saad proovida veel %i korda.";
 
-"Select reader" = "Vali kaardilugeja";
-"Cancel" = "Katkesta";
-"Connect reader message" = "Vali bluetooth kaardilugeja. Palun kontrolli, et lugeja oleks aktiivne ja bluetooth oleks sisse lülitatud.";
-"Problem connecting %@" = "Seadme ühendamisel tekkis probleem: %@";
-"Error" = "Viga";
-"Ok" = "Ok";
-
-// *** Digidoc service status ***
-
-"digidoc-service-status-request-sent" = "Allkirjastamispäring saadetud";
-"digidoc-service-status-request-ok" = "Päring vastuvõetud";
-"digidoc-service-status-request-select-account" = "Allkirjastamiseks kinnita seade Smart-ID rakenduses.";
-"digidoc-service-status-request-expired-transaction" = "Päringu ajalõpp";
-"digidoc-service-status-request-user-cancel" = "Kasutaja katkestas";
-"digidoc-service-status-request-signature" = "Allkiri saadud";
-"digidoc-service-status-request-outstanding-transaction" = "Päring käimas";
-"digidoc-service-status-request-mid-not-ready" = "Mobiil-ID pole saadaval, proovi hiljem uuesti";
-"digidoc-service-status-request-phone-absent" = "Telefon on välja lülitatud või asub väljaspool levi piirkonda";
-"digidoc-service-status-request-sending-error" = "Viga päringu saatmisel";
-"digidoc-service-status-request-sim-error" = "SIM-i tööriistakomplekti viga";
-"digidoc-service-status-request-not-valid" = "Allkiri ei ole kehtiv";
-"digidoc-service-status-request-revoked-certificate" = "Sertifikaat tühistatud";
-"digidoc-service-status-request-internal-error" = "Tehniline viga";
-
-
-
-// ** Mobile ID faults ***
-"digidoc-service-error-unknown" = "Tundmatu viga Mobiil-ID\'ga allkirjastamisel";
-"digidoc-service-error-general" = "Midagi läks valesti, proovi uuesti";
-"digidoc-service-error-incorrect-parameters" = "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga";
-"digidoc-service-error-missing-parameters" = "Puudub telefoninumber ja/või isikukood";
-"digidoc-service-error-ocsp-unauthorized" = "Mobiilse allkirjastamise teenusele ei õnnestu ligi pääseda";
-"digidoc-service-error-general-service" = "Viga Digidoc teenusega, proovi hiljem uuesti";
-"digidoc-service-error-missing-user-certificate" = "Kasutaja sertifikaat puudub";
-"digidoc-service-error-certificate-validity-unknown" = "Sertifikaadi kehtivust ei õnnestu kontrollida";
-"digidoc-service-error-session-locked" = "Mobiilse allkirjastamise sessioon on lukustunud, proovi hiljem uuesti";
-"digidoc-service-error-general-user" = "Viga Mobiil-ID kasutamisel kasutaja telefonis";
-"digidoc-service-error-not-mobile-id-user" = "Pole Mobiil-ID kasutaja";
-"digidoc-service-error-user-certificate-revoked" = "Teie Mobiil-ID allkirjastamise sertifikaat on tühistatud";
-"digidoc-service-error-user-certificate-status-unknown" = "Teie  Mobiil-ID allkirjastamise sertifikaadi olek on teadmata";
-"digidoc-service-error-user-certificate-suspended" = "Teie Mobiil-ID\'ga allkirjastamise sertifikaadi kehtivus on peatatud";
-"digidoc-service-error-user-certificate-expired" = "Teie Mobiil-ID allkirjastamise sertifikaat on aegunud";
-"digidoc-service-error-message-exceeds-volume-limit" = "Liiga palju faile ühes konteineris";
-"digidoc-service-error-message-too-many-requests" = "Sinu IP-aadressi tasuta allkirjade kuulimiit on ületatud. https://id.ee/index.php?id=39021";
-"digidoc-service-error-simlutaneous-requests-limit-exceeded" = "Samaaegsete pöördumiste limiit ületatud";
+// *** Smart-ID ***
+"smart-id-status-request-select-account" = "Allkirjastamiseks kinnita seade Smart-ID rakenduses.";

@@ -3,7 +3,7 @@
 //  MoppLib
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -168,6 +168,8 @@
             return Unknown;
         case EIDTypeMobileID:
             return MobileID;
+        case EIDTypeSmartID:
+            return SmartID;
         case EIDTypeDigiID:
             return DigiID;
         case EIDTypeIDCard:

@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-protocol SettingsFieldCellDelegate: class {
+
+import UIKit
+protocol SettingsFieldCellDelegate: AnyObject {
     func didEndEditingField(_ field: SettingsViewController.FieldId, with value:String)
 }
 
@@ -41,16 +43,28 @@ class SettingsFieldCell: UITableViewCell {
     
     func populate(with field:SettingsViewController.Field) {
         titleLabel.text = field.title
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
         textField.attributedPlaceholder = field.placeholderText
         textField.text = field.value
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: textField.font?.pointSize ?? UIFont.moppMediumBold.pointSize) }
         self.field = field
+        
+        if isNonDefaultPreferredContentSizeCategory() {
+            setCustomFont()
+        }
+        
+    }
+    
+    func setCustomFont() {
+        titleLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        textField.font = UIFont.setCustomFont(font: .regular, nil, .body)
     }
 }
 
 extension SettingsFieldCell: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         delegate.didEndEditingField(field.id, with: textField.text ?? String())
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, textField)
+        UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: textField)
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {

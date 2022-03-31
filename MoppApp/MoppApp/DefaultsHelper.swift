@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,18 @@ let ContainerFormatEdoc = "edoc"
 let ContainerFormatDdoc = "ddoc"
 let ContainerFormatAsice = "asice"
 let ContainerFormatAsiceShort = "sce"
-let ContainerFormatAscis = "asics"
+let ContainerFormatAsics = "asics"
 let ContainerFormatAsicsShort = "scs"
 let ContainerFormatPDF  = "pdf"
 let ContainerFormatCdoc = "cdoc"
+let ContainerFormatP12d = "p12d"
 let FileFormatXml = "xml"
+
+let ContainerFormatAsiceMimetype = "application/vnd.etsi.asic-e+zip"
+let ContainerFormatAsicsMimetype = "application/vnd.etsi.asic-s+zip"
+let ContainerFormatDdocMimetype = "application/x-ddoc"
+let ContainerFormatCdocMimetype = "application/x-cdoc"
+let ContainerFormatAdocMimetype = "application/vnd.lt.archyvai.adoc-2008"
 
 let DefaultContainerFormat = ContainerFormatAsice
 
@@ -50,6 +57,7 @@ fileprivate let kCrashReportSettingKey = "kCrashReportSettingKey"
 fileprivate let kPreviousPreferredLanguage = "kPreviousPreferredLanguage"
 fileprivate let kMoppLanguage = "kMoppLanguage"
 fileprivate let kHideShareContainerDialog = "kHideShareContainerDialog"
+fileprivate let kIsTimestampedDdoc = "kIsTimestampedDdoc"
 
 class DefaultsHelper
 {
@@ -149,6 +157,15 @@ class DefaultsHelper
         }
         get {
             return UserDefaults.standard.bool(forKey: kHideShareContainerDialog)
+        }
+    }
+    
+    class var isTimestampedDdoc: Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kIsTimestampedDdoc)
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: kIsTimestampedDdoc)
         }
     }
 

@@ -3,7 +3,7 @@
 //  MoppLib
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,5 +32,4 @@
 -(id)initWithInterface:(ReaderInterface*)interface andContextHandle:(SCARDHANDLE)contextHandle;
 -(void)setupWithSuccess:(DataSuccessBlock)success failure:(FailureBlock)failure;
 -(void)updateContextHandle:(SCARDCONTEXT) contextHandle;
--(NSString *)atr;
 @end

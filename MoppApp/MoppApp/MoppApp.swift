@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,8 @@
  */
 
 import Foundation
-import Foundation
 import FirebaseCrashlytics
 import Firebase
-
 
 class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
 
@@ -37,10 +35,9 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
     var window: UIWindow?
     var currentElement:String = ""
     var documentFormat:String = ""
-    
-    // iOS 11 blur window fix
-    var blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-    
+    var downloadTask: URLSessionTask?
+    var isInvalidFileInList: Bool = false
+
     var rootViewController: UIViewController? {
         return window?.rootViewController
     }
@@ -64,12 +61,12 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         case openOrCreate
         case addToContainer
     }
-    
+
     enum ContainerType {
         case asic
         case cdoc
     }
-    
+
     static var versionString:String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? String()
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? String()
@@ -83,22 +80,24 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         return "\(majorVersion).\(minorVersion).\(patchVersion)"
     }
 
-    func didFinishLaunchingWithOptions(launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+    func didFinishLaunchingWithOptions(launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         // Log console logs to a file in Documents folder
         #if DEBUG
             setDebugMode(value: true)
-            
+
             let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let documentsDirectory: String = paths[0]
             let currentDate = MoppDateFormatter().ddMMYYYY(toString: Date())
             let fileName = "\(currentDate).log"
             let logFilePath = URL(string: documentsDirectory)?.appendingPathComponent(fileName)
             freopen(logFilePath!.absoluteString, "a+", stderr)
+        
+        print("DEBUG mode: Logging to file. File location: \(logFilePath?.path ?? "Unable to log file path")")
         #else
             setDebugMode(value: false)
         #endif
-        
-        
+
+
         loadNibs()
         // Set navBar not translucent by default.
 
@@ -107,20 +106,20 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
 
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = UIColor.white
-        
+
         // Check for min Xcode 11 and iOS 13
         #if compiler(>=5.1)
         if #available(iOS 13.0, *) {
             window?.overrideUserInterfaceStyle = .light
         }
         #endif
-        
+
         UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().tintColor = UIColor.moppText
         UINavigationBar.appearance().barTintColor = UIColor.moppBaseBackground
         UINavigationBar.appearance().titleTextAttributes = [.foregroundColor : UIColor.moppText]
         UINavigationBar.appearance().barStyle = .default
-        
+
         // Selected TabBar item text color
         UITabBarItem.appearance().setTitleTextAttributes(
             [.foregroundColor:UIColor.white,
@@ -132,19 +131,29 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
             [.foregroundColor:UIColor.moppUnselectedTabBarItem,
              .font:UIFont(name: "RobotoCondensed-Regular", size: 10)!],
             for: .normal)
-        
+
         if isDeviceJailbroken {
             window?.rootViewController = UIStoryboard.jailbreak.instantiateInitialViewController()
         } else {
             
+            #if !DEBUG
+                // Prevent screen recording
+                NotificationCenter.default.addObserver(self, selector: #selector(handleScreenRecording), name: UIScreen.capturedDidChangeNotification, object: nil)
+
+                // Give time to load before handling screen recording
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.handleScreenRecording()
+                }
+            #endif
+
             // Get remote configuration
             SettingsConfiguration().getCentralConfiguration()
-            
+
             TSLUpdater().checkForTSLUpdates()
-            
+
             let notification = Notification(name: .configurationLoaded)
             NotificationCenter.default.post(notification)
-            
+
             let initializationViewController = InitializationViewController()
             window?.rootViewController = initializationViewController
         }
@@ -153,12 +162,24 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         return true
     }
 
+    func handleSharedFiles(sharedFiles: [URL]) {
+        if !sharedFiles.isEmpty {
+            _ = openPath(urls: sharedFiles)
+        }
+    }
+
     func setupTabController() {
         landingViewController = UIStoryboard.landing.instantiateInitialViewController(of: LandingViewController.self)
         window?.rootViewController = landingViewController
-        if let tempUrl = self.tempUrl {
-            _ = openUrl(url: tempUrl, options: [:])
-            self.tempUrl = nil
+
+        let sharedFiles: [URL] = MoppFileManager.shared.sharedDocumentPaths().compactMap { URL(fileURLWithPath: $0) }
+        if !sharedFiles.isEmpty {
+           handleSharedFiles(sharedFiles: sharedFiles)
+        } else {
+            if let tempUrl = self.tempUrl {
+                _ = openUrl(url: tempUrl, options: [:])
+                self.tempUrl = nil
+            }
         }
         if Crashlytics.crashlytics().didCrashDuringPreviousExecution() {
             if (DefaultsHelper.crashReportSetting != CrashlyticsAlwaysSend) {
@@ -183,7 +204,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         }))
         UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true)
     }
-    
+
     func checkForUnsentReportsWithCompletion(send: Bool) {
         Crashlytics.crashlytics().checkForUnsentReports { hasUnsentReport in
             if ((send && hasUnsentReport)) {
@@ -194,68 +215,182 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         }
     }
 
-    func openUrl(url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        if !url.absoluteString.isEmpty {
-            var cleanup = false
-            // Used to access folders on user device when opening container outside app (otherwise gives "Operation not permitted" error)
-            url.startAccessingSecurityScopedResource()
-        
-            // Let all the modal view controllers know that they should dismiss themselves
-            NotificationCenter.default.post(name: .didOpenUrlNotificationName, object: nil)
-        
-            // When app has just been launched, it may not be ready to deal with containers yet. We need to wait until libdigidocpp setup is complete.
-            if landingViewController == nil {
-                tempUrl = url
-                return true
-            }
-            
-            var newUrl = url
-            
-            // Sharing from Google Drive may change file extension
-            let fileExtension = determineFileExtension(mimeType: MimeTypeExtractor().getMimeTypeFromContainer(filePath: newUrl))
-            if fileExtension != "" {
-                do {
-                    let newData: Data = try Data(contentsOf: newUrl)
-                    let fileName: String = newUrl.deletingPathExtension().lastPathComponent
-                    let fileURL: URL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent("temp", isDirectory: true).appendingPathComponent("\(fileName).\(fileExtension)")
-                    do {
-                        try newData.write(to: fileURL, options: .atomic)
-                        newUrl = fileURL
-                        cleanup = true;
-                    } catch {
-                        MSLog("Error writing to file: \(error)")
-                    }
-                } catch {
-                    MSLog("Error getting directory: \(error)")
-                }
-            }
+    func openUrl(url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return openPath(urls: [url], options: options)
+    }
 
-            var isXmlExtensionFileCdoc = false
-            if newUrl.pathExtension.isXmlFileExtension {
-                //Google Drive will change file extension and puts it to Inbox folder
-                if newUrl.absoluteString.range(of: "/Inbox/") != nil {
-                    newUrl = URL (string: newUrl.absoluteString.replacingOccurrences(of: "/Inbox", with: "/temp"))!
-                    isXmlExtensionFileCdoc = self.isXmlExtensionFileCdoc(with: url)
-                    if isXmlExtensionFileCdoc {
-                        newUrl.deletePathExtension()
-                        newUrl.appendPathExtension("cdoc")
+    func openPath(urls: [URL], options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        guard !urls.isEmpty else {
+            printLog("No URLs found to open")
+            return false
+        }
+        var fileUrls: [URL] = []
+        var cleanup: Bool = false
+        for url in urls {
+            if !url.absoluteString.isEmpty {
+                
+                guard let keyWindow = UIApplication.shared.keyWindow, let topViewController = keyWindow.rootViewController?.getTopViewController() else {
+                    printLog("Unable to get view controller")
+                    return false
+                }
+                
+                var fileUrl: URL = url
+                
+                // Handle file from web with "digidoc" scheme
+                if url.scheme == "digidoc" && url.host == "http" {
+                    printLog("Opening HTTP links is not supported")
+                    DispatchQueue.main.async {
+                        return topViewController.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportNewFileOpeningFailedAlertMessage, [url.lastPathComponent]))
                     }
-                    let isFileMoved = MoppFileManager.shared.moveFile(withPath: url.path, toPath: newUrl.path, overwrite: true)
-                    if !isFileMoved {
-                        newUrl = url
+                    return false
+                } else if url.scheme == "digidoc" {
+                    let dispatchGroup: DispatchGroup = DispatchGroup()
+                    dispatchGroup.enter()
+                    UrlSchemeHandler.shared.getFileLocationFromURL(url: url) { (fileLocation: URL?) in
+                        guard let filePath = fileLocation else {
+                            printLog("Unable to get file location from URL")
+                            DispatchQueue.main.async {
+                                return topViewController.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportNewFileOpeningFailedAlertMessage, [url.lastPathComponent]))
+                            }
+                            dispatchGroup.leave()
+                            return
+                        }
+                        fileUrl = filePath
+                        dispatchGroup.leave()
+                    }
+                    // Wait until downloading file from web is done
+                    dispatchGroup.wait()
+                }
+
+                // Check if url has changed after opening file with digidoc scheme to prevent multiple error messages
+                if fileUrl.scheme == "digidoc" && fileUrl == url {
+                    printLog("Failed to open file with scheme")
+                    return false
+                }
+
+                // Used to access folders on user device when opening container outside app (otherwise gives "Operation not permitted" error)
+                fileUrl.startAccessingSecurityScopedResource()
+
+                // Let all the modal view controllers know that they should dismiss themselves
+                NotificationCenter.default.post(name: .didOpenUrlNotificationName, object: nil)
+
+                // When app has just been launched, it may not be ready to deal with containers yet. We need to wait until libdigidocpp setup is complete.
+                if landingViewController == nil {
+                    tempUrl = fileUrl
+                    return true
+                }
+                
+                let isResourceReachable = try? fileUrl.checkResourceIsReachable()
+                if fileUrl.isFileURL && (isResourceReachable == nil || isResourceReachable == false) {
+                    let dispatchGroup: DispatchGroup = DispatchGroup()
+                    dispatchGroup.enter()
+                    FileDownloader.shared.downloadExternalFile(url: fileUrl) { fileLocation in
+                        if let fileLocation = fileLocation {
+                            fileUrl = fileLocation
+                        }
+                        dispatchGroup.leave()
+                    }
+                    dispatchGroup.wait()
+                }
+
+                var newUrl: URL = fileUrl
+                
+                let isFileEmpty = MoppFileManager.isFileEmpty(fileUrl: newUrl)
+                
+                if isFileEmpty {
+                    printLog("Unable to import empty file")
+                    if urls.count == 1 {
+                        topViewController.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportFailedEmptyFile))
+                        return false
+                    }
+                    isInvalidFileInList = true
+                }
+
+                // Sharing from Google Drive may change file extension
+                let fileExtension: String? = MimeTypeExtractor.determineFileExtension(mimeType: MimeTypeExtractor.getMimeTypeFromContainer(filePath: newUrl)) ?? newUrl.pathExtension
+
+                guard var pathExtension = fileExtension else {
+                    printLog("Unable to get file extension")
+                    topViewController.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportNewFileOpeningFailedAlertMessage, [newUrl.lastPathComponent]))
+                    return false
+                }
+                
+                // Some containers have the same mimetype
+                pathExtension = MimeTypeExtractor.determineContainer(mimetype: MimeTypeExtractor.getMimeTypeFromContainer(filePath: newUrl), fileExtension: newUrl.pathExtension)
+
+                do {
+                    let newData: Data? = try Data(contentsOf: newUrl)
+                    let fileName: String = MoppLibManager.sanitize(newUrl.deletingPathExtension().lastPathComponent)
+                    let tempDirectoryPath: String? = MoppFileManager.shared.tempDocumentsDirectoryPath()
+                    guard let tempDirectory = tempDirectoryPath else {
+                        printLog("Unable to get temporary file directory")
+                        topViewController.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportNewFileOpeningFailedAlertMessage, ["\(fileName).\(pathExtension)"]))
+                        return false
+                    }
+                    let fileURL: URL? = URL(fileURLWithPath: tempDirectory, isDirectory: true).appendingPathComponent(fileName, isDirectory: false).appendingPathExtension(pathExtension)
+
+                    guard let newUrlData: Data = newData, let filePath: URL = fileURL else {
+                        printLog("Unable to get file data or file path")
+                        topViewController.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportNewFileOpeningFailedAlertMessage, ["\(fileName).\(pathExtension)"]))
+                        return false
+                    }
+                    do {
+                        try newUrlData.write(to: filePath, options: .atomic)
+                        newUrl = filePath
+                        if !isFileEmpty {
+                            fileUrls.append(newUrl)
+                        }
+                        cleanup = true
+                    } catch let error {
+                        printLog("Error writing to file: \(error.localizedDescription)")
+                        topViewController.showErrorMessage(title: L(.fileImportOpenExistingFailedAlertTitle), message: L(.fileImportNewFileOpeningFailedAlertMessage, ["\(fileName).\(pathExtension)"]))
+                        return false
+                    }
+                } catch let error {
+                    printLog("Error getting directory: \(error)")
+                    topViewController.showErrorMessage(title: L(.fileImportOpenExistingFailedAlertTitle), message: L(.fileImportNewFileOpeningFailedAlertMessage, [newUrl.lastPathComponent]))
+                    return false
+                }
+
+
+                var isXmlExtensionFileCdoc = false
+                if newUrl.pathExtension.isXmlFileExtension {
+                    //Google Drive will change file extension and puts it to Inbox folder
+                    if newUrl.absoluteString.range(of: "/Inbox/") != nil {
+                        newUrl = URL (string: newUrl.absoluteString.replacingOccurrences(of: "/Inbox", with: "/temp"))!
+                        isXmlExtensionFileCdoc = self.isXmlExtensionFileCdoc(with: url)
+                        if isXmlExtensionFileCdoc {
+                            newUrl.deletePathExtension()
+                            newUrl.appendPathExtension(ContainerFormatCdoc)
+                        }
+                        let isFileMoved = MoppFileManager.shared.moveFile(withPath: url.path, toPath: newUrl.path, overwrite: true)
+                        if !isFileMoved {
+                            newUrl = url
+                            fileUrls.append(newUrl)
+                        }
                     }
                 }
+
+                if newUrl.pathExtension.isCdocContainerExtension {
+                    landingViewController?.containerType = .cdoc
+                } else {
+                    landingViewController?.containerType = .asic
+                }
             }
-            
-            if newUrl.pathExtension.isCdocContainerExtension {
-                landingViewController?.containerType = .cdoc
-            } else {
-                landingViewController?.containerType = .asic
-            }
-            landingViewController?.fileImportIntent = .openOrCreate
-            landingViewController?.importFiles(with: [newUrl], cleanup: cleanup)
+            url.stopAccessingSecurityScopedResource()
         }
-        url.stopAccessingSecurityScopedResource()
+
+        if fileUrls.isEmpty {
+            if isInvalidFileInList {
+                landingViewController?.showErrorMessage(title: L(.errorAlertTitleGeneral), message: L(.fileImportFailedEmptyFile))
+                return false
+            }
+            fileUrls = urls
+        }
+
+        landingViewController?.fileImportIntent = .openOrCreate
+        landingViewController?.importFiles(with: fileUrls, cleanup: cleanup, isEmptyFileImported: isInvalidFileInList)
+
         return true
     }
 
@@ -263,53 +398,47 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
         #if !DEBUG
-            if #available(iOS 12, *) {
-                ScreenDisguise.shared.show()
-            } else {
-                // iOS 11 blur window fix
-                blurWindow()
-            }
+            ScreenDisguise.shared.show()
         #endif
     }
 
     func didEnterBackground() {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        MoppFileManager.shared.removeFilesFromSharedFolder()
     }
 
 
     func willEnterForeground() {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         #if !DEBUG
-            if #available(iOS 12, *) {
-                    ScreenDisguise.shared.hide()
-            } else {
-                // iOS 11 blur window fix
-                blurWindow()
-                removeWindowBlur()
-            }
+            ScreenDisguise.shared.hide()
         #endif
     }
 
     func didBecomeActive() {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         #if !DEBUG
-            if #available(iOS 12, *) {
-                ScreenDisguise.shared.hide()
-            } else {
-                // iOS 11 blur window fix
-                removeWindowBlur()
-            }
+            ScreenDisguise.shared.hide()
         #endif
-        
+
+        if UIViewController().getTopViewController() is InitializationViewController || UIViewController().getTopViewController() is LandingViewController {
+            let sharedFiles: [URL] = MoppFileManager.shared.sharedDocumentPaths().compactMap { URL(fileURLWithPath: $0) }
+            if !sharedFiles.isEmpty {
+               handleSharedFiles(sharedFiles: sharedFiles)
+            }
+        }
+
         restartIdCardDiscovering()
     }
 
     func willTerminate() {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-        
+
         // Remove temporarily saved files folder
-        MoppFileManager.shared.removeTempSavedFiles()
+        MoppFileManager.shared.removeTempSavedFilesInDocuments(folderName: "Saved Files")
+        MoppFileManager.shared.removeTempSavedFilesInDocuments(folderName: "Downloads")
+        MoppFileManager.shared.removeFilesFromSharedFolder()
     }
 
     func handleEventsForBackgroundURLSession(identifier: String, completionHandler: @escaping () -> Void) {
@@ -323,13 +452,19 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let data = try? Data(contentsOf: location)
         if data != nil {
-            var groupFolderUrl = MoppFileManager.shared.fileManager.containerURL(forSecurityApplicationGroupIdentifier: "group.ee.ria.digidoc.ios")
-            groupFolderUrl = groupFolderUrl?.appendingPathComponent("Temp")
-            var err: Error?
-            try? MoppFileManager.shared.fileManager.createDirectory(at: groupFolderUrl!, withIntermediateDirectories: false, attributes: nil)
-            let filePath: URL? = groupFolderUrl?.appendingPathComponent(location.lastPathComponent)
-            var error: Error?
-            try? MoppFileManager.shared.fileManager.copyItem(at: location, to: filePath!)
+            let groupFolderUrl = MoppFileManager.shared.fileManager.containerURL(forSecurityApplicationGroupIdentifier: "group.ee.ria.digidoc.ios")
+            guard var tempGroupFolderUrl = groupFolderUrl else {
+                printLog("Unable to get temp group folder url")
+                return
+            }
+            tempGroupFolderUrl = tempGroupFolderUrl.appendingPathComponent("Temp")
+            try? MoppFileManager.shared.fileManager.createDirectory(at: tempGroupFolderUrl, withIntermediateDirectories: false, attributes: nil)
+            let filePath: URL? = tempGroupFolderUrl.appendingPathComponent(location.lastPathComponent)
+            guard let tempFilePath = filePath else {
+                printLog("Unable to get temp file path url")
+                return
+            }
+            try? MoppFileManager.shared.fileManager.copyItem(at: location, to: tempFilePath)
         }
     }
 
@@ -344,7 +479,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         window?.rootViewController = landingViewController
         window?.makeKeyAndVisible()
     }
-    
+
     func isXmlExtensionFileCdoc(with url: URL) -> Bool {
         let parser = XMLParser(contentsOf: url)
         parser?.delegate = self;
@@ -355,9 +490,9 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         }
         return false
     }
-    
+
     func convertViewToImage(with view: UIView) -> UIImage? {
-        
+
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
         defer { UIGraphicsEndImageContext() }
         if let context = UIGraphicsGetCurrentContext() {
@@ -368,52 +503,32 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         return nil
     }
     
-    private func blurWindow() -> Void {
-        self.window?.backgroundColor = .white
-        window?.alpha = 0.5
-        blurEffectView.frame = self.window!.bounds
-        self.window?.addSubview(blurEffectView)
+    @objc private func handleScreenRecording() -> Void {
+        ScreenDisguise.shared.handleScreenRecordingPrevention()
     }
-    
-    private func removeWindowBlur() -> Void {
-        if blurEffectView.isDescendant(of: self.window!) {
-            blurEffectView.backgroundColor = .clear
-            window?.alpha = 1.0
-            blurEffectView.removeFromSuperview()
-        }
-    }
-    
+
     private func restartIdCardDiscovering() {
         let topViewController = UIViewController().getTopViewController()
-        
-        for childViewController in topViewController.childViewControllers {
+
+        for childViewController in topViewController.children {
             if childViewController is IdCardViewController {
                 MoppLibCardReaderManager.sharedInstance().startDiscoveringReaders()
             }
         }
     }
-    
-    private func determineFileExtension(mimeType: String) -> String {
-        switch mimeType {
-        case "application/vnd.etsi.asic-e+zip":
-            return "asice"
-        case "application/vnd.etsi.asic-s+zip":
-            return "asics"
-        case "application/x-ddoc":
-            return "ddoc"
-        case "application/x-cdoc":
-            return "cdoc"
-        default:
-            return ""
-        }
-    }
-    
+
     private func setDebugMode(value: Bool) -> Void {
         let defaults = UserDefaults.standard
         defaults.set(value, forKey: "isDebugMode")
         defaults.synchronize()
     }
-    
+
+    private func showErrorMessage(title: String, message: String) {
+        guard let keyWindow = UIApplication.shared.keyWindow, let topViewController = keyWindow.rootViewController?.getTopViewController() else {
+            return
+        }
+        topViewController.errorAlert(message: message, title: title, dismissCallback: nil)
+    }
 }
 
 extension MoppApp {

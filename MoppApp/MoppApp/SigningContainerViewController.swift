@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@
  */
 
 import Foundation
+import MoppLib
+import UIKit
 
 class SigningContainerViewController : ContainerViewController, SigningActions, UIDocumentPickerDelegate {
     
@@ -51,6 +53,10 @@ class SigningContainerViewController : ContainerViewController, SigningActions, 
         signingContainerViewDelegate = self
         
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 }
 
 extension SigningContainerViewController : SigningContainerViewControllerDelegate {
@@ -61,6 +67,10 @@ extension SigningContainerViewController : SigningContainerViewControllerDelegat
     
     func getSignature(index: Int) -> Any {
         return container.signatures[index]
+    }
+    
+    func getTimestampToken(index: Int) -> Any {
+        return container.timestampTokens[index]
     }
     
     func startSigning() {
@@ -74,6 +84,13 @@ extension SigningContainerViewController : SigningContainerViewControllerDelegat
         return container.signatures.count
     }
     
+    func getTimestampTokensCount() -> Int {
+        if isContainerEmpty() {
+            return 0
+        }
+        return container.timestampTokens.count
+    }
+    
     func isContainerSignable() -> Bool {
         if isContainerEmpty() {
             return true
@@ -85,40 +102,75 @@ extension SigningContainerViewController : SigningContainerViewControllerDelegat
 extension SigningContainerViewController : ContainerViewControllerDelegate {
     
     func removeDataFile(index: Int) {
+        let containerFileCount: Int = self.containerViewDelegate.getDataFileCount()
+        guard containerFileCount > 0 else {
+            printLog("No files in container")
+            self.errorAlert(message: L(.genericErrorMessage))
+            return
+        }
+        
+        if containerFileCount == 1 {
+            confirmDeleteAlert(message: L(.lastDatafileRemoveConfirmMessage)) { [weak self] (alertAction) in
+                if alertAction == .cancel {
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.dataFileRemovalCancelled))
+                } else if alertAction == .confirm {
+                    let containerPath: String? = self?.getContainerPath()
+                    let isDeleted: Bool = ContainerRemovalActions.shared.removeAsicContainer(containerPath: containerPath)
+                    if !isDeleted {
+                        self?.errorAlert(message: L(.dataFileRemovalFailed))
+                        return
+                    }
+                    
+                    UIAccessibility.post(notification: .announcement, argument: L(.dataFileRemoved))
+                    self?.navigationController?.popToRootViewController(animated: true)
+                }
+            }
+        }
+        
         confirmDeleteAlert(
             message: L(.datafileRemoveConfirmMessage),
             confirmCallback: { [weak self] (alertAction) in
-                
-                self?.notifications = []
-                self?.updateState(.loading)
-                MoppLibContainerActions.sharedInstance().removeDataFileFromContainer(
-                    withPath: self?.containerPath,
-                    at: UInt(index),
-                    success: { [weak self] container in
-                        self?.updateState((self?.isCreated ?? false) ? .created : .opened)
-                        self?.container.dataFiles.remove(at: index)
-                        self?.reloadData()
-                    },
-                    failure: { [weak self] error in
-                        self?.updateState((self?.isCreated ?? false) ? .created : .opened)
-                        self?.reloadData()
-                        self?.errorAlert(message: error?.localizedDescription)
-                })
-        })
+                if alertAction == .cancel {
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.dataFileRemovalCancelled))
+                } else if alertAction == .confirm {
+                    self?.notifications = []
+                    self?.updateState(.loading)
+                    MoppLibContainerActions.sharedInstance().removeDataFileFromContainer(
+                        withPath: self?.containerPath,
+                        at: UInt(index),
+                        success: { [weak self] container in
+                            self?.updateState((self?.isCreated ?? false) ? .created : .opened)
+                            self?.container.dataFiles.remove(at: index)
+                            UIAccessibility.post(notification: .announcement, argument: L(.dataFileRemoved))
+                            self?.reloadData()
+                        },
+                        failure: { [weak self] error in
+                            self?.updateState((self?.isCreated ?? false) ? .created : .opened)
+                            self?.reloadData()
+                            self?.errorAlert(message: L(.dataFileRemovalFailed))
+                        })
+                }
+            })
     }
     
-    func saveDataFile(name: String?) {
-        SaveableContainer(signingContainerPath: self.containerPath).saveDataFile(name: name, completionHandler: { tempSavedFileLocation, isSuccess in
+    func saveDataFile(name: String?, containerPath: String?) {
+        var saveFileFromContainerPath = self.containerPath
+        if let dataFileContainerPath = containerPath, !dataFileContainerPath.isEmpty {
+            saveFileFromContainerPath = dataFileContainerPath
+        }
+        SaveableContainer(signingContainerPath: saveFileFromContainerPath ?? "").saveDataFile(name: name, completionHandler: { [weak self] tempSavedFileLocation, isSuccess in
             if isSuccess && !tempSavedFileLocation.isEmpty {
                 // Show file save location picker
                 let pickerController = UIDocumentPickerViewController(url: URL(fileURLWithPath: tempSavedFileLocation), in: .exportToService)
                 pickerController.delegate = self
-                self.present(pickerController, animated: true) {
-                    NSLog("Showing file saving location picker")
+                self?.present(pickerController, animated: true) {
+                    printLog("Showing file saving location picker")
                 }
+                return
             } else {
-                NSLog("Failed to save \(name ?? "file") to 'Saved Files' directory")
-                return self.errorAlert(message: L(.fileImportFailedFileSave))
+                printLog("Failed to save \(name ?? "file") to 'Saved Files' directory")
+                self?.errorAlert(message: L(.fileImportFailedFileSave))
+                return
             }
         })
     }
@@ -126,23 +178,27 @@ extension SigningContainerViewController : ContainerViewControllerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if SaveableContainer.isFileSaved(urls: urls) {
             let savedFileLocation: URL? = urls.first
-            NSLog("File export done. Location: \(savedFileLocation?.path ?? "Not available")")
+            printLog("File export done. Location: \(savedFileLocation?.path ?? "Not available")")
             self.errorAlert(message: L(.fileImportFileSaved))
         } else {
-            NSLog("Failed to save file")
+            printLog("Failed to save file")
             return self.errorAlert(message: L(.fileImportFailedFileSave))
         }
     }
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-        NSLog("File saving cancelled")
+        printLog("File saving cancelled")
     }
     
     func getDataFileDisplayName(index: Int) -> String? {
         guard let dataFile = container.dataFiles[index] as? MoppLibDataFile else {
             return nil
         }
-        return (dataFile.fileName as NSString).lastPathComponent
+        return MoppLibManager.sanitize((dataFile.fileName as String))
+    }
+    
+    func getContainer() -> MoppLibContainer {
+        return container
     }
     
     func getContainerPath() -> String {
@@ -183,7 +239,10 @@ extension SigningContainerViewController : ContainerViewControllerDelegate {
             
             if afterSignatureCreated && container.isSignable() && !strongSelf.isForPreview {
                 strongSelf.notifications.append((true, L(.containerDetailsSigningSuccess)))
-                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification,  L(.containerDetailsSigningSuccess))
+                
+                if UIAccessibility.isVoiceOverRunning {
+                    UIAccessibility.post(notification: .screenChanged, argument: L(.containerDetailsSigningSuccess))
+                }
                 
                 if !DefaultsHelper.hideShareContainerDialog {
                     strongSelf.displayShareContainerDialog()
@@ -216,6 +275,8 @@ extension SigningContainerViewController : ContainerViewControllerDelegate {
                 if nserror.code == Int(MoppLibErrorCode.moppLibErrorGeneral.rawValue) {
                     title = L(.fileImportOpenExistingFailedAlertTitle)
                     message = L(.fileImportOpenExistingFailedAlertMessage, [self?.containerPath.substr(fromLast: "/") ?? String()])
+                } else if nserror.code == Int(MoppLibErrorCode.moppLibErrorNoInternetConnection.rawValue) {
+                    message = L(.noConnectionMessage)
                 }
                 self?.errorAlert(message: message, title: title, dismissCallback: { _ in
                     _ = self?.navigationController?.popViewController(animated: true)

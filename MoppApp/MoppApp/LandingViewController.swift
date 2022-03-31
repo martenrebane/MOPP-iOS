@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-protocol LandingViewControllerTabButtonsDelegate: class {
+protocol LandingViewControllerTabButtonsDelegate: AnyObject {
     func landingViewControllerTabButtonTapped(tabButtonId: LandingViewController.TabButtonId, sender: UIView)
 }
 
@@ -72,7 +72,7 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
 
     var selectedTab: TabButtonId = .signTab {
         willSet {
-            if childViewControllers.first != nil && selectedTab == newValue {
+            if children.first != nil && selectedTab == newValue {
                 return
             }
             changeTabViewController(with: newValue)
@@ -111,6 +111,9 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
     func selectTab(with tabButtonId: TabButtonId) {
         buttonsCollection.forEach {
             $0.setSelected(TabButtonId(rawValue: $0.accessibilityIdentifier!)! == tabButtonId)
+            if isBoldTextEnabled() {
+                $0.title.font = UIFont(name: MoppFontName.allCapsBold.rawValue, size: 11)
+            }
         }
     }
 
@@ -149,14 +152,14 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
     }
 
     func changeTabViewController(with buttonID: TabButtonId) {
-        let oldViewController = childViewControllers.first
+        let oldViewController = children.first
         let newViewController = createViewController(for: buttonID)
         
-        oldViewController?.willMove(toParentViewController: nil)
-        addChildViewController(newViewController)
+        oldViewController?.willMove(toParent: nil)
+        addChild(newViewController)
         
-        oldViewController?.removeFromParentViewController()
-        newViewController.didMove(toParentViewController: self)
+        oldViewController?.removeFromParent()
+        newViewController.didMove(toParent: self)
     
         newViewController.view.translatesAutoresizingMaskIntoConstraints = false
     
@@ -179,7 +182,7 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
 
     func viewController(for tab: TabButtonId) -> UIViewController {
         selectedTab = tab
-        return childViewControllers.first!
+        return children.first!
     }
 
     @objc func tabButtonTapAction(sender: UIButton) {
@@ -201,15 +204,8 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
         let error = userInfo[kErrorKey] as? NSError
         var errorMessage = error?.userInfo[NSLocalizedDescriptionKey] as? String ??
             userInfo[kErrorMessage] as? String
-        if errorMessage == "USER_CANCEL" {
-            errorMessage = MoppLib_LocalizedString("digidoc-service-status-request-user-cancel")
-        }
-        else if errorMessage == "EXPIRED_TRANSACTION" {
-            errorMessage = MoppLib_LocalizedString("digidoc-service-status-request-expired-transaction")
-        } else {
-            guard let strongErrorMessage = errorMessage else { return }
-            errorMessage = MoppLib_LocalizedString(strongErrorMessage)
-        }
+        guard let strongErrorMessage = errorMessage else { return }
+        errorMessage = MoppLib_LocalizedString(strongErrorMessage)
         let alert = UIAlertController(
             title: L(.errorAlertTitleGeneral),
             message: errorMessage,
@@ -221,8 +217,8 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
     }
     
     @objc func receiveStartImportingFilesWithDocumentPickerNotification(_ notification: Notification) {
-        fileImportIntent = notification.userInfo![kKeyFileImportIntent] as! MoppApp.FileImportIntent
-        containerType = notification.userInfo![kKeyContainerType] as! MoppApp.ContainerType
+        fileImportIntent = notification.userInfo![kKeyFileImportIntent] as? MoppApp.FileImportIntent
+        containerType = notification.userInfo![kKeyContainerType] as? MoppApp.ContainerType
         documentPicker.delegate = self
         present(documentPicker, animated: false, completion: nil)
     }
@@ -232,7 +228,14 @@ class LandingViewController : UIViewController, NativeShare, ContainerActions
 
 extension LandingViewController : UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        importFiles(with: urls, cleanup: true)
+        var isEmptyFileImported: Bool = false
+        for url in urls {
+            if MoppFileManager.isFileEmpty(fileUrl: url) {
+                isEmptyFileImported = true
+                break
+            }
+        }
+        importFiles(with: urls, cleanup: true, isEmptyFileImported: isEmptyFileImported)
     }
 }
 
@@ -272,11 +275,11 @@ extension LandingViewController {
                 break
             case "shareButton":
                 if buttonIDs.contains(TabButtonId.decryptButton) && buttonIDs.contains(TabButtonId.shareButton) {
-                    view.accessibilityLabel = setTabAccessibilityLabel(isTabSelected: false, tabName: L(.tabShareButton), positionInRow: "2", viewCount: String(visibleViews.count))
+                    view.accessibilityLabel = setTabAccessibilityLabel(isTabSelected: false, tabName: L(.tabShareButtonAccessibility), positionInRow: "2", viewCount: String(visibleViews.count))
                 } else {
-                    view.accessibilityLabel = setTabAccessibilityLabel(isTabSelected: false, tabName: L(.tabShareButton), positionInRow: "1", viewCount: String(visibleViews.count))
+                    view.accessibilityLabel = setTabAccessibilityLabel(isTabSelected: false, tabName: L(.tabShareButtonAccessibility), positionInRow: "1", viewCount: String(visibleViews.count))
                 }
-                view.accessibilityTraits = UIAccessibilityTraitButton
+                view.accessibilityTraits = UIAccessibilityTraits.button
                 break
             case "signButton":
                 if buttonIDs.contains(TabButtonId.signButton) && buttonIDs.count == 1 {
@@ -284,11 +287,11 @@ extension LandingViewController {
                 } else {
                     view.accessibilityLabel = setTabAccessibilityLabel(isTabSelected: false, tabName: L(.tabSignButton), positionInRow: "2", viewCount: String(visibleViews.count))
                 }
-                view.accessibilityTraits = UIAccessibilityTraitButton
+                view.accessibilityTraits = UIAccessibilityTraits.button
                 break
             case "encryptButton":
-                view.accessibilityLabel = L(.tabEncryptButton)
-                view.accessibilityTraits = UIAccessibilityTraitButton
+                view.accessibilityLabel = L(.tabEncryptButtonAccessibility)
+                view.accessibilityTraits = UIAccessibilityTraits.button
                 break
             case "decryptButton":
                 if buttonIDs.contains(TabButtonId.decryptButton) && buttonIDs.contains(TabButtonId.shareButton) {
@@ -296,11 +299,11 @@ extension LandingViewController {
                 } else {
                     view.accessibilityLabel = L(.tabDecryptButton)
                 }
-                view.accessibilityTraits = UIAccessibilityTraitButton
+                view.accessibilityTraits = UIAccessibilityTraits.button
                 break
             case "confirmButton":
                 view.accessibilityLabel = L(.tabConfirmButton)
-                view.accessibilityTraits = UIAccessibilityTraitButton
+                view.accessibilityTraits = UIAccessibilityTraits.button
                 break
             default:
                 break

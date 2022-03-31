@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,8 +38,15 @@ class AboutViewController: MoppViewController, WKNavigationDelegate {
         webView.configuration.preferences.javaScriptEnabled = false
 
         titleLabel.text = L(.aboutTitle)
+        titleLabel.font = UIFont.moppMediumBold
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
         
-        self.view.accessibilityElements = [titleLabel, dismissButton, webView]
+        guard let titleUILabel = titleLabel, let dismissUIButton = dismissButton, let webUIView = webView else {
+            printLog("Unable to get titleLabel, dismissButton or webView")
+            return
+        }
+        
+        self.view.accessibilityElements = [titleUILabel, dismissUIButton, webUIView]
         
         var localizedAboutHtmlPath:String!
         let appLanguageID = DefaultsHelper.moppLanguageID

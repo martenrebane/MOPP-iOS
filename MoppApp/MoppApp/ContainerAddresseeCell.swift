@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,9 @@
  */
 
 import Foundation
+import UIKit
 
-protocol ContainerAddresseeCellDelegate : class {
+protocol ContainerAddresseeCellDelegate : AnyObject {
     func removeAddressee(index: Int)
 }
 
@@ -41,6 +42,7 @@ class ContainerAddresseeCell: UITableViewCell, AddresseeActions {
     
     @IBAction func removeAddressee(_ sender: Any) {
         delegate.removeAddressee(index: removeIndex)
+        UIAccessibility.post(notification: .screenChanged, argument: L(.cryptoRecipientRemoved))
     }
     
     func populate(addressee: Addressee, index: Int, showRemoveButton: Bool) {
@@ -49,5 +51,10 @@ class ContainerAddresseeCell: UITableViewCell, AddresseeActions {
         removeIndex = index
         nameLabel.text = determineName(addressee: addressee)
         infoLabel.text = determineInfo(addressee: addressee)
+        
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            nameLabel.font = UIFont.setCustomFont(font: .medium, nil, .body)
+            infoLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        }
     }
 }

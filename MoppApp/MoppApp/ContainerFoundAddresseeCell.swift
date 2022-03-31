@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 
 import Foundation
 
-protocol ContainerFoundAddresseeCellDelegate : class {
+protocol ContainerFoundAddresseeCellDelegate : AnyObject {
     func addAddresseeToSelectedArea(index: Int)
 }
 
@@ -43,6 +43,7 @@ class ContainerFoundAddresseeCell: UITableViewCell, AddresseeActions {
     
     @IBAction func addAddressee(_ sender: Any) {
         delegate.addAddresseeToSelectedArea(index: index)
+        UIAccessibility.post(notification: .screenChanged, argument: L(.cryptoRecipientAdded))
     }
     
     func populate(addressee: Addressee, index: Int, isAddButtonDisabled: Bool) {
@@ -54,10 +55,18 @@ class ContainerFoundAddresseeCell: UITableViewCell, AddresseeActions {
         if isAddButtonDisabled {
             addButton.isEnabled = false
             addButton.setTitle(L(LocKey.cryptoAddresseeAddedButtonTitle))
+            addButton.setTitleColor(UIColor.moppLabelDarker, for: .disabled)
         } else {
             addButton.isEnabled = true
             addButton.setTitle(L(LocKey.cryptoAddAddresseeButtonTitle))
-            addButton.accessibilityLabel = L(.cryptoAddAddresseeButtonTitle).lowercased()
+            addButton.accessibilityLabel = L(.cryptoAddAddresseeButtonTitleAccessibility).lowercased()
+            addButton.tintColor = UIColor.moppBase
+        }
+        
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            nameLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+            infoLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+            addButton.titleLabel?.font = UIFont.setCustomFont(font: .medium, 12, .body)
         }
         
     }

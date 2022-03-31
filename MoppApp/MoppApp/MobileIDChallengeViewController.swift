@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,29 +22,35 @@
  */
 
 import SkSigningLib
+import UIKit
 
 private var kRequestTimeout: Double = 120.0
 
 
 class MobileIDChallengeViewController : UIViewController {
-    
+
     @IBOutlet weak var codeLabel: UILabel!
     @IBOutlet weak var timeoutProgressView: UIProgressView!
-    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var helpLabel: UILabel!
-    
+
     var challengeID = String()
     var sessCode = String()
 
     var currentProgress: Double = 0.0
     var sessionTimer: Timer?
-    
+
     var isAnnouncementMade: Bool = false
+
+    func setCustomFont() {
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            helpLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+            codeLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        titleLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-sent")
+
         helpLabel.text = L(.mobileIdSignHelpTitle)
         codeLabel.isHidden = true
         timeoutProgressView.progress = 0
@@ -57,6 +63,28 @@ class MobileIDChallengeViewController : UIViewController {
             selector: #selector(receiveMobileCreateSignatureNotification),
             name: .createSignatureNotificationName,
             object: nil)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didFinishAnnouncement(_:)),
+            name: UIAccessibility.announcementDidFinishNotification,
+            object: nil)
+
+        setCustomFont()
+    }
+
+    @objc func didFinishAnnouncement(_ notification: Notification) {
+        let announcementValue: String? = notification.userInfo?[UIAccessibility.announcementStringValueUserInfoKey] as? String
+        let isAnnouncementSuccessful: Bool? = notification.userInfo?[UIAccessibility.announcementWasSuccessfulUserInfoKey] as? Bool
+
+        guard let isSuccessful = isAnnouncementSuccessful else {
+            return
+        }
+
+        if !isSuccessful {
+            printLog("Control code announcement was not successful, retrying...")
+            UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcementValue)
+        }
     }
 
     deinit {
@@ -69,50 +97,48 @@ class MobileIDChallengeViewController : UIViewController {
     }
 
     @objc func receiveStatusPendingNotification(_ notification: Notification) {
-        if UIAccessibilityIsVoiceOverRunning() {
+        if UIAccessibility.isVoiceOverRunning {
             if !isAnnouncementMade {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: { [weak self] in
                     let challengeIdNumbers = Array<Character>(self!.challengeID)
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3]). \(self!.helpLabel.text!)"]))
+                    UIAccessibility.post(notification: .screenChanged, argument: L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3]). \(self!.helpLabel.text!)"]))
                     self?.isAnnouncementMade = true
                 })
             }
         }
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.titleLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-outstanding-transaction")
-        }
     }
 
     @objc func receiveCreateSignatureStatus(_ notification: Notification) {
-        DispatchQueue.main.async { [weak self] in
-            self?.titleLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-signature")
-        }
         sessionTimer?.invalidate()
         NotificationCenter.default.post(name: .signatureCreatedFinishedNotificationName, object: nil)
         dismiss(animated: false)
     }
-    
+
     @objc func receiveMobileCreateSignatureNotification(_ notification: Notification) {
 
         guard let response = notification.userInfo?[kCreateSignatureResponseKey] as? MoppLibMobileCreateSignatureResponse else {
             return
         }
-    
+
         challengeID = response.challengeId!
         sessCode = "\(Int(response.sessCode))"
-    
-        codeLabel.isHidden = false
-        titleLabel.text = MoppLib_LocalizedString("digidoc-service-status-request-ok")
-        codeLabel.text = L(LocKey.challengeCodeLabel, [challengeID])
-        
         let challengeIdNumbers = Array<Character>(challengeID)
-        codeLabel.accessibilityLabel = L(LocKey.challengeCodeLabel, ["\(challengeIdNumbers[0]), \(challengeIdNumbers[1]), \(challengeIdNumbers[2]), \(challengeIdNumbers[3])"])
+        let challengeIdAccessibilityLabel: String = "\(L(.signingProgress)) \(String(Int(self.timeoutProgressView.progress))) %. \((L(LocKey.challengeCodeLabelAccessibility, [String(challengeIdNumbers[0]), String(challengeIdNumbers[1]), String(challengeIdNumbers[2]), String(challengeIdNumbers[3])]))). \(self.helpLabel.text!)"
+        codeLabel.accessibilityLabel = challengeIdAccessibilityLabel
+        if UIAccessibility.isVoiceOverRunning && !isAnnouncementMade {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: challengeIdAccessibilityLabel)
+            }
+        }
+
+        codeLabel.isHidden = false
+        codeLabel.text = L(LocKey.challengeCodeLabel, [challengeID])
+
         currentProgress = 0.0
-        
+
         sessionTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateSessionProgress), userInfo: nil, repeats: true)
     }
-  
+
     @objc func receiveErrorNotification(_ notification: Notification) {
         guard let userInfo = notification.userInfo else { return }
         let error = userInfo[kErrorKey] as? NSError
@@ -120,30 +146,32 @@ class MobileIDChallengeViewController : UIViewController {
         let errorMessage = userInfo[kErrorMessage] as? String ?? SigningError.generalError.signingErrorDescription ?? L(.genericErrorMessage)
         return showErrorDialog(errorMessage: SkSigningLib_LocalizedString(signingErrorMessage?.signingErrorDescription ?? errorMessage))
     }
-  
+
     func showErrorDialog(errorMessage: String) -> Void {
         DispatchQueue.main.async {
             self.dismiss(animated: false) {
                 let topViewController = self.getTopViewController()
-                
+
                 let errorMessageNoLink: String? = errorMessage.removeFirstLinkFromMessage()
-                
-                let alert = UIAlertController(title: L(.errorAlertTitleGeneral), message: errorMessageNoLink, preferredStyle: UIAlertControllerStyle.alert)
+
+                let alert = UIAlertController(title: L(.errorAlertTitleGeneral), message: errorMessageNoLink, preferredStyle: UIAlertController.Style.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 if let linkInUrl: String = errorMessage.getFirstLinkInMessage() {
                     if let alertActionUrl: UIAlertAction = UIAlertAction().getLinkAlert(message: linkInUrl) {
                         alert.addAction(alertActionUrl)
                     }
                 }
-                
-                topViewController.present(alert, animated: true, completion: nil)
+
+                if !(topViewController is UIAlertController) {
+                    topViewController.present(alert, animated: true, completion: nil)
+                }
             }
         }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
         view.backgroundColor = UIColor.black.withAlphaComponent(0.0)
         UIView.animate(withDuration: 0.35) {
             self.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -160,6 +188,11 @@ class MobileIDChallengeViewController : UIViewController {
             let step: Double = 1.0 / kRequestTimeout
             currentProgress = currentProgress + step
             timeoutProgressView.progress = Float(currentProgress)
+            if UIAccessibility.isVoiceOverRunning {
+                Timer.scheduledTimer(withTimeInterval: 8.5, repeats: false) { timer in
+                    UIAccessibility.post(notification: .layoutChanged, argument: self.timeoutProgressView)
+                }
+            }
         }
         else {
             timer.invalidate()

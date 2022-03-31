@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,17 +54,19 @@ class MoppDateFormatter {
     public static let shared = MoppDateFormatter()
 
     func ddMMYYYY(toString date: Date) -> String {
-        return ddMMYYYYDateFormatter.string(from: date)
+        return handleTimeFormats(date: date, dateFormat: ddMMYYYYDateFormatter.dateFormat)
     }
 
     // 02.03.2015
     func ddMMYYYY(toDate string: String) -> Date {
-        return ddMMYYYYDateFormatter.date(from: string) ?? Date()
+        return ddMMYYYYDateFormatter.date(from: handleTimeFormats(
+            date: ddMMYYYYDateFormatter.date(from: string) ?? Date(),
+            dateFormat: ddMMYYYYDateFormatter.dateFormat)) ?? Date()
     }
 
     // 17:32:06 02.03.2015
     func hHmmssddMMYYYY(toString date: Date) -> String {
-        return hHmmssddMMYYYYDateFormatter.string(from: date)
+        return handleTimeFormats(date: date, dateFormat: hHmmssddMMYYYYDateFormatter.dateFormat)
     }
 
     // 21. Nov OR relative string "Today" etc.
@@ -72,11 +74,11 @@ class MoppDateFormatter {
         let relativeString: String = relativeDateFormatter.string(from: date)
         let nonRelativeString: String = nonRelativeDateFormatter.string(from: date)
         if relativeString == nonRelativeString {
-            return ddMMMDateFormatter.string(from: date)
+            return handleTimeFormats(date: date, dateFormat: ddMMMDateFormatter.dateFormat)
             // No relative date available, use custom format.
         }
         else {
-            return relativeString
+            return handleTimeFormats(date: date, dateFormat: relativeDateFormatter.dateFormat)
             // Return relative date.
         }
     }
@@ -85,7 +87,7 @@ class MoppDateFormatter {
         let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "HH:mm:ss dd.MM.YYYY"
             dateFormatter.timeZone = NSTimeZone.local
-        return dateFormatter.string(from: date)
+        return handleTimeFormats(date: date, dateFormat: dateFormatter.dateFormat)
     }
     
     func dateToString(date: Date?) -> String {
@@ -96,20 +98,24 @@ class MoppDateFormatter {
         
         let formattedDateTime = formatter.date(from: formatter.string(from: date))
         formatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
-        return formatter.string(from: formattedDateTime!)
+        return handleTimeFormats(date: formattedDateTime!, dateFormat: formatter.dateFormat)
     }
     
     func stringToDate(dateString: String?) -> Date {
         guard let dateString = dateString, !dateString.isEmpty else { return Date() }
         let dateFormatter = DateFormatter()
-        let dateFormat = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: Locale.autoupdatingCurrent)
-        if dateString.contains(dateFormatter.amSymbol) || dateString.contains(dateFormatter.pmSymbol) || dateFormat!.contains("a") {
-            // 12h time format
-            dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss Z"
-        } else {
-            // 24h time format
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
-        }
-        return dateFormatter.date(from: dateString)!
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        let date = dateFormatter.date(from: dateString) ?? Date()
+        dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd jj:mm:ss Z")
+        let convertedDateString = dateFormatter.string(from: date)
+        return dateFormatter.date(from: convertedDateString) ?? Date()
+    }
+    
+    func handleTimeFormats(date: Date, dateFormat: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = dateFormat
+        let universalHourFormat = dateFormat.replacingOccurrences(of: "hh", with: "jj").replacingOccurrences(of: "HH", with: "jj")
+        dateFormatter.setLocalizedDateFormatFromTemplate(universalHourFormat)
+        return dateFormatter.string(from: date)
     }
 }

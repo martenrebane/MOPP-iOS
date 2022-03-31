@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ class TokenFlowSelectionViewController : MoppViewController {
     @IBOutlet weak var centerViewCenterCSTR: NSLayoutConstraint!
     @IBOutlet weak var centerViewOutofscreenCSTR: NSLayoutConstraint!
     @IBOutlet weak var centerViewKeyboardCSTR: NSLayoutConstraint!
+    @IBOutlet var centerLandscapeCSTR: NSLayoutConstraint!
     @IBOutlet var tokenFlowMethodButtons: [UIButton]!
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var tokenNavbar: UIView!
@@ -54,10 +55,6 @@ class TokenFlowSelectionViewController : MoppViewController {
         localizeButtonTitles()
     }
 
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let signMethod = TokenFlowMethodButtonID(rawValue: DefaultsHelper.signMethod) ?? .mobileID
@@ -76,6 +73,8 @@ class TokenFlowSelectionViewController : MoppViewController {
         centerViewCenterCSTR.priority = .defaultLow
         centerViewOutofscreenCSTR.priority = .defaultHigh
         
+        handleConstraintInLandscape()
+        
         view.layoutIfNeeded()
         
         UIView.animate(withDuration: 0.35, delay: 0.0, options: .curveEaseOut, animations: {
@@ -85,6 +84,10 @@ class TokenFlowSelectionViewController : MoppViewController {
         }) { _ in
             
         }
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        handleConstraintInLandscape()
     }
     
     func localizeButtonTitles() {
@@ -107,13 +110,14 @@ class TokenFlowSelectionViewController : MoppViewController {
 
 extension TokenFlowSelectionViewController {
     func changeTokenFlowMethod(newSignMethod: TokenFlowMethodButtonID) {
-        let oldViewController = childViewControllers.first
+        let oldViewController = children.first
         let newViewController: MoppViewController!
         selectButton(buttonID: newSignMethod)
         switch newSignMethod {
         case .idCard:
             let idCardSignVC = UIStoryboard.tokenFlow.instantiateViewController(of: IdCardViewController.self)
                 idCardSignVC.containerPath = containerPath
+            centerLandscapeCSTR.isActive = false
             if isFlowForDecrypting {
                 idCardSignVC.isActionDecryption = true
                 idCardSignVC.decryptDelegate = idCardDecryptViewControllerDelegate
@@ -125,11 +129,13 @@ extension TokenFlowSelectionViewController {
             viewAccessibilityElements = [idCardButton, containerView, mobileIDButton,  smartIDButton, containerView]
         case .mobileID:
             let mobileIdEditVC = UIStoryboard.tokenFlow.instantiateViewController(of: MobileIDEditViewController.self)
+            handleConstraintInLandscape()
                 mobileIdEditVC.delegate = mobileIdEditViewControllerDelegate
             newViewController = mobileIdEditVC
             viewAccessibilityElements = [mobileIDButton, containerView, smartIDButton, idCardButton, containerView]
         case .smartID:
             let smartIdEditVC = UIStoryboard.tokenFlow.instantiateViewController(of: SmartIDEditViewController.self)
+            handleConstraintInLandscape()
                 smartIdEditVC.delegate = smartIdEditViewControllerDelegate
             newViewController = smartIdEditVC
             viewAccessibilityElements = [smartIDButton, containerView, idCardButton, mobileIDButton, smartIDButton, containerView]
@@ -138,11 +144,11 @@ extension TokenFlowSelectionViewController {
         self.view.accessibilityElements = viewAccessibilityElements
         newViewController.accessibilityElements = viewAccessibilityElements
         
-        oldViewController?.willMove(toParentViewController: nil)
-        addChildViewController(newViewController)
+        oldViewController?.willMove(toParent: nil)
+        addChild(newViewController)
         
-        oldViewController?.removeFromParentViewController()
-        newViewController.didMove(toParentViewController: self)
+        oldViewController?.removeFromParent()
+        newViewController.didMove(toParent: self)
     
         newViewController.view.translatesAutoresizingMaskIntoConstraints = false
         
@@ -185,7 +191,7 @@ extension TokenFlowSelectionViewController {
                 $0.setTitleColor(lightColor, for: .normal)
                 $0.setTitleColor(lightColor, for: .selected)
                 $0.setTitleColor(lightColor, for: .highlighted)
-                $0.titleLabel?.font = UIFont(name: MoppFontName.allCapsBold.rawValue, size: 17.0)
+                $0.titleLabel?.font = UIFont.setCustomFont(font: .allCapsBold, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
                 $0.isSelected = true
             } else {
                 // set unselected state
@@ -193,9 +199,17 @@ extension TokenFlowSelectionViewController {
                 $0.setTitleColor(darkColor, for: .normal)
                 $0.setTitleColor(darkColor, for: .selected)
                 $0.setTitleColor(darkColor, for: .highlighted)
-                $0.titleLabel?.font = UIFont(name: MoppFontName.allCapsRegular.rawValue, size: 17.0)
+                $0.titleLabel?.font = UIFont.setCustomFont(font: .allCapsRegular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
                 $0.isSelected = false
             }
+        }
+    }
+    
+    func handleConstraintInLandscape() {
+        if isDeviceOrientationLandscape() {
+            centerLandscapeCSTR.isActive = true
+        } else {
+            centerLandscapeCSTR.isActive = false
         }
     }
 }

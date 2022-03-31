@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-protocol MenuHeaderDelegate: class {
+protocol MenuHeaderDelegate: AnyObject {
     func menuHeaderDismiss()
 }
 
 class MenuHeaderCell : UITableViewCell {
     weak var delegate: MenuHeaderDelegate!
+    
+    @IBOutlet weak var menuCloseButton: UIButton!
     
     @IBAction func dismissAction() {
         delegate.menuHeaderDismiss()
@@ -33,5 +35,6 @@ class MenuHeaderCell : UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        menuCloseButton.accessibilityLabel = L(.menuClose)
     }
 }

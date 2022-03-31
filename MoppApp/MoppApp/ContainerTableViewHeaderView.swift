@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
  */
 import Foundation
 
-protocol ContainerTableViewHeaderDelegate : class {
+protocol ContainerTableViewHeaderDelegate : AnyObject {
     func didTapContainerHeaderButton()
 }
 
@@ -40,13 +40,19 @@ class ContainerTableViewHeaderView: UIView {
         
         let topColor = UIColor.white.withAlphaComponent(1.0)
         let botColor = UIColor.white.withAlphaComponent(0.8)
-        _ = createGradientLayer(topColor: topColor, bottomColor: botColor)
+        createGradientLayer(topColor: topColor, bottomColor: botColor)
     }
     
     func populate(withTitle title: String, showAddButton: Bool) {
         addButton.isHidden = !showAddButton
-        
+        addButton.accessibilityLabel = showAddButton ? L(.containerHeaderFilesAddFile) : ""
         titleLabel.text = title
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
+        if isNonDefaultPreferredContentSizeCategory() {
+            titleLabel.font = UIFont.setCustomFont(font: .medium, nil, .body)
+            titleLabel.numberOfLines = 3
+            titleLabel.lineBreakMode = .byWordWrapping
+        }
     }
     
     @IBAction func addAction() {

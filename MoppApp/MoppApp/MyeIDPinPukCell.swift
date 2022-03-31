@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-protocol MyeIDPinPukCellDelegate: class {
+protocol MyeIDPinPukCellDelegate: AnyObject {
     func didTapChangeCodeButton()
 }
 
@@ -29,6 +29,7 @@ class MyeIDPinPukCell: UITableViewCell {
     weak var infoManager: MyeIDInfoManager!
     var kind: MyeIDInfoManager.PinPukCell.Kind!
     
+    @IBOutlet weak var certInfoView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var certInfoLabel: UILabel!
     @IBOutlet weak var button: UIButton!
@@ -80,15 +81,15 @@ class MyeIDPinPukCell: UITableViewCell {
             var url: URL!
             let appLanguageID = DefaultsHelper.moppLanguageID
             if appLanguageID  == "et" {
-                url = URL(string: "https://www.id.ee/index.php?id=30133")
+                url = URL(string: "https://www.politsei.ee/et/juhend/id-kaardi-taotlemine-taeiskasvanule/id-kaardi-kasutaja-meelespea")
             }
             else if appLanguageID == "ru" {
-                url = URL(string: "https://www.id.ee/?lang=ru&id=33922")
+                url = URL(string: "https://www.politsei.ee/ru/instruktsii/hodataystvo-o-vydache-id-karty-vzroslomu/pamyatka-dlya-polzovatelya-id-karti")
             }
             else {
-                url = URL(string: "https://www.id.ee/?lang=en&id=31027")
+                url = URL(string: "https://www.politsei.ee/en/instructions/applying-for-an-id-card-for-an-adult/reminders-for-id-card-holders")
             }
-            MoppApp.instance.open(url, options: [:], completionHandler: nil)
+            MoppApp.instance.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
         }
         
         if let actionType = actionType {
@@ -100,11 +101,13 @@ class MyeIDPinPukCell: UITableViewCell {
         contentView.bounds = bounds
         layoutIfNeeded()
         
-        titleLabel.isAccessibilityElement = true
-        certInfoLabel.isAccessibilityElement = true
+        certInfoView.isAccessibilityElement = true
+        errorLabel.isAccessibilityElement = true
         
         errorLabel.preferredMaxLayoutWidth = errorLabel.frame.width
-        certInfoLabel.preferredMaxLayoutWidth = certInfoLabel.frame.width
+        if !isNonDefaultPreferredContentSizeCategory() {
+            certInfoLabel.preferredMaxLayoutWidth = certInfoLabel.frame.width
+        }
         
         kind = pinPukCellInfo.kind
         bottomLine.isHidden = kind == .puk
@@ -134,7 +137,7 @@ class MyeIDPinPukCell: UITableViewCell {
                 }
             } else {
                 showLink(authCertValid && !pukBlocked)
-                linkLabel.attributedText = NSAttributedString(string: pinPukCellInfo.linkText, attributes: [.underlineStyle : NSUnderlineStyle.styleSingle.rawValue])
+                linkLabel.attributedText = NSAttributedString(string: pinPukCellInfo.linkText, attributes: [.underlineStyle : NSUnderlineStyle.single.rawValue])
                 linkButton.accessibilityLabel = L(.myEidInfoPin1LinkText)
                 errorLabel.isHidden = true
                 errorLabel.text = nil
@@ -142,9 +145,9 @@ class MyeIDPinPukCell: UITableViewCell {
                 button.backgroundColor = UIColor.moppBase
                 
                 if savedLastFocusElement == .changePIN1 {
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, button)
+                    UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: button)
                 } else if savedLastFocusElement == .unblockPIN1 {
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, linkButton)
+                    UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: linkButton)
                 }
             }
         }
@@ -163,16 +166,16 @@ class MyeIDPinPukCell: UITableViewCell {
                 }
             } else {
                 showLink(signCertValid && !pukBlocked)
-                linkLabel.attributedText = NSAttributedString(string: pinPukCellInfo.linkText, attributes: [.underlineStyle : NSUnderlineStyle.styleSingle.rawValue])
+                linkLabel.attributedText = NSAttributedString(string: pinPukCellInfo.linkText, attributes: [.underlineStyle : NSUnderlineStyle.single.rawValue])
                 linkButton.accessibilityLabel = L(.myEidInfoPin2LinkText)
                 showErrorLabel(false)
                 showChangeButton(signCertValid, with: pinPukCellInfo.buttonText)
                 button.backgroundColor = UIColor.moppBase
                 
                 if savedLastFocusElement == .changePIN2 {
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, button)
+                    UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: button)
                 } else if savedLastFocusElement == .unblockPIN2 {
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, linkButton)
+                    UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: linkButton)
                 }
             }
         }
@@ -180,7 +183,7 @@ class MyeIDPinPukCell: UITableViewCell {
             titleLabel.text = pinPukCellInfo.title
             if pukBlocked {
                 showLink(true)
-                linkLabel.attributedText = NSAttributedString(string: L(.myEidHowToGetCodesMessage), attributes: [.underlineStyle : NSUnderlineStyle.styleSingle.rawValue])
+                linkLabel.attributedText = NSAttributedString(string: L(.myEidHowToGetCodesMessage), attributes: [.underlineStyle : NSUnderlineStyle.single.rawValue])
                 linkButton.accessibilityLabel = L(.myEidHowToGetCodesMessage)
                 showErrorLabel(true, with: L(.myEidInfoPukBlockedMessage))
                 showChangeButton(false)
@@ -192,9 +195,13 @@ class MyeIDPinPukCell: UITableViewCell {
                 button.backgroundColor = UIColor.moppBase
                 
                 if savedLastFocusElement == .changePUK {
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, button)
+                    UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: button)
                 }
             }
+        }
+        
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            setCustomFont()
         }
         
         layoutIfNeeded()
@@ -204,11 +211,12 @@ class MyeIDPinPukCell: UITableViewCell {
         if let certInfoText = pinPukCellInfo.certInfoText {
             certInfoLabel.text = certInfoText
             certInfoLabel.accessibilityLabel = certInfoText
+            certInfoLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
         } else {
             certInfoLabel.text = nil
-            certInfoLabel.font = nil
             certInfoLabel.accessibilityLabel = nil
             certInfoLabel.attributedText = infoManager.certInfoAttributedString(for: kind)
+            certInfoLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
             certInfoLabel.setNeedsDisplay()
         }
     }
@@ -232,6 +240,7 @@ class MyeIDPinPukCell: UITableViewCell {
     func showErrorLabel(_ show:Bool, with text:String? = nil) {
         errorLabel.attributedText = nil
         errorLabel.text = show ? text : nil
+        errorLabel.accessibilityLabel = show ? text : nil
         errorLabel.isHidden = !show
     }
     
@@ -239,4 +248,17 @@ class MyeIDPinPukCell: UITableViewCell {
         showCertsExpiredCSTR.priority = show ? UILayoutPriority.defaultHigh : UILayoutPriority.defaultLow
         hideCertsExpiredCSTR.priority = show ? UILayoutPriority.defaultLow : UILayoutPriority.defaultHigh
     }
+    
+    func setCustomFont() {
+        titleLabel.font = UIFont.setCustomFont(font: .medium, nil, .body)
+        errorLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        linkLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        linkButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        button.titleLabel?.font = UIFont.setCustomFont(font: .allCapsRegular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+    }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -67,6 +67,10 @@ extension CryptoContainerViewController : CryptoContainerViewControllerDelegate 
         startEncryptingProcess()
     }
     
+    func getContainer() -> CryptoContainer {
+        return container
+    }
+    
     func removeSelectedAddressee(index: Int) {
         container.addressees.removeObject(at: index)
         reloadCryptoData()
@@ -101,30 +105,68 @@ extension CryptoContainerViewController : AddresseeViewControllerDelegate {
 extension CryptoContainerViewController : ContainerViewControllerDelegate {
     
     func removeDataFile(index: Int) {
+        let containerFileCount: Int = self.getContainer().dataFiles.count
+        guard containerFileCount > 0 else {
+            printLog("No files in container")
+            self.errorAlert(message: L(.genericErrorMessage))
+            return
+        }
+        
+        if containerFileCount == 1 {
+            confirmDeleteAlert(message: L(.lastDatafileRemoveConfirmMessage)) { [weak self] (alertAction) in
+                if alertAction == .cancel {
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.dataFileRemovalCancelled))
+                } else if alertAction == .confirm {
+                    let cryptoContainer: CryptoContainer? = self?.getContainer()
+                    let isDeleted: Bool = ContainerRemovalActions.shared.removeCdocContainer(cryptoContainer: cryptoContainer)
+                    if !isDeleted {
+                        self?.errorAlert(message: L(.dataFileRemovalFailed))
+                        return
+                    }
+                    
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.dataFileRemoved))
+                    self?.navigationController?.popToRootViewController(animated: true)
+                }
+            }
+        }
         confirmDeleteAlert(
             message: L(.datafileRemoveConfirmMessage),
             confirmCallback: { [weak self] (alertAction) in
-                guard let strongSelf = self else { return }
-                strongSelf.notifications = []
-                strongSelf.updateState(.loading)
-                strongSelf.updateState((self?.isCreated)! ? .created : .opened)
-                strongSelf.container.dataFiles.removeObject(at:index)
-                strongSelf.reloadData()
-        })
+                if alertAction == .cancel {
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.dataFileRemovalCancelled))
+                } else if alertAction == .confirm {
+                    guard let strongSelf = self else { return }
+                    strongSelf.notifications = []
+                    strongSelf.updateState(.loading)
+                    strongSelf.updateState((self?.isCreated)! ? .created : .opened)
+                    if strongSelf.container.dataFiles.count > index {
+                        strongSelf.container.dataFiles.removeObject(at: index)
+                    } else {
+                        self?.errorAlert(message: L(.dataFileRemovalFailed))
+                        return
+                    }
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.dataFileRemoved))
+                    strongSelf.reloadData()
+                }
+            })
 
     }
     
-    func saveDataFile(name: String?) {
-        SaveableContainer(signingContainerPath: self.containerPath, cryptoContainer: container).saveDataFile(name: name, completionHandler: { tempSavedFileLocation, isSuccess in
+    func saveDataFile(name: String?, containerPath: String?) {
+        var saveFileFromContainerPath = self.containerPath
+        if let dataFileContainerPath = containerPath, !dataFileContainerPath.isEmpty {
+            saveFileFromContainerPath = dataFileContainerPath
+        }
+        SaveableContainer(signingContainerPath: saveFileFromContainerPath ?? "", cryptoContainer: container).saveDataFile(name: name, completionHandler: { tempSavedFileLocation, isSuccess in
             if isSuccess && !tempSavedFileLocation.isEmpty {
                 // Show file save location picker
                 let pickerController = UIDocumentPickerViewController(url: URL(fileURLWithPath: tempSavedFileLocation), in: .exportToService)
                 pickerController.delegate = self
                 self.present(pickerController, animated: true) {
-                    NSLog("Showing file saving location picker")
+                    printLog("Showing file saving location picker")
                 }
             } else {
-                NSLog("Failed to save \(name ?? "file") to 'Saved Files' directory")
+                printLog("Failed to save \(name ?? "file") to 'Saved Files' directory")
                 return self.errorAlert(message: L(.fileImportFailedFileSave))
             }
         })
@@ -133,16 +175,16 @@ extension CryptoContainerViewController : ContainerViewControllerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if SaveableContainer.isFileSaved(urls: urls) {
             let savedFileLocation: URL? = urls.first
-            NSLog("File export done. Location: \(savedFileLocation?.path ?? "Not available")")
+            printLog("File export done. Location: \(savedFileLocation?.path ?? "Not available")")
             self.errorAlert(message: L(.fileImportFileSaved))
         } else {
-            NSLog("Failed to save file")
+            printLog("Failed to save file")
             return self.errorAlert(message: L(.fileImportFailedFileSave))
         }
     }
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-        NSLog("File saving cancelled")
+        printLog("File saving cancelled")
     }
     
     func getDataFileDisplayName(index: Int) -> String? {
@@ -153,6 +195,10 @@ extension CryptoContainerViewController : ContainerViewControllerDelegate {
             return dataFile.filename
         }
         return (dataFile.filePath as NSString).lastPathComponent
+    }
+    
+    func getContainer() -> MoppLibContainer {
+        return MoppLibContainer()
     }
     
     func getContainerPath() -> String {

@@ -2,7 +2,7 @@
 //  CryptoLib.h
 //  CryptoLib
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,3 +33,7 @@ FOUNDATION_EXPORT const unsigned char CryptoLibVersionString[];
 #import <CryptoLib/CryptoDataFile.h>
 #import <CryptoLib/CdocInfo.h>
 #import "base64.h"
+#import <CryptoLib/CdocParser.h>
+#import <CryptoLib/AbstractSmartToken.h>
+#import <CryptoLib/MoppLdapConfiguration.h>
+#import <CryptoLib/OpenLdap.h>

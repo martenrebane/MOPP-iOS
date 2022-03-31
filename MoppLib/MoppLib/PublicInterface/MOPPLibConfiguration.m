@@ -3,7 +3,7 @@
 //  MoppLib
 //
 /*
- * Copyright 2019 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 
 @implementation MoppLibConfiguration
 
-- (id) initWithConfiguration:(NSString *)SIVAURL TSLURL:(NSString *)TSLURL TSLCERTS:(NSArray<NSString*> *)TSLCERTS TSAURL:(NSString *)TSAURL OCSPISSUERS:(NSDictionary *)OCSPISSUERS {
+- (id) initWithConfiguration:(NSString *)SIVAURL TSLURL:(NSString *)TSLURL TSLCERTS:(NSArray<NSString*> *)TSLCERTS TSAURL:(NSString *)TSAURL OCSPISSUERS:(NSDictionary *)OCSPISSUERS CERTBUNDLE:(NSArray<NSString*> *)CERTBUNDLE {
     self = [super init];
     if (self) {
         self.SIVAURL = SIVAURL;
@@ -33,6 +33,7 @@
         self.TSLCERTS = TSLCERTS;
         self.TSAURL = TSAURL;
         self.OCSPISSUERS = OCSPISSUERS;
+        self.CERTBUNDLE = CERTBUNDLE;
     }
     
     return self;

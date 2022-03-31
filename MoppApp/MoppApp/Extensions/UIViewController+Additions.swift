@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,10 +23,14 @@
 import Foundation
 
 extension UIViewController {
-    func confirmDeleteAlert(message: String?, confirmCallback: @escaping (_ action: UIAlertAction) -> Void) {
+    func confirmDeleteAlert(message: String?, confirmCallback: @escaping (_ action: UIAlertAction.DeleteAction) -> Void) {
         let confirmDialog = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-            confirmDialog.addAction(UIAlertAction(title: L(.actionCancel), style: .default, handler: nil))
-            confirmDialog.addAction(UIAlertAction(title: L(.actionDelete), style: .destructive, handler: confirmCallback))
+        confirmDialog.addAction(UIAlertAction(title: L(.actionCancel), style: .cancel, handler: { _ in
+            confirmCallback(.cancel)
+        }))
+        confirmDialog.addAction(UIAlertAction(title: L(.actionDelete), style: .destructive, handler: { _ in
+            confirmCallback(.confirm)
+        }))
         present(confirmDialog, animated: true, completion: nil)
     }
     
@@ -84,8 +88,12 @@ extension UIViewController {
     }
     
     func displayShareContainerDialog() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            let uiAlertController: UIAlertController = UIAlertController(title: nil, message: L(.successNotificationDialogLabel), preferredStyle: .alert)
+        var dialogWaitTime: DispatchTime = DispatchTime.now() + 1
+        if UIAccessibility.isVoiceOverRunning {
+            dialogWaitTime = DispatchTime.now() + 2
+        }
+        DispatchQueue.main.asyncAfter(deadline: dialogWaitTime) {
+            let uiAlertController: UIAlertController = UIAlertController(title: "", message: L(.successNotificationDialogLabel), preferredStyle: .alert)
             
             uiAlertController.addAction(UIAlertAction(title: L(.successNotificationDialogDontShowAgain), style: .default, handler: {(_: UIAlertAction) in
                 DefaultsHelper.hideShareContainerDialog = true
@@ -97,5 +105,21 @@ extension UIViewController {
             
             self.present(uiAlertController, animated: true, completion: nil)
         }
+    }
+    
+    func displayMessageDialog(message: String) {
+        let uiAlertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        
+        uiAlertController.addAction(UIAlertAction(title: L(.actionOk), style: .default))
+        
+        self.present(uiAlertController, animated: true, completion: nil)
+    }
+    
+    func showErrorMessage(title: String, message: String) {
+        let topViewController: UIViewController = getTopViewController()
+        guard topViewController.isViewLoaded else {
+            return
+        }
+        topViewController.errorAlert(message: message, title: title, dismissCallback: nil)
     }
 }

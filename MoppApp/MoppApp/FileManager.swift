@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -70,7 +70,6 @@ class MoppFileManager {
         let path: String = documentsDirectoryPath() + ("/temp")
         var isDir : ObjCBool = false
         if !(fileManager.fileExists(atPath: path, isDirectory: &isDir)) {
-            var error: Error?
             try? fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: [FileAttributeKey.protectionKey: FileProtectionType.complete])
         }
         return path
@@ -78,7 +77,7 @@ class MoppFileManager {
 
     func tempFilePath(withFileName fileName: String) -> String? {
         let tempPathURL = URL(fileURLWithPath: tempDocumentsDirectoryPath())
-        let filePathURL = URL(fileURLWithPath: fileName,
+        let filePathURL = URL(fileURLWithPath: MoppLibManager.sanitize(fileName),
             isDirectory: false, relativeTo: tempPathURL).absoluteURL
 
         // Create intermediate directories for possibility of creating temporary
@@ -106,12 +105,23 @@ class MoppFileManager {
 
     func sharedDocumentPaths() -> [String] {
         let cachePath: String = sharedDocumentsPath()
-        let files = try! fileManager.contentsOfDirectory(atPath: sharedDocumentsPath())
-        var array = [String]()
-        for file in files {
-            array.append("\(cachePath)/\(file)")
+        var filePaths: [String] = []
+        guard !cachePath.isEmpty else {
+            printLog("Unable to get shared documents folder path")
+            return filePaths
         }
-        return array
+        
+        let files: [String]? = try? fileManager.contentsOfDirectory(atPath: cachePath)
+        guard let filesInDirectory: [String] = files else {
+            printLog("Unable to get shared documents directory")
+            return filePaths
+        }
+        
+        for file in filesInDirectory {
+            filePaths.append("\(cachePath)/\(file)")
+        }
+        
+        return filePaths
     }
     
     func libraryDirectoryPath() -> String {
@@ -166,16 +176,16 @@ class MoppFileManager {
         let savedFilesDirectory: URL? = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Saved Files", isDirectory: true)
         let tempFilesDirectory: URL? = URL(string: MoppFileManager.shared.tempDocumentsDirectoryPath())
         
-        guard let saveDir: URL = savedFilesDirectory else { NSLog("Failed to get \(savedFilesDirectory?.lastPathComponent ?? "requested") directory"); completionHandler(false, nil); return }
+        guard let saveDir: URL = savedFilesDirectory else { printLog("Failed to get \(savedFilesDirectory?.lastPathComponent ?? "requested") directory"); completionHandler(false, nil); return }
         do {
             _ = try saveDir.checkResourceIsReachable()
         } catch {
             // Create directory
-            NSLog("Directory '\(saveDir.lastPathComponent)' does not exist, creating...")
+            printLog("Directory '\(saveDir.lastPathComponent)' does not exist, creating...")
             do {
                 _ = try fileManager.createDirectory(at: saveDir, withIntermediateDirectories: true, attributes: nil)
             } catch let error {
-                NSLog("Failed to create '\(saveDir.lastPathComponent)' directory. Error: \(error.localizedDescription)")
+                printLog("Failed to create '\(saveDir.lastPathComponent)' directory. Error: \(error.localizedDescription)")
                 completionHandler(false, nil)
                 return
             }
@@ -184,16 +194,16 @@ class MoppFileManager {
         // Save file to temporary location
         let saveTempFileToLocation: String = saveDir.appendingPathComponent(fileName).path
         
-        guard let tempDir: URL = tempFilesDirectory else { NSLog("Failed to get \(tempFilesDirectory?.lastPathComponent ?? "requested") directory"); completionHandler(false, nil); return }
+        guard let tempDir: URL = tempFilesDirectory else { printLog("Failed to get \(tempFilesDirectory?.lastPathComponent ?? "requested") directory"); completionHandler(false, nil); return }
         let saveFileForCdocLocation: String = tempDir.appendingPathComponent(fileName).path
         
         if URL(fileURLWithPath: containerPath).pathExtension.isAsicContainerExtension {
             MoppLibContainerActions.sharedInstance()?.container(containerPath, saveDataFile: fileName, to: saveTempFileToLocation, success: {
-                NSLog("Successfully saved \(fileName) to 'Saved Files' directory")
+                printLog("Successfully saved \(fileName) to 'Saved Files' directory")
                 completionHandler(true, saveTempFileToLocation)
                 return
             }, failure: { (error) in
-                NSLog("Failed to save file. Error: \(error?.localizedDescription ?? "No error to display")")
+                printLog("Failed to save file. Error: \(error?.localizedDescription ?? "No error to display")")
                 completionHandler(false, nil)
                 return
             })
@@ -204,26 +214,26 @@ class MoppFileManager {
                 try savedCdocFileData?.write(to: fileUrl)
                 completionHandler(true, saveFileForCdocLocation)
             } catch let error {
-                NSLog("Failed to save file. Error: \(error.localizedDescription)")
+                printLog("Failed to save file. Error: \(error.localizedDescription)")
                 completionHandler(false, nil)
                 return
             }
         }
     }
     
-    func removeTempSavedFiles() {
+    func removeTempSavedFilesInDocuments(folderName: String) {
         do {
-            let savedFilesDirectory: URL? = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Saved Files", isDirectory: true)
+            let savedFilesDirectory: URL? = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(folderName, isDirectory: true)
 
-            guard let saveDir: URL = savedFilesDirectory else { NSLog("Failed to get \(savedFilesDirectory?.lastPathComponent ?? "requested") directory"); return }
+            guard let saveDir: URL = savedFilesDirectory else { printLog("Failed to get \(savedFilesDirectory?.lastPathComponent ?? "requested") directory"); return }
             if fileManager.fileExists(atPath: saveDir.path) {
                 try fileManager.removeItem(atPath: saveDir.path)
-                NSLog("Folder '\(saveDir.lastPathComponent)' removed!")
+                printLog("Folder '\(saveDir.lastPathComponent)' removed!")
             } else {
-                NSLog("Folder '\(saveDir.lastPathComponent)' does not exist")
+                printLog("Folder '\(saveDir.lastPathComponent)' does not exist")
             }
         } catch let error {
-            NSLog("Error removing folder. Error \(error.localizedDescription)")
+            printLog("Error removing folder. Error \(error.localizedDescription)")
         }
     }
 
@@ -231,7 +241,7 @@ class MoppFileManager {
         do {
             try fileManager.removeItem(atPath: filePath(withFileName: fileName))
         } catch {
-            MSLog("removeFileWithName error: %@", error)
+            printLog("removeFileWithName error: \(error.localizedDescription)")
         }
     }
 
@@ -239,7 +249,15 @@ class MoppFileManager {
         do {
             try fileManager.removeItem(atPath: filePath)
         } catch {
-            MSLog("removeFileWithPath error: %@", error)
+            printLog("removeFileWithPath error: \(error.localizedDescription)")
+        }
+    }
+    
+    func removeFilesFromSharedFolder() {
+        let sharedFiles = sharedDocumentPaths().compactMap { URL(fileURLWithPath: $0) }
+        
+        for sharedFile: URL in sharedFiles {
+            removeFile(withPath: sharedFile.path)
         }
     }
 
@@ -254,9 +272,23 @@ class MoppFileManager {
         do {
             try fileManager.moveItem(atPath: sourcePath, toPath: destinationPath)
         } catch {
-            MSLog("moveFileWithPath error: %@", error)
+            printLog("moveFileWithPath error: \(error.localizedDescription)")
             return false
         }
+        return true
+    }
+    
+    func renameFile(withPath sourcePath: URL, toPath destinationPath: URL) -> Bool {
+        do {
+            guard let newUrl: URL = try fileManager.replaceItemAt(sourcePath, withItemAt: destinationPath), fileExists(newUrl.path) else {
+                printLog("Failed to replace file or file not found")
+                return false
+            }
+        } catch let error {
+            printLog("Error while renaming file: \(error.localizedDescription)")
+            return false
+        }
+        
         return true
     }
 
@@ -278,7 +310,7 @@ class MoppFileManager {
         do {
             try fileManager.copyItem(atPath: sourcePath, toPath: finalName)
         } catch {
-            MSLog("copyFileWithPath error: %@", error)
+            printLog("copyFileWithPath error: \(error.localizedDescription)")
         }
         return finalName
     }
@@ -307,49 +339,82 @@ class MoppFileManager {
     }
     
     private func importFiles_recursive(with urls: [URL], importedPaths: [String], completion: ((_ error: Error?, _ paths: [String]) -> Void)?) {
-        var mutableURLs = urls
+        var mutableURLs: [URL] = urls
         
-        guard let url = mutableURLs.first else {
+        guard let url: URL = mutableURLs.first else {
             completion?(nil, importedPaths)
             return
         }
         
-        let isUrlSSR = url.startAccessingSecurityScopedResource()
-        let coordinator = NSFileCoordinator(filePresenter: nil)
-        let readingIntent = NSFileAccessIntent.readingIntent(with: url, options: .withoutChanges)
+        let coordinator: NSFileCoordinator = NSFileCoordinator(filePresenter: nil)
+        let readingIntent: NSFileAccessIntent = NSFileAccessIntent.readingIntent(with: url, options: .withoutChanges)
         
         coordinator.coordinate(with: [readingIntent], queue: OperationQueue.main) { [weak self] error in
-            var data: Data!
+            var data: Data
             if error == nil {
-                let safeURL = readingIntent.url
+                // Used to access folders on user device when opening container outside app (otherwise gives "Operation not permitted" error)
+                url.startAccessingSecurityScopedResource()
                 
-                data = try! Data(contentsOf: safeURL)
+                let safeURL: URL? = readingIntent.url
                 
-                guard let destinationPath = MoppFileManager.shared.tempFilePath(withFileName: safeURL.lastPathComponent) else {
-                    completion?(NSError(domain: String(), code: 0, userInfo: nil), [])
+                guard let fileURL: URL = safeURL else {
+                    printLog("Error opening imported file")
+                    url.stopAccessingSecurityScopedResource()
+                    completion?(NSError(domain: "Unable to open imported file", code: 1, userInfo: nil), [])
                     return
                 }
                 
-                if !FileManager.default.fileExists(atPath: destinationPath) {
-                    MoppFileManager.shared.createFile(atPath: destinationPath, contents: data)
+                let isFileEmpty = MoppFileManager.isFileEmpty(fileUrl: fileURL)
+                
+                if urls.count == 1 && importedPaths.isEmpty && isFileEmpty {
+                    printLog("Unable to open empty file")
+                    url.stopAccessingSecurityScopedResource()
+                    let error = NSError(domain: "Unable to open empty file", code: 3, userInfo: [NSLocalizedDescriptionKey: L(.fileImportFailedEmptyFile)])
+                    completion?(error, [])
+                    return
                 }
                 
-                if isUrlSSR {
+                do {
+                    data = try Data(contentsOf: fileURL)
+                } catch let error {
+                    printLog("Error opening file: \(error.localizedDescription)")
                     url.stopAccessingSecurityScopedResource()
+                    completion?(NSError(domain: error.localizedDescription, code: 2, userInfo: nil), [])
+                    return
+                }
+                
+                guard let destinationPath = MoppFileManager.shared.tempFilePath(withFileName: MoppLibManager.sanitize(fileURL.lastPathComponent)) else {
+                    printLog("Error opening file. Unable to get temp file path")
+                    completion?(NSError(domain: String(), code: 0, userInfo: nil), [])
+                    url.stopAccessingSecurityScopedResource()
+                    return
+                }
+                
+                if !isFileEmpty {
+                    if !FileManager.default.fileExists(atPath: destinationPath) {
+                        MoppFileManager.shared.createFile(atPath: destinationPath, contents: data)
+                    }
                 }
                 
                 _ = mutableURLs.removeFirst()
                 
                 var modifiedImportedPaths = importedPaths
+                if !isFileEmpty {
                     modifiedImportedPaths.append(destinationPath)
+                }
+                
+                url.stopAccessingSecurityScopedResource()
                 
                 self?.importFiles_recursive(with: mutableURLs, importedPaths: modifiedImportedPaths, completion: completion)
             } else {
-                if isUrlSSR {
-                    url.stopAccessingSecurityScopedResource()
-                }
                 completion?(error, [])
             }
         }
+    }
+    
+    static func isFileEmpty(fileUrl: URL) -> Bool {
+        let fileSize: Double? = try? fileUrl.resourceValues(forKeys: [.fileSizeKey]).allValues.first?.value as? Double
+        guard let fileSizeBytes = fileSize else { printLog("Could not get file size"); return true }
+        return fileSizeBytes.isZero
     }
 }

@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,37 +25,82 @@ import Foundation
 import UIKit
 
 
-public class ScreenDisguise {
+public class ScreenDisguise: NSObject {
     public static let shared = ScreenDisguise()
     private var viewController: ScreenDisguiseViewController? = nil
     
     var uiVisualEffectView = UIVisualEffectView()
     var blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
     
-    private init() {}
+    private func getTopViewController() -> UIViewController? {
+        guard let keyWindow = UIApplication.shared.keyWindow, let topViewController = keyWindow.rootViewController?.getTopViewController() else {
+            return nil
+        }
+        
+        return topViewController
+    }
     
     public func show() {
-        if #available(iOS 12, *) {
-            if !uiVisualEffectView.isDescendant(of: UIApplication.shared.keyWindow!) {
-                UIView.animate(withDuration: 0.05) {
-                    self.uiVisualEffectView.effect = UIBlurEffect(style: .light)
-                    self.uiVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-                    self.uiVisualEffectView.frame = (UIApplication.shared.keyWindow?.bounds)!
-                }
-                
-                UIApplication.shared.keyWindow?.addSubview(uiVisualEffectView)
+        guard let keyWindow = UIApplication.shared.keyWindow, let topViewController = keyWindow.rootViewController?.getTopViewController() else {
+            return
+        }
+        
+        if !uiVisualEffectView.isDescendant(of: keyWindow) {
+            UIView.animate(withDuration: 0.05) {
+                self.uiVisualEffectView.effect = UIBlurEffect(style: .light)
+                self.uiVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+                self.uiVisualEffectView.frame = keyWindow.bounds
+            }
+            
+            keyWindow.addSubview(uiVisualEffectView)
+            
+            if (topViewController is MobileIDChallengeViewController || topViewController is SmartIDChallengeViewController) {
+                keyWindow.rootViewController?.view.addSubview(uiVisualEffectView)
+                uiVisualEffectView.contentView.bringSubviewToFront(topViewController.view)
             }
         }
     }
     
     public func hide() {
-        if #available(iOS 12, *) {
-            UIView.animate(withDuration: 0.25, animations: {
-                self.uiVisualEffectView.alpha = 0.0
-                UIApplication.shared.keyWindow!.alpha = 1.0
-            }, completion: {(value: Bool) in
-                self.uiVisualEffectView.removeFromSuperview()
-            })
+        guard let keyWindow = UIApplication.shared.keyWindow else { return }
+        UIView.animate(withDuration: 0.25, animations: {
+            self.uiVisualEffectView.alpha = 0.0
+            keyWindow.alpha = 1.0
+        }, completion: {(value: Bool) in
+            self.uiVisualEffectView.removeFromSuperview()
+        })
+    }
+    
+    public func handleScreenRecordingPrevention() {
+        let isScreenBeingCaptured: Bool = UIScreen.main.isCaptured
+        
+        guard let topViewController: UIViewController = getTopViewController() else { return }
+        
+        if isScreenBeingCaptured {
+            show()
+            if let launchScreenView = Bundle.main.loadNibNamed("LaunchScreen", owner: self, options: nil)?.last as? UIView {
+                launchScreenView.tag = launchScreenTag
+                topViewController.view.addSubview(launchScreenView)
+                topViewController.view.bringSubviewToFront(launchScreenView)
+                hide()
+                
+                // Pin to edges
+                let layoutGuide = topViewController.view.safeAreaLayoutGuide
+                launchScreenView.translatesAutoresizingMaskIntoConstraints = false
+                launchScreenView.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
+                launchScreenView.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
+                launchScreenView.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
+                launchScreenView.topAnchor.constraint(equalTo: topViewController.view.topAnchor).isActive = true
+            }
+            
+            
+        } else {
+            if let launchScreenView = getTopViewController()?.view.viewWithTag(launchScreenTag) {
+                launchScreenView.removeFromSuperview()
+                hide()
+            } else {
+                print("Unable to find view with tag \(launchScreenTag)")
+            }
         }
     }
 }

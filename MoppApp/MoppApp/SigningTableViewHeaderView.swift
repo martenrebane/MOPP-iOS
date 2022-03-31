@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,9 @@
  *
  */
 import Foundation
+import UIKit
 
-protocol SigningTableViewHeaderViewDelegate: class {
+protocol SigningTableViewHeaderViewDelegate: AnyObject {
     func signingTableViewHeaderViewSearchKeyChanged(_ searchKeyValue: String)
     func signingTableViewHeaderViewDidEndSearch()
 }
@@ -35,6 +36,7 @@ class SigningTableViewHeaderView: UIView {
     @IBOutlet weak var searchTextField: SearchTextField!
     
     @IBAction func searchTapped() {
+        searchTextField.isAccessibilityElement = true
         showSearch(true, animated: true)
     }
     
@@ -43,7 +45,12 @@ class SigningTableViewHeaderView: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         searchTextField._delegate = self
-        self.accessibilityElements = [titleLabel, searchButton, searchTextField]
+        guard let titleUILabel = titleLabel, let searchUIButton = searchButton, let searchUITextField = searchTextField else {
+            printLog("Unable to get titleLabel, searchButton or searchTextField")
+            return
+        }
+        searchUITextField.isAccessibilityElement = false
+        self.accessibilityElements = [titleUILabel, searchUIButton]
     }
     
     override func layoutSubviews() {
@@ -51,11 +58,17 @@ class SigningTableViewHeaderView: UIView {
         
         let topColor = UIColor.white.withAlphaComponent(1.0)
         let botColor = UIColor.white.withAlphaComponent(0.8)
-        _ = createGradientLayer(topColor: topColor, bottomColor: botColor)
+        createGradientLayer(topColor: topColor, bottomColor: botColor)
     }
     
     func populate(title: String, _ requestCloseSearch: inout () -> Void) {
         titleLabel.text = title
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
+        if isNonDefaultPreferredContentSizeCategoryMedium() {
+            titleLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        } else if isNonDefaultPreferredContentSizeCategoryBigger() {
+            titleLabel.font = UIFont.setCustomFont(font: .regular, 10, .body)
+        }
         requestCloseSearch = { [weak self] in
             self?.showSearch(false, animated: false)
         }
@@ -69,9 +82,10 @@ class SigningTableViewHeaderView: UIView {
         self.titleLabel.isHidden = false
         self.searchButton.isHidden = false
         self.searchTextField.isHidden = false
+        self.searchButton.titleLabel?.font = UIFont.moppLargerMedium
     
         let changeTo = {
-            if !UIAccessibilityIsVoiceOverRunning() {
+            if !UIAccessibility.isVoiceOverRunning {
                 self.titleLabel.alpha = show ? 0.0 : 1.0
                 self.searchButton.alpha = show ? 0.0 : 1.0
                 self.searchTextField.alpha = show ? 1.0 : 0.0
@@ -83,7 +97,7 @@ class SigningTableViewHeaderView: UIView {
         }
         
         let changeFinished = {
-            if !UIAccessibilityIsVoiceOverRunning() {
+            if !UIAccessibility.isVoiceOverRunning {
                 self.titleLabel.isHidden = show
                 self.searchButton.isHidden = show
                 self.searchTextField.isHidden = !show
@@ -91,7 +105,7 @@ class SigningTableViewHeaderView: UIView {
             if show {
                 self.searchTextField.becomeFirstResponder()
             } else {
-                if !UIAccessibilityIsVoiceOverRunning() {
+                if !UIAccessibility.isVoiceOverRunning {
                     self.searchTextField.resignFirstResponder()
                     self.searchTextField.text = nil
                     self.delegate?.signingTableViewHeaderViewDidEndSearch()
@@ -120,7 +134,7 @@ class SigningTableViewHeaderView: UIView {
 extension SigningTableViewHeaderView: SearchTextFieldDelegate {
     func searchTextFieldDidEndEditing() {
         showSearch(false, animated: true)
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.searchTextField)
+        UIAccessibility.post(notification: UIAccessibility.Notification.layoutChanged, argument: self.searchTextField)
     }
     
     func searchTextFieldValueChanged(_ newValue: String) {

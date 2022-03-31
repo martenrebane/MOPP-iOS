@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 
 import Foundation
 
-protocol AddresseeViewControllerDelegate: class {
+protocol AddresseeViewControllerDelegate: AnyObject {
     func addAddresseeToContainer(selectedAddressees: NSMutableArray)
 }
 
@@ -64,6 +64,13 @@ class AddresseeViewController : MoppViewController {
         LandingViewController.shared.presentButtons([.confirmButton])
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if selectedAddressees.count == 0 {
+            UIAccessibility.post(notification: .screenChanged, argument: L(.cryptoRecipientAddingCancelled))
+        }
+    }
+    
     private func dismissKeyboard() {
         let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
         tap.cancelsTouchesInView = false
@@ -81,7 +88,7 @@ extension AddresseeViewController : UISearchBarDelegate {
             success: { (_ ldapResponse: NSMutableArray?) -> Void in
                 _ = ldapResponse?.sorted {($0 as! Addressee).identifier < ($1 as! Addressee).identifier }
                 
-                self.foundAddressees = (ldapResponse?.sorted {($0 as! Addressee).identifier < ($1 as! Addressee).identifier } as! NSArray)
+                self.foundAddressees = (ldapResponse?.sorted {($0 as! Addressee).identifier < ($1 as! Addressee).identifier } as NSArray? ?? [])
                 self.showLoading(show: false)
                 self.tableView.reloadData()
             },
@@ -111,6 +118,14 @@ extension AddresseeViewController : UITableViewDataSource {
         return sections.count
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if !isNonDefaultPreferredContentSizeCategoryMedium() && isNonDefaultPreferredContentSizeCategoryBigger() {
+            return ContainerSearchCell.height * 3
+        }
+        
+        return tableView.rowHeight
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch sections[section] {
             case .notifications:
@@ -118,7 +133,13 @@ extension AddresseeViewController : UITableViewDataSource {
             case .search:
                 return 1
             case .searchResult:
-                return foundAddressees.count
+                let foundAddresseesCount = foundAddressees.count
+                if foundAddresseesCount == 1 {
+                    UIAccessibility.post(notification: .screenChanged, argument: L(.cryptoRecipientFound))
+                } else if foundAddresseesCount > 1 {
+                    UIAccessibility.post(notification: .screenChanged, argument: L(.cryptoRecipientsFound, [String(foundAddresseesCount)]))
+                }
+                return foundAddresseesCount
             case .addressees:
                 return selectedAddressees.count
         }
@@ -145,6 +166,9 @@ extension AddresseeViewController : UITableViewDataSource {
                 }
                 let isAddButtonDisabled = selectedIndexes.contains(row) || isSelected
                 cell.populate(addressee: foundAddressees[row] as! Addressee, index: row, isAddButtonDisabled: isAddButtonDisabled)
+                if indexPath.row == 0 {
+                    UIAccessibility.post(notification: .layoutChanged, argument: cell)
+                }
                 return cell
             case .addressees:
                 let cell = tableView.dequeueReusableCell(withType: ContainerAddresseeCell.self, for: indexPath)!
@@ -217,10 +241,14 @@ extension AddresseeViewController : UITableViewDelegate {
 
 extension AddresseeViewController : ContainerTableViewHeaderDelegate {
     func didTapContainerHeaderButton() {
+        guard let landingViewControllerContainerType = LandingViewController.shared.containerType else {
+            printLog("Unable to get LandingViewControlelr container type")
+            return
+        }
         NotificationCenter.default.post(
             name: .startImportingFilesWithDocumentPickerNotificationName,
             object: nil,
-            userInfo: [kKeyFileImportIntent: MoppApp.FileImportIntent.addToContainer, kKeyContainerType: LandingViewController.shared.containerType])
+            userInfo: [kKeyFileImportIntent: MoppApp.FileImportIntent.addToContainer, kKeyContainerType: landingViewControllerContainerType])
     }
 }
 

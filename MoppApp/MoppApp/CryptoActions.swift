@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,19 +33,21 @@ extension CryptoActions where Self: CryptoContainerViewController {
         if container.addressees.count > 0 {
             MoppLibCryptoActions.sharedInstance().encryptData(
                 container.filePath as String?,
-                withDataFiles: container.dataFiles as! [Any],
-                withAddressees: container.addressees as! [Any],
+                withDataFiles: container.dataFiles as? [Any],
+                withAddressees: container.addressees as? [Any],
                 success: {
                     self.isCreated = false
                     self.isForPreview = false
                     self.state = .loading
                     self.containerViewDelegate.openContainer(afterSignatureCreated: true)
-                    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, L(.cryptoEncryptionSuccess))
+                    UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: L(.cryptoEncryptionSuccess))
                     self.notifications.append((true, L(.cryptoEncryptionSuccess)))
                     self.reloadCryptoData()
                     
                     if !DefaultsHelper.hideShareContainerDialog {
-                        self.displayShareContainerDialog()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            self.displayShareContainerDialog()
+                        }
                     }
                     
             },
@@ -78,7 +80,7 @@ extension CryptoContainerViewController : IdCardDecryptViewControllerDelegate {
                 container.dataFiles.removeAllObjects()
                 for dataFile in dataFiles {
                     let cryptoDataFile = CryptoDataFile()
-                    cryptoDataFile.filename = dataFile.key as! String
+                    cryptoDataFile.filename = dataFile.key as? String
                     guard let destinationPath = MoppFileManager.shared.tempFilePath(withFileName: cryptoDataFile.filename) else {
                         dismiss(animated: false)
                         errorAlert(message: L(.decryptionErrorMessage))
@@ -95,7 +97,7 @@ extension CryptoContainerViewController : IdCardDecryptViewControllerDelegate {
                 self.isDecrypted = true
                 
                 self.notifications.append((true, L(.containerDetailsDecryptionSuccess)))
-                UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, L(.containerDetailsDecryptionSuccess))
+                UIAccessibility.post(notification: .screenChanged, argument: L(.containerDetailsDecryptionSuccess))
                 
                 self.reloadCryptoData()
             } else {

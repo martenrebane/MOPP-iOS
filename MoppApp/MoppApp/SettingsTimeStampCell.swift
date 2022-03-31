@@ -6,9 +6,10 @@
 //  Copyright © 2018 Riigi Infosüsteemide Amet. All rights reserved.
 //
 import Foundation
+import UIKit
 
 
-protocol SettingsTimeStampCellDelegate: class {
+protocol SettingsTimeStampCellDelegate: AnyObject {
     func didChangeTimestamp(_ field: SettingsViewController.FieldId, with value: String?)
 }
 
@@ -23,10 +24,20 @@ class SettingsTimeStampCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        titleLabel.font = UIFont.moppSmallRegular
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
         textField.moppPresentDismissButton()
         textField.layer.borderColor = UIColor.moppContentLine.cgColor
         textField.layer.borderWidth = 1
         textField.delegate = self
+        if isNonDefaultPreferredContentSizeCategory() {
+            setCustomFont()
+        }
+    }
+    
+    func setCustomFont() {
+        titleLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        textField.font = UIFont.setCustomFont(font: .regular, nil, .body)
     }
     
     func populate(with field:SettingsViewController.Field) {
@@ -43,12 +54,16 @@ class SettingsTimeStampCell: UITableViewCell {
         let useDefault = DefaultsHelper.timestampUrl == nil
         useDefaultSwitch.isOn = useDefault
         textField.isEnabled = !useDefault
-        textField.textColor = useDefault ? UIColor.moppLabel : UIColor.moppText
+        textField.textColor = useDefault ? UIColor.moppLabelDarker : UIColor.moppText
         textField.text = DefaultsHelper.timestampUrl ?? MoppConfiguration.tsaUrl
+        if isBoldTextEnabled() { textField.font = UIFont.boldSystemFont(ofSize: textField.font?.pointSize ?? UIFont.moppMediumBold.pointSize) }
         
         titleLabel.text = L(.settingsTimestampUrlTitle)
+        titleLabel.font = UIFont.moppMediumRegular
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
         textField.placeholder = L(.settingsTimestampUrlPlaceholder)
         useDefaultTitleLabel.text = L(.settingsTimestampUseDefaultTitle)
+        useDefaultTitleLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
         
         textField.layoutIfNeeded()
     }

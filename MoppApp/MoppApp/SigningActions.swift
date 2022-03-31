@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,23 +43,27 @@ extension SigningActions where Self: SigningContainerViewController {
         confirmDeleteAlert(
             message: L(.signatureRemoveConfirmMessage),
             confirmCallback: { [weak self] (alertAction) in
-                
-                self?.notifications = []
-                self?.updateState(.loading)
-                MoppLibContainerActions.sharedInstance().remove(
-                    signature,
-                    fromContainerWithPath: self?.container.filePath,
-                    success: { [weak self] container in
-                        self?.updateState((self?.isCreated ?? false) ? .created : .opened)
-                        self?.container.signatures.remove(at: signatureIndex)
-                        self?.reloadData()
-                    },
-                    failure: { [weak self] error in
-                        self?.updateState((self?.isCreated ?? false) ? .created : .opened)
-                        self?.reloadData()
-                        self?.errorAlert(message: error?.localizedDescription)
-                })
-        })
+                if alertAction == .cancel {
+                    UIAccessibility.post(notification: .layoutChanged, argument: L(.signatureRemovalCancelled))
+                } else if alertAction == .confirm {
+                    self?.notifications = []
+                    self?.updateState(.loading)
+                    MoppLibContainerActions.sharedInstance().remove(
+                        signature,
+                        fromContainerWithPath: self?.container.filePath,
+                        success: { [weak self] container in
+                            self?.updateState((self?.isCreated ?? false) ? .created : .opened)
+                            self?.container.signatures.remove(at: signatureIndex)
+                            UIAccessibility.post(notification: .announcement, argument: L(.signatureRemoved))
+                            self?.reloadData()
+                        },
+                        failure: { [weak self] error in
+                            self?.updateState((self?.isCreated ?? false) ? .created : .opened)
+                            self?.reloadData()
+                            self?.errorAlert(message: L(.generalSignatureRemovalMessage))
+                        })
+                }
+            })
     }
     
     func startSigningProcess() {
@@ -130,27 +134,13 @@ extension SigningContainerViewController : MobileIDEditViewControllerDelegate {
     }
     
     func decideLanguageBasedOnPreferredLanguages() -> String {
-        var language: String = String()
-        let prefLanguages = NSLocale.preferredLanguages
-        for i in 0..<prefLanguages.count {
-            if prefLanguages[i].hasPrefix("et-") {
-                language = "EST"
-                break
-            }
-            else if prefLanguages[i].hasPrefix("lt-") {
-                language = "LIT"
-                break
-            }
-            else if prefLanguages[i].hasPrefix("ru-") {
-                language = "RUS"
-                break
-            }
+        let currentLanguage = DefaultsHelper.moppLanguageID
+        if currentLanguage == "et" {
+            return "EST"
+        } else if currentLanguage == "ru" {
+            return "RUS"
         }
-        if language.isEmpty {
-            language = "ENG"
-        }
-        
-        return language
+        return "ENG"
     }
 }
 
@@ -188,7 +178,7 @@ extension SigningContainerViewController : IdCardSignViewControllerDelegate {
                 } else if nsError.code == Int(MoppLibErrorCode.moppLibErrorOCSPTimeSlot.rawValue) {
                     errorAlert(message: L(.ocspInvalidTimeSlot))
                 } else {
-                    errorAlert(message: L(.genericErrorMessage))
+                    errorAlert(message: L(.generalSignatureAddingMessage))
                 }
             }
         } else {
@@ -222,11 +212,12 @@ extension BinaryInteger {
 
 extension String {
     func leftPadding(toLength: Int, withPad character: Character) -> String {
-        let newLength = self.characters.count
+        let newLength = self.count
         if newLength < toLength {
             return String(repeatElement(character, count: toLength - newLength)) + self
         } else {
-            return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
+            let strIndex = self.index(self.startIndex, offsetBy: newLength - toLength)
+            return String(self[..<strIndex])
         }
     }
 }

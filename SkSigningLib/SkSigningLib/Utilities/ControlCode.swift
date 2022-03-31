@@ -3,7 +3,7 @@
 //  SkSigningLib
 //
 /*
- * Copyright 2020 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ public class ControlCode {
     
     public func getVerificationCode(hash: Array<Int>) -> String? {
         guard !hash.isEmpty else {
+            Logging.errorLog(forMethod: "RIA.MobileID - getVerificationCode", error: nil, extraInfo: "Unable to get hash")
             return nil
         }
         
@@ -36,7 +37,7 @@ public class ControlCode {
         
         let verificationCodeAsString: String = addLeadingZerosIfNeeded(verificationCode: String(verificationCode))
         
-        print("Mobile-ID verification code: \(verificationCodeAsString)")
+        Logging.log(forMethod: "RIA.MobileID - getVerificationCode", info: "Mobile-ID verification code: \(verificationCodeAsString)")
         
         return verificationCodeAsString
     }

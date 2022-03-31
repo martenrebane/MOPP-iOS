@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
  *
  */
 @objc
-protocol MyeIDChangeCodesViewControllerUIDelegate: class {
+protocol MyeIDChangeCodesViewControllerUIDelegate: AnyObject {
     func didTapDiscardButton(_ ui: MyeIDChangeCodesViewControllerUI)
     func didTapConfirmButton(_ ui: MyeIDChangeCodesViewControllerUI)
 }
@@ -33,7 +33,9 @@ class MyeIDChangeCodesViewControllerUI: NSObject {
     
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var scrollViewContentView: UIView!
-    @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var firstInfoLabel: UILabel!
+    @IBOutlet weak var secondInfoLabel: UILabel!
+    @IBOutlet weak var thirdInfoLabel: UILabel!
     @IBOutlet weak var discardButton: UIButton!
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var firstCodeTextField: UITextField!
@@ -66,21 +68,31 @@ class MyeIDChangeCodesViewControllerUI: NSObject {
         discardButton.setTitle(model.discardButtonTitleText)
         confirmButton.setTitle(model.confirmButtonTitleText)
         
+        discardButton.accessibilityLabel = setDiscardButtonAccessibilityLabel(actionType: model.actionType)
+        confirmButton.accessibilityLabel = setConfirmButtonAccessibilityLabel(actionType: model.actionType)
+        
         firstCodeTextField.delegate = self
         secondCodeTextField.delegate = self
         thirdCodeTextField.delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillShowNotification, object: nil)
         
-        let font = UIFont(name: MoppFontName.regular.rawValue, size: 16)!
+        let font = UIFont.setCustomFont(font: .regular, nil, .body)
         let color = UIColor.moppText
-        let attributes = [NSAttributedStringKey.font : font, NSAttributedStringKey.foregroundColor : color]
+        let attributes = [NSAttributedString.Key.font : font, NSAttributedString.Key.foregroundColor : color]
         
-        let fullAttributedString = NSMutableAttributedString()
+        var partAttributedStrings = [String]()
+        var fullAttributedStrings = [NSMutableAttributedString]()
         
         let textAttachment = NSTextAttachment()
-            textAttachment.image = UIImage(named: "bullet")!.withRenderingMode(.alwaysTemplate)
+        textAttachment.image = UIImage(named: "bullet")!.withRenderingMode(.alwaysTemplate)
+        textAttachment.image?.isAccessibilityElement = false
+        textAttachment.image?.accessibilityLabel = ""
+        textAttachment.accessibilityTraits = [.none]
+        textAttachment.image?.accessibilityTraits = [.none]
+        
+        textAttachment.isAccessibilityElement = false
         
         for index in 0..<model.infoBullets.count {
             let infoBullet = model.infoBullets[index]
@@ -95,17 +107,32 @@ class MyeIDChangeCodesViewControllerUI: NSObject {
             
             let paragraphStyle = createParagraphAttribute()
             attributedString.addAttributes(
-                attributes.merging([NSAttributedStringKey.paragraphStyle: paragraphStyle],
+                attributes.merging([NSAttributedString.Key.paragraphStyle: paragraphStyle],
                     uniquingKeysWith: {current,_  in return current }),
                 range: NSMakeRange(0, attributedString.length))
             
-            fullAttributedString.append(attributedString)
+            fullAttributedStrings.append(attributedString)
+            partAttributedStrings.append(infoBullet)
         }
         
-        textView.attributedText = fullAttributedString
+        firstInfoLabel.isAccessibilityElement = true
+        secondInfoLabel.isAccessibilityElement = true
+        thirdInfoLabel.isAccessibilityElement = true
+        
+        firstInfoLabel.attributedText = fullAttributedStrings.indices.contains(0) ? fullAttributedStrings[0] : NSAttributedString()
+        secondInfoLabel.attributedText = fullAttributedStrings.indices.contains(1) ? fullAttributedStrings[1] : NSAttributedString()
+        thirdInfoLabel.attributedText = fullAttributedStrings.indices.contains(2) ? fullAttributedStrings[2] : NSAttributedString()
+    
+        firstInfoLabel.accessibilityLabel = partAttributedStrings.indices.contains(0) ? partAttributedStrings[0] : ""
+        secondInfoLabel.accessibilityLabel = partAttributedStrings.indices.contains(1) ? partAttributedStrings[1] : ""
+        thirdInfoLabel.accessibilityLabel = partAttributedStrings.indices.contains(2) ? partAttributedStrings[2] : ""
         
         statusViewHiddenCSTR.priority = UILayoutPriority.defaultHigh
         statusViewVisibleCSTR.priority = UILayoutPriority.defaultLow
+        
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            setCustomFont()
+        }
     }
     
     func createParagraphAttribute() -> NSParagraphStyle
@@ -124,16 +151,16 @@ class MyeIDChangeCodesViewControllerUI: NSObject {
     
     @objc func adjustForKeyboard(notification: NSNotification) {
         
-        if notification.name == NSNotification.Name.UIKeyboardWillHide {
+        if notification.name == UIResponder.keyboardWillHideNotification {
             scrollView.contentInset = UIEdgeInsets.zero
             isKeyboardVisible = false
         
-        } else if notification.name == NSNotification.Name.UIKeyboardWillShow {
+        } else if notification.name == UIResponder.keyboardWillShowNotification {
             if isKeyboardVisible { return }
             
             let userInfo = notification.userInfo!
             
-            let keyboardScreenEndFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+            let keyboardScreenEndFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
             let keyboardViewEndFrame = viewController.view.convert(keyboardScreenEndFrame, from: viewController.view.window)
             
             let scrollViewRectInWindow = scrollView.convert(scrollView.frame, from: viewController.view.window)
@@ -146,23 +173,54 @@ class MyeIDChangeCodesViewControllerUI: NSObject {
                 bottomContentInset += scrollViewContentDelta
             }
         
-            scrollView.contentInset = UIEdgeInsetsMake(0, 0, bottomContentInset, 0)
+            scrollView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: bottomContentInset, right: 0)
             isKeyboardVisible = true
         }
     }
     
     func showStatusView(with title: String) {
         statusLabel.text = title
-        UIView.animate(withDuration: 0.35, delay: 0.0, options: UIViewAnimationOptions.curveLinear, animations: { [weak self] in
+        self.scrollView.contentOffset = CGPoint.zero
+        UIView.animate(withDuration: 0.35, delay: 0.0, options: UIView.AnimationOptions.curveLinear, animations: { [weak self] in
             self?.statusViewHiddenCSTR.priority = UILayoutPriority.defaultLow
             self?.statusViewVisibleCSTR.priority = UILayoutPriority.defaultHigh
             self?.viewController.view.layoutIfNeeded()
         }) { (finished) in
-            UIView.animate(withDuration: 0.35, delay: 3.0, options: UIViewAnimationOptions.curveLinear, animations: { [weak self] in
+            UIView.animate(withDuration: 0.35, delay: 3.0, options: UIView.AnimationOptions.curveLinear, animations: { [weak self] in
                 self?.statusViewHiddenCSTR.priority = UILayoutPriority.defaultHigh
                 self?.statusViewVisibleCSTR.priority = UILayoutPriority.defaultLow
                 self?.viewController.view.layoutIfNeeded()
             }) { (finished) in }
+        }
+    }
+    
+    func setDiscardButtonAccessibilityLabel(actionType: MyeIDChangeCodesModel.ActionType) -> String {
+        switch actionType {
+        case .changePin1:
+            return L(.myEidDiscardPin1ButtonTitleAccessibility)
+        case .changePin2:
+            return L(.myEidDiscardPin2ButtonTitleAccessibility)
+        case .changePuk:
+            return L(.myEidDiscardPukChangeButtonTitleAccessibility)
+        case .unblockPin1:
+            return L(.myEidDiscardPin1UnblockButtonTitleAccessibility)
+        case .unblockPin2:
+            return L(.myEidDiscardPin2UnblockButtonTitleAccessibility)
+        }
+    }
+    
+    func setConfirmButtonAccessibilityLabel(actionType: MyeIDChangeCodesModel.ActionType) -> String {
+        switch actionType {
+        case .changePin1:
+            return L(.myEidConfirmPin1ChangeButtonTitleAccessibility)
+        case .changePin2:
+            return L(.myEidConfirmPin2ChangeButtonTitleAccessibility)
+        case .changePuk:
+            return L(.myEidConfirmPukChangeButtonTitleAccessibility)
+        case .unblockPin1:
+            return L(.myEidConfirmPin1UnblockButtonTitleAccessibility)
+        case .unblockPin2:
+            return L(.myEidConfirmPin2UnblockButtonTitleAccessibility)
         }
     }
     
@@ -177,16 +235,31 @@ class MyeIDChangeCodesViewControllerUI: NSObject {
         secondInlineErrorLabel.text = nil
         thirdInlineErrorLabel.text = nil
     }
+    
+    func setCustomFont() {
+        firstInfoLabel.font = UIFont.setCustomFont(font: .medium, nil, .body)
+        secondInfoLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        thirdInfoLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        discardButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        confirmButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        firstCodeTextFieldLabel.font = UIFont.setCustomFont(font: .allCapsRegular, nil, .body)
+        secondCodeTextFieldLabel.font = UIFont.setCustomFont(font: .allCapsRegular, nil, .body)
+        thirdCodeTextFieldLabel.font = UIFont.setCustomFont(font: .allCapsRegular, nil, .body)
+        firstInlineErrorLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        secondInlineErrorLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        thirdInlineErrorLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        statusLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+    }
 }
 
 extension MyeIDChangeCodesViewControllerUI: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, textField)
+        UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: textField)
         return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, textField)
+        UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: textField)
     }
 }

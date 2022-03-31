@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -47,15 +47,22 @@ class MenuLanguageCell : UITableViewCell {
         stackViewContainerView.layer.borderWidth = 1
     
         for view in (stackView.arrangedSubviews as! [MenuLanguageButtonView]) {
+            let appLanguageID = DefaultsHelper.moppLanguageID
             switch view.label.text {
             case AvailableLanguages.estonian.rawValue:
+                DefaultsHelper.moppLanguageID = "et"
                 view.button.accessibilityLabel = L(.languageEstonian)
+                DefaultsHelper.moppLanguageID = appLanguageID
                 break
             case AvailableLanguages.english.rawValue:
+                DefaultsHelper.moppLanguageID = "en"
                 view.button.accessibilityLabel = L(.languageEnglish)
+                DefaultsHelper.moppLanguageID = appLanguageID
                 break
             case AvailableLanguages.russian.rawValue:
+                DefaultsHelper.moppLanguageID = "ru"
                 view.button.accessibilityLabel = L(.languageRussian)
+                DefaultsHelper.moppLanguageID = appLanguageID
                 break
             default:
                 break
@@ -70,6 +77,8 @@ class MenuLanguageCell : UITableViewCell {
         selectLanguage(langId)
         
         delegate?.didSelectLanguage(languageId: langId)
+        
+        UIAccessibility.post(notification: .pageScrolled, argument: L(.languageChanged))
     }
     
     override func layoutSubviews() {
@@ -85,6 +94,6 @@ class MenuLanguageCell : UITableViewCell {
     }
 }
 
-protocol MenuLanguageCellDelegate : class {
+protocol MenuLanguageCellDelegate : AnyObject {
     func didSelectLanguage(languageId: String)
 }

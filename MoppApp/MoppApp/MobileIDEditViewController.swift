@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ class MyTextField : UITextField {
     }
 }
 
-protocol MobileIDEditViewControllerDelegate : class {
+protocol MobileIDEditViewControllerDelegate : AnyObject {
     func mobileIDEditViewControllerDidDismiss(cancelled: Bool, phoneNumber: String?, idCode: String?)
 }
 
@@ -62,6 +62,10 @@ class MobileIDEditViewController : MoppViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if isNonDefaultPreferredContentSizeCategory() || isBoldTextEnabled() {
+            setCustomFont()
+        }
+        
         idCodeTextField.moppPresentDismissButton()
         phoneTextField.moppPresentDismissButton()
         
@@ -70,7 +74,7 @@ class MobileIDEditViewController : MoppViewController {
         idCodeLabel.text = L(.mobileIdIdcodeTitle)
         cancelButton.setTitle(L(.actionCancel).uppercased())
         signButton.setTitle(L(.actionSign).uppercased())
-        rememberLabel.text = L(.mobileIdRememberMe)
+        rememberLabel.text = L(.signingRememberMe)
         
         idCodeTextField.layer.borderColor = UIColor.moppContentLine.cgColor
         idCodeTextField.layer.borderWidth = 1.0
@@ -82,7 +86,12 @@ class MobileIDEditViewController : MoppViewController {
         tapGR.addTarget(self, action: #selector(cancelAction))
         view.addGestureRecognizer(tapGR)
         
-        self.view.accessibilityElements = [titleLabel, phoneLabel, phoneTextField, idCodeLabel, idCodeTextField, rememberLabel, rememberSwitch, cancelButton, signButton]
+        guard let titleUILabel = titleLabel, let phoneUILabel = phoneLabel, let phoneUITextField = phoneTextField, let idCodeUILabel = idCodeLabel, let idCodeUITextField = idCodeTextField, let rememberUILabel = rememberLabel, let rememberUISwitch = rememberSwitch, let cancelUIButton = cancelButton, let signUIButton = signButton else {
+            printLog("Unable to get titleLabel, phoneLabel, phoneTextField, idCodeLabel, idCodeTextField, rememberLabel, rememberSwitch, cancelButton or signButton")
+            return
+        }
+        
+        self.view.accessibilityElements = [titleUILabel, phoneUILabel, phoneUITextField, idCodeUILabel, idCodeUITextField, rememberUILabel, rememberUISwitch, cancelUIButton, signUIButton]
     }
     
     @objc func dismissKeyboard(_ notification: NSNotification) {
@@ -98,6 +107,7 @@ class MobileIDEditViewController : MoppViewController {
                 cancelled: true,
                 phoneNumber: nil,
                 idCode: nil)
+            UIAccessibility.post(notification: .screenChanged, argument: L(.signingCancelled))
         }
     }
     
@@ -126,8 +136,8 @@ class MobileIDEditViewController : MoppViewController {
         idCodeTextField.text = DefaultsHelper.idCode
         phoneTextField.text = DefaultsHelper.phoneNumber
         
-        idCodeTextField.attributedPlaceholder = NSAttributedString(string: L(.settingsIdCodePlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)])
-        phoneTextField.attributedPlaceholder = NSAttributedString(string: L(.settingsPhoneNumberPlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1.0)])
+        idCodeTextField.attributedPlaceholder = NSAttributedString(string: L(.settingsIdCodePlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor.moppPlaceholderDarker])
+        phoneTextField.attributedPlaceholder = NSAttributedString(string: L(.settingsPhoneNumberPlaceholder), attributes: [NSAttributedString.Key.foregroundColor: UIColor.moppPlaceholderDarker])
         
         idCodeTextField.addTarget(self, action: #selector(editingChanged(sender:)), for: .editingChanged)
         phoneTextField.addTarget(self, action: #selector(editingChanged(sender:)), for: .editingChanged)
@@ -167,6 +177,20 @@ class MobileIDEditViewController : MoppViewController {
             signButton.isEnabled = true
             signButton.backgroundColor = UIColor.moppBase
         }
+    }
+    
+    func setCustomFont() {
+        titleLabel.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? nil : 19, .body)
+        phoneLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        idCodeLabel.font = UIFont.setCustomFont(font: .regular, nil, .body)
+        cancelButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        signButton.titleLabel?.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        rememberLabel.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        idCodeTextField.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        phoneTextField.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 11 : nil, .body)
+        
+        signButton.sizeToFit()
+        
     }
     
     @objc func editingChanged(sender: UITextField) {

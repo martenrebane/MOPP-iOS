@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,7 @@ class MyeIDInfoViewController: MoppViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         ui.tableView.reloadData()
+        UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: ui.tableView)
     }
 }
 
@@ -97,7 +98,9 @@ extension MyeIDInfoViewController: MyeIDInfoViewControllerUIDelegate {
             let cell = ui.tableView.dequeueReusableCell(withType: MyeIDPinPukCell.self, for: indexPath)!
                 cell.infoManager = infoManager
                 cell.bounds = CGRect(x: 0, y: 0, width: ui.tableView.bounds.width, height: 99999)
-                cell.populate(pinPukCellInfo: infoManager.pinPukCell.items[indexPath.row])
+            let pinPukCellInfo: MyeIDInfoManager.PinPukCell.Info = infoManager.pinPukCell.items[indexPath.row]
+                cell.populate(pinPukCellInfo: pinPukCellInfo)
+                cell.certInfoView.accessibilityLabel = "\(pinPukCellInfo.title ?? ""). \(infoManager.certInfoAttributedString(for: pinPukCellInfo.kind)?.string ?? pinPukCellInfo.certInfoText ?? "")"
             cell.accessibilityLabel = ""
             return cell
         case .margin:
@@ -111,7 +114,7 @@ extension MyeIDInfoViewController: MyeIDInfoViewControllerUIDelegate {
             return UITableViewCell()
         case .changePins:
             let cell = ui.tableView.dequeueReusableCell(withType: MyeIDSegmentHeaderCell.self, for: indexPath)!
-            cell.accessibilityTraits = UIAccessibilityTraitButton
+            cell.accessibilityTraits = UIAccessibilityTraits.button
             return cell
         }
     }

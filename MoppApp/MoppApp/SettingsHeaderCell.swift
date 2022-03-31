@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-protocol SettingsHeaderCellDelegate: class {
+protocol SettingsHeaderCellDelegate: AnyObject {
     func didDismissSettings()
 }
 class SettingsHeaderCell: UITableViewCell {
@@ -34,10 +34,16 @@ class SettingsHeaderCell: UITableViewCell {
     
     func populate(with title:String) {
         titleLabel.text = title
+        titleLabel.font = UIFont.moppLargeMedium
+        if isBoldTextEnabled() { titleLabel.font = UIFont.boldSystemFont(ofSize: titleLabel.font.pointSize) }
     }
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.accessibilityElements = [dismissButton, titleLabel]
+        guard let dismissUIButton: UIButton = dismissButton, let titleUILabel: UILabel = titleLabel else {
+            printLog("Unable to get dismissButton or titleLabel")
+            return
+        }
+        self.accessibilityElements = [dismissUIButton, titleUILabel]
     }
 }

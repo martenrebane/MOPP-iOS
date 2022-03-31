@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="czA-yQ-yzD">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="czA-yQ-yzD">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -30,14 +30,14 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MenuHeaderCell" rowHeight="140" id="SzM-Ni-3qo" customClass="MenuHeaderCell" customModule="MoppApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="140"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="375" height="140"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SzM-Ni-3qo" id="IeX-2D-oTP">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="140"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cdw-xa-vVM">
-                                                    <rect key="frame" x="312" y="11" width="48" height="48"/>
+                                                    <rect key="frame" x="311" y="11" width="48" height="48"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="48" id="G6A-8h-xoa"/>
                                                         <constraint firstAttribute="height" constant="48" id="fQw-LF-DcI"/>
@@ -56,9 +56,12 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        <connections>
+                                            <outlet property="menuCloseButton" destination="cdw-xa-vVM" id="9NF-WU-FKf"/>
+                                        </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MenuCell" rowHeight="48" id="LeK-zq-mFb" customClass="MenuCell" customModule="MoppApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="168" width="375" height="48"/>
+                                        <rect key="frame" x="0.0" y="184.5" width="375" height="48"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="LeK-zq-mFb" id="JuY-RR-GaA">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="48"/>
@@ -72,8 +75,8 @@
                                                         <constraint firstAttribute="width" secondItem="EE1-vC-yuM" secondAttribute="height" multiplier="1:1" id="yFV-de-8ns"/>
                                                     </constraints>
                                                 </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vHb-5a-4W3">
-                                                    <rect key="frame" x="72" y="14.5" width="288" height="19"/>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="wordWrap" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vHb-5a-4W3">
+                                                    <rect key="frame" x="72" y="14.5" width="287" height="19"/>
                                                     <fontDescription key="fontDescription" name="RobotoCondensed-Regular" family="Roboto Condensed" pointSize="16"/>
                                                     <color key="textColor" name="MoppBaseBackground"/>
                                                     <nil key="highlightedColor"/>
@@ -81,7 +84,10 @@
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <constraints>
+                                                <constraint firstItem="vHb-5a-4W3" firstAttribute="centerY" secondItem="JuY-RR-GaA" secondAttribute="centerY" id="4Zn-eg-HfH"/>
                                                 <constraint firstItem="EE1-vC-yuM" firstAttribute="centerY" secondItem="JuY-RR-GaA" secondAttribute="centerY" id="7jn-lH-trP"/>
+                                                <constraint firstItem="vHb-5a-4W3" firstAttribute="leading" secondItem="EE1-vC-yuM" secondAttribute="trailing" constant="8" symbolic="YES" id="K3Q-mk-h9p"/>
+                                                <constraint firstItem="vHb-5a-4W3" firstAttribute="top" secondItem="JuY-RR-GaA" secondAttribute="top" constant="14.5" id="fMV-CF-Qq6"/>
                                                 <constraint firstItem="vHb-5a-4W3" firstAttribute="leading" secondItem="EE1-vC-yuM" secondAttribute="trailing" constant="8" id="knL-TZ-0Yo"/>
                                                 <constraint firstItem="EE1-vC-yuM" firstAttribute="leading" secondItem="JuY-RR-GaA" secondAttribute="leading" constant="16" id="qSB-yQ-N2s"/>
                                                 <constraint firstItem="vHb-5a-4W3" firstAttribute="centerY" secondItem="JuY-RR-GaA" secondAttribute="centerY" id="w1J-Ss-yyI"/>
@@ -95,7 +101,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MenuSeparatorCell" rowHeight="33" id="L1Q-hP-HNC" customClass="MenuSeparatorCell" customModule="MoppApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="216" width="375" height="33"/>
+                                        <rect key="frame" x="0.0" y="232.5" width="375" height="33"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="L1Q-hP-HNC" id="6ek-8A-bdq">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="33"/>
@@ -119,7 +125,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MenuLanguageCell" rowHeight="69" id="kyP-3t-jrX" customClass="MenuLanguageCell" customModule="MoppApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="249" width="375" height="69"/>
+                                        <rect key="frame" x="0.0" y="265.5" width="375" height="69"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="kyP-3t-jrX" id="3RM-VJ-ZKm">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="69"/>
@@ -134,7 +140,7 @@
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2NM-A8-DOE" customClass="MenuLanguageButtonView" customModule="MoppApp" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="0.0" width="119.5" height="53"/>
                                                                     <subviews>
-                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TDv-qC-NIj" customClass="MenuLanguageButton" customModule="MoppApp" customModuleProvider="target">
+                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TDv-qC-NIj" customClass="MenuLanguageButton" customModule="MoppApp" customModuleProvider="target">
                                                                             <rect key="frame" x="0.0" y="0.0" width="119.5" height="53"/>
                                                                             <color key="backgroundColor" name="MoppTitle"/>
                                                                             <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="16"/>
@@ -142,7 +148,7 @@
                                                                                 <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             </state>
                                                                         </button>
-                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Eesti keel" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VbF-tA-3Ro">
+                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Eesti keel" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VbF-tA-3Ro">
                                                                             <rect key="frame" x="8" y="0.0" width="103.5" height="53"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                             <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="15"/>
@@ -170,7 +176,7 @@
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qGd-iu-skS" customClass="MenuLanguageButtonView" customModule="MoppApp" customModuleProvider="target">
                                                                     <rect key="frame" x="119.5" y="0.0" width="120" height="53"/>
                                                                     <subviews>
-                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oDO-Oa-baT" customClass="MenuLanguageButton" customModule="MoppApp" customModuleProvider="target">
+                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oDO-Oa-baT" customClass="MenuLanguageButton" customModule="MoppApp" customModuleProvider="target">
                                                                             <rect key="frame" x="0.0" y="0.0" width="120" height="53"/>
                                                                             <color key="backgroundColor" red="0.28235294117647058" green="0.34901960784313724" blue="0.4392156862745098" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="16"/>
@@ -178,7 +184,7 @@
                                                                                 <color key="titleColor" name="MoppDescriptiveText"/>
                                                                             </state>
                                                                         </button>
-                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Русский язык" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jAN-zn-zOE">
+                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Русский язык" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jAN-zn-zOE">
                                                                             <rect key="frame" x="8" y="0.0" width="104" height="53"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                             <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="15"/>
@@ -226,7 +232,7 @@
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tBD-Wt-RS0" customClass="MenuLanguageButtonView" customModule="MoppApp" customModuleProvider="target">
                                                                     <rect key="frame" x="239.5" y="0.0" width="119.5" height="53"/>
                                                                     <subviews>
-                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iwX-V7-ww9" customClass="MenuLanguageButton" customModule="MoppApp" customModuleProvider="target">
+                                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iwX-V7-ww9" customClass="MenuLanguageButton" customModule="MoppApp" customModuleProvider="target">
                                                                             <rect key="frame" x="0.0" y="0.0" width="119.5" height="53"/>
                                                                             <color key="backgroundColor" name="MoppMenuLanguageUnselected"/>
                                                                             <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="16"/>
@@ -234,7 +240,7 @@
                                                                                 <color key="titleColor" name="MoppDescriptiveText"/>
                                                                             </state>
                                                                         </button>
-                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="English" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HlN-By-C5T">
+                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="English" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HlN-By-C5T">
                                                                             <rect key="frame" x="8" y="0.0" width="103.5" height="53"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                             <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="15"/>
@@ -295,6 +301,7 @@
                                 </connections>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="9zc-BY-AeD"/>
                         <color key="backgroundColor" red="0.015686274509803921" green="0.11764705882352941" blue="0.25882352941176467" alpha="0.95023544520547942" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="h2r-Ep-gDU" firstAttribute="top" secondItem="9zc-BY-AeD" secondAttribute="top" id="LPl-4E-mAW"/>
@@ -302,7 +309,6 @@
                             <constraint firstItem="h2r-Ep-gDU" firstAttribute="bottom" secondItem="9zc-BY-AeD" secondAttribute="bottom" id="fmg-BQ-MFT"/>
                             <constraint firstItem="h2r-Ep-gDU" firstAttribute="trailing" secondItem="9zc-BY-AeD" secondAttribute="trailing" id="nf9-sg-UIv"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="9zc-BY-AeD"/>
                     </view>
                     <connections>
                         <outlet property="tableView" destination="h2r-Ep-gDU" id="9sE-KN-yMu"/>
@@ -319,8 +325,8 @@
                     <view key="view" contentMode="scaleToFill" id="jxs-Z0-c4T">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="DwB-yh-Fgv"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qR5-TX-gsJ" userLabel="First Responder" sceneMemberID="firstResponder"/>

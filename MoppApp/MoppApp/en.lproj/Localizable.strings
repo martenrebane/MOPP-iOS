@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,14 +28,17 @@
 "tab-signature" = "SIGNATURE";
 "tab-sign-button" = "SIGN";
 "tab-share-button" = "SHARE";
+"tab-share-button-accessibility" = "SHARE CONTAINER";
 "tab-encrypt-button" = "ENCRYPT";
+"tab-encrypt-button-accessibility" = "ENCRYPT DOCUMENT";
 "tab-decrypt-button" = "DECRYPT";
-"tab-confirm-button" = "CONFIRM SELECTION";
+"tab-confirm-button" = "CONFIRM";
 
 "tab-selected" = "Selected, %@, tab %@ of %@";
 "tab-unselected" = "%@, tab %@ of %@";
 
 // Main menu
+"menu-close" = "CLOSE MENU";
 "menu-help" = "HELP";
 "menu-recent-containers" = "RECENT DOCUMENTS";
 "menu-settings" = "SETTINGS";
@@ -46,6 +49,7 @@
 "language-estonian" = "Estonian language";
 "language-english" = "English language";
 "language-russian" = "Russian language";
+"language-changed" = "Language changed";
 
 // Signature view
 "signature-view-begin-label" = "Choose a file to sign or validate";
@@ -60,30 +64,42 @@
 "crypto-ldap-search-placeholder" = "Enter personal code, company or registry code";
 "crypto-encryption-error-text" = "Something went wrong with encryption";
 "crypto-encryption-success" = "ENCRYPTION SUCCEEDED";
-"crypto-no-addressees-warning" = "No addressees specified";
+"crypto-decryption-cancelled" = "File decryption cancelled";
+"crypto-recipient-found" = "Recipient found";
+"crypto-recipients-found" = "%@ recipients found";
+"crypto-recipient-added" = "Recipient added";
+"crypto-recipient-removed" = "Recipient removed";
+"crypto-recipient-adding-cancelled" = "Recipient addition cancelled";
+"crypto-no-addressees-warning" = "No recipients specified";
 "crypto-valid-to" = "valid to";
 "crypto-type-id-card" = "ID-card";
 "crypto-type-digi-id" = "Digi-ID";
-"crypto-type-eseal" = "e-Seal";
-"crypto-type-mobile-id" = "MOBILE-ID";
-"crypto-type-unknown" = "UNKNOWN";
+"crypto-type-eseal" = "Certificate for Encryption";
+"crypto-type-mobile-id" = "Mobile-ID";
+"crypto-type-unknown" = "Unknown";
 "crypto-add-addressee-button-title" = "ADD";
+"crypto-add-addressee-button-title-accessibility" = "ADD RECIPIENT";
 "crypto-addressee-added-button-title" = "ADDED";
-"crypto-remove-addressee-button" = "Remove Signature";
+"crypto-remove-addressee-button" = "Remove recipient";
 
 // Signing view
 "signing-recent-containers" = "Recent documents";
 
 // Crashlytics
 "crashlytics-title" = "Send crash report?";
-"crashlytics-message" = "Hey. Looks like we crashed! Please help us fix the problem by sending a crash report.";
+"crashlytics-message" = "Application crashed. Please send us crash report, so we can fix the problem.";
 "crashlytics-action-send" = "Send";
 "crashlytics-action-always-send" = "Always send";
 "crashlytics-action-do-not-send" = "Don’t send";
 
+// SiVa consent
+"siva-send-message" = "Signed document in PDF and DDOC format will be transmitted to the Digital Signature Validation Service SiVa to verify the validity of the digital signature. Read more information about transmitted data to Digital Signature Validation service from id.ee website.\n Do you want to continue? https://www.id.ee/en/article/data-protection-conditions-for-the-id-software-of-the-national-information-system-authority/";
+
 // *** Actions ***
 "action-ok" = "OK";
+"action-yes" = "YES";
 "action-cancel" = "Cancel";
+"action-abort" = "CANCEL";
 "action-delete" = "Delete";
 "action-sign" = "Sign";
 "action-decrypt" = "Decrypt";
@@ -99,10 +115,13 @@
 "file-import-open-existing-failed-alert-message" = "Failed to open container %@";
 "file-import-create-new-failed-alert-title" = "Error creating container";
 "file-import-create-new-failed-alert-message" = "Failed to open container %@";
-"file-import-remove-file" = "Remove File";
+"file-import-new-file-opening-failed-alert-message" = "Failed to open file %@";
+"file-import-remove-file" = "Remove file";
 "file-import-save-file" = "Save file";
 "file-import-file-saved" = "File saved";
 "file-import-failed-file-save" = "Failed to save file";
+"file-import-failed-empty-file" = "Cannot add empty file to the container.";
+"file-import-failed-empty-file-imported" = "An empty file is attached to the envelope. Remove the empty file from the container to sign.";
 
 // Details
 "container-details-signing-success" = "SIGNATURE ADDED";
@@ -110,9 +129,15 @@
 "container-details-file-already-exists" = "File already exists in the container";
 "container-header-files-title" = "Container files";
 "container-header-create-files-title" = "Container files";
+"container-edit-name-button" = "Container name";
+"container-error-message-failed-container-name-change" = "Failed to rename container";
+"container-name-changed" = "Container name changed";
+"container-name-change-cancelled" = "Container name change cancelled";
+"container-header-files-add-file" = "Add file";
 "container-header-create-addressee-title" = "Recipients";
 "container-header-timestamp-title" = "Container timestamps";
 "container-header-signatures-title" = "Container signatures";
+"container-header-timestamps-title" = "Container timestamps";
 "container-row-edit-remove" = "Delete";
 "container-header-title" = "CONTAINER:";
 "container-error-message-invalid-signature" = "1 INVALID SIGNATURE";
@@ -127,12 +152,14 @@
 "container-signature-status-non-qscd" = "(Restrictions)";
 "container-signature-status-invalid" = "Signature is not valid";
 "container-signature-status-unknown" = "Signature is unknown";
-"container-signature-test-signature-title" = "Test signature";
+"container-timestamp-valid" = "Timestamp is valid";
+"container-timestamp-unknown" = "Timestamp is unknown";
 "container-timestamp-invalid" = "Timestamp is not valid";
 
 // *** Mobile ID Challenge View ***
 
-"challenge-code-label" = "Control code: %@";
+"challenge-code-label" = "%@";
+"challenge-code-label-accessibility" = "Control code: %@ %@ %@ %@";
 
 "sim-toolkit-sign-document-title" = "Sign document";
 
@@ -145,22 +172,35 @@
 "share-extension-import-title" = "Importing file";
 "share-extension-import-message" = "File is now cached for you. Go to RIA DigiDoc application to finish import";
 
+"datafile-added" = "File added";
+"datafiles-added" = "Files added";
+"signature-remove-button" = "Remove signature";
 "signature-remove-confirm-message" = "Remove signature from container?";
 "datafile-remove-confirm-message" = "Remove file from container?";
+"last-datafile-remove-confirm-message" = "You are about to remove the last file in the container, it is removed along with the container.";
+"datafile-removed" = "File removed";
+"datafile-removal-failed" = "Failed to remove file";
+"datafile-removal-cancelled" = "File removal cancelled";
+"general-signature-adding-message" = "Failed to sign container";
+"general-signature-removal-message" = "Failed to remove signature from container";
+"signature-removed" = "Signature removed";
+"signature-removal-cancelled" = "Signature removal cancelled";
 
-"mobile-id-title" = "Enter your mobile number and personal code to sign with Mobile-ID";
+"signing-progress" = "Progress";
+"signing-remember-me" = "Remember me";
+"signing-cancelled" = "Container signing cancelled";
+"mobile-id-title" = "Enter your mobile number and personal code to sign with mobile-ID";
 "mobile-id-phone-title" = "Country code and phone number";
 "mobile-id-idcode-title" = "Personal code";
-"mobile-id-remember-me" = "Remember me";
-"mobile-id-challenge-title" = "Sign with Mobile-ID app";
+"mobile-id-challenge-title" = "Sign with mobile-ID";
 "mobile-id-challenge-waiting-response" = "Waiting for response ...";
 "smart-id-title" = "Enter your personal code to sign with Smart-ID";
 "smart-id-country-title" = "Country";
 "smart-id-country-estonia" = "Estonia";
 "smart-id-country-lithuania" = "Lithuania";
 "smart-id-country-latvia" = "Latvia";
-"smart-id-challenge-title" = "Sign with Smart-ID app";
-"smart-id-sign-help-title" = "Make sure control code matches with one in phone screen and enter Smart-ID PIN2-code";
+"smart-id-challenge-title" = "Sign with Smart-ID";
+"smart-id-sign-help-title" = "Make sure control code matches with one in phone screen and enter Smart-ID PIN2 code";
 "container-sign-title" = "Sign";
 "container-encryption-title" = "Encryption";
 "container-decryption-title" = "Decryption";
@@ -168,10 +208,11 @@
 "container-validate-title" = "Container verification";
 "container-validating" = "Loading...";
 "importing-files-progress-message" = "Importing files...";
-"mobile-id-sign-help-title" = "Make sure the control code matches the one on phone screen and enter Mobile-ID PIN2-code";
+"mobile-id-sign-help-title" = "Make sure the control code matches the one on phone screen and enter mobile-ID PIN2 code";
 "done-button-title" = "Done";
 "recent-containers-empty-list-title" = "No recent documents";
 "recent-containers-empty-search-message" = "Document not found";
+"recent-document-removed" = "Document removed";
 "search-container-file" = "Search container file";
 "sign-title-mobile-id" = "Mobile-ID";
 "sign-title-smart-id" = "Smart-ID";
@@ -179,12 +220,12 @@
 "card-reader-state-initial" = "Connect the card reader and insert your ID-card into the reader.";
 "card-reader-state-reader-not-found" = "No card readers found";
 "card-reader-state-id-card-not-found" = "Reader found.\nInsert your ID-card into the reader.";
-"card-reader-state-id-card-connected" = "ID-card found.\nRequesting information.";
+"card-reader-state-id-card-connected" = "ID-card found.\nRequesting information...";
 "card-reader-state-ready-for-pin2" = "Ready to sign with ID-card. \n%@ (%@)";
 "card-reader-state-ready-for-pin1" = "Ready to decrypt with ID-card.\n%@ (%@)";
 "signing-in-progress" = "Signing in progress.\nPlease wait.";
 "decryption-in-progress" = "Decryption in progress.\nPlease wait.";
-"signing-error-too-many-requests" = "The limit for digital signatures per month has been reached for this IP address. https://www.id.ee/index.php?id=39023";
+"signing-error-too-many-requests" = "The limit for digital signatures per month has been reached for this IP address. https://www.id.ee/en/article/for-organisations-that-sign-large-quantities-of-documents-using-digidoc4-client/";
 "no-response-error" = "Please check your internet connection";
 "ocsp-invalid-time-slot" = "Please check your smart device time. https://www.id.ee/en/article/ria-digidoc-error-please-check-your-smart-device-time/";
 "wrong-pin2" = "Wrong PIN2. You have %d attempts left.";
@@ -195,12 +236,12 @@
 "pin1-textfield-label" = "Enter PIN1";
 "pin2-blocked-alert" = "PIN2 blocked. Go to My eID to unblock it.";
 "pin1-blocked-alert" = "PIN1 blocked. Go to My eID to unblock it.";
-"generic-error-message" = "Something went wrong. Please try again";
-"decryption-error-message" = "Something went wrong with decryption. Please try again";
+"generic-error-message" = "Something went wrong. Please try again.";
+"decryption-error-message" = "Something went wrong with decryption. Please try again.";
 "signing-aborted-message" = "Signing process aborted";
-"my-eid-status-reader-not-found" = "Connect your card reader to your phone and insert ID-card into the reader.";
+"my-eid-status-reader-not-found" = "Connect your card reader to your smart device and insert ID-card into the reader.";
 "my-eid-status-card-not-found" = "Reader found.\nInsert your ID-card into the reader.";
-"my-eid-status-requesting-data" = "ID-card found.\nRequesting information.";
+"my-eid-status-requesting-data" = "ID-card found.\nRequesting information...";
 "my-eid-cert-expired" = "expired";
 "my-eid-cert-valid" = "valid";
 "my-eid-info-item-given-names" = "GIVEN NAMES";
@@ -213,6 +254,7 @@
 "my-eid-info-my-eid-accessibility" = "MY e-ID";
 "my-eid-info-my-eid-id-card" = "ID-CARD";
 "my-eid-info-my-eid-mobile-id" = "MOBILE-ID";
+"my-eid-info-my-eid-smart-id" = "SMART-ID";
 "my-eid-info-my-eid-digi-id" = "DIGI-ID";
 "my-eid-info-my-eid-unknown" = "UNKNOWN";
 "my-eid-info-my-eid-e-resident" = "E-RESIDENT";
@@ -230,14 +272,19 @@
 "my-eid-info-pin1-button-title" = "CHANGE PIN1";
 "my-eid-info-pin2-button-title" = "CHANGE PIN2";
 "my-eid-info-puk-button-title" = "CHANGE PUK";
+"my-eid-info-pin1-change-cancelled" = "Pin1 change cancelled";
+"my-eid-info-pin2-change-cancelled" = "Pin2 change cancelled";
+"my-eid-info-pin1-unblock-cancelled" = "Pin1 unblock cancelled";
+"my-eid-info-pin2-unblock-cancelled" = "Pin2 unblock cancelled";
+"my-eid-info-puk-change-cancelled" = "PUK code change cancelled";
 "my-eid-info-puk-cert-info-text" = "PUK code is in your code envelope";
 "my-eid-info-pin-puk-segment-title" = "PIN/PUK CODES AND CERTIFICATES";
-"my-eid-info-pin1-blocked-message" = "PIN1 is blocked, because PIN1 has been inserted 3 times incorrectly.";
-"my-eid-info-pin2-blocked-message" = "PIN2 is blocked, because PIN2 has been inserted 3 times incorrectly.";
-"my-eid-info-puk-blocked-message" = "PUK is blocked, because PUK code has been inserted 3 times incorrectly. You can find instructions on how to get a new document from here.";
+"my-eid-info-pin1-blocked-message" = "PIN1 has been blocked, because PIN1 code has been entered incorrectly 3 times. Unblock to reuse PIN1.";
+"my-eid-info-pin2-blocked-message" = "PIN2 has been blocked, because PIN2 code has been entered incorrectly 3 times. Unblock to reuse PIN2.";
+"my-eid-info-puk-blocked-message" = "PUK has been blocked, because PUK code has been entered incorrectly 3 times. You can not unblock the PUK code yourself.";
 "my-eid-unblock-pin1-button-title" = "UNBLOCK";
 "my-eid-unblock-pin2-button-title" = "UNBLOCK";
-"my-eid-how-to-get-codes-message" = "You can find instructions on how to get a new document from here.";
+"my-eid-how-to-get-codes-message" = "Please visit the service center to obtain new codes.";
 "my-eid-code-changed-success-message" = "%@ CHANGED";
 "my-eid-code-unblocked-success-message" = "%@ UNBLOCKED";
 "my-eid-wrong-code-message" = "Wrong %@ code. You can try 2 more times.";
@@ -261,6 +308,16 @@
 "my-eid-discard-button-title" = "CANCEL";
 "my-eid-confirm-change-button-title" = "CHANGE";
 "my-eid-confirm-unblock-button-title" = "UNBLOCK";
+"my-eid-discard-pin1-button-title-accessibility" = "CANCEL PIN1 CHANGING PROCESS";
+"my-eid-discard-pin2-button-title-accessibility" = "CANCEL PIN2 CHANGING PROCESS";
+"my-eid-confirm-pin1-change-button-title-accessibility" = "CONFIRM PIN1 CHANGE";
+"my-eid-confirm-pin2-change-button-title-accessibility" = "CONFIRM PIN2 CHANGE";
+"my-eid-discard-pin1-unblock-button-title-accessibility" = "CANCEL PIN1 UNBLOCKING PROCESS";
+"my-eid-discard-pin2-unblock-button-title-accessibility" = "CANCEL PIN2 UNBLOCKING PROCESS";
+"my-eid-confirm-pin1-unblock-button-title-accessibility" = "CONFIRM PIN1 UNBLOCK";
+"my-eid-confirm-pin2-unblock-button-title-accessibility" = "CONFIRM PIN2 UNBLOCK";
+"my-eid-discard-puk-change-button-title-accessibility" = "CANCEL PUK CHANGING PROCESS";
+"my-eid-confirm-puk-change-button-title-accessibility" = "CONFIRM PUK CHANGE";
 "my-eid-error-new-code-too-short" = "New %@ code must be at least %i digits long";
 "my-eid-error-current-code-too-short" = "Current %@ code must be at least %i digits long";
 "my-eid-error-codes-mismatch" = "New %@ codes must match";
@@ -269,19 +326,20 @@
 "my-eid-error-code-is-date-of-birth" = "New %@ code can't be your date of birth";
 "my-eid-error-code-too-easy" = "New %@ code can't be so easy";
 "settings-title" = "Settings";
-"settings-phone-number-title" = "Country code and phone number";
 "settings-phone-number-placeholder" = "372XXXXXXXX";
-"settings-id-code-title" = "Personal code";
 "settings-id-code-placeholder" = "Personal code";
-"settings-rpuuid-title" = "Access to Mobile-ID and Smart-ID service";
+"settings-rpuuid-title" = "Access to mobile-ID and Smart-ID service";
 "settings-rpuuid-placeholder" = "00000000-0000-0000-0000-000000000000";
-"settings-timestamp-url-title" = "Time Stamp service URL";
+"settings-timestamp-url-title" = "Access to Time-Stamping service";
 "settings-timestamp-url-placeholder" = "";
 "settings-timestamp-use-default-title" = "Use default";
+"settings-value-changed" = "Setting value changed";
 "diagnostics-title" = "Diagnostics";
 "diagnostics-app-version" = "Application version";
 "diagnostics-ios-version" = "OS";
 "diagnostics-libraries-label" = "Libraries:";
+"diagnostics-rpuuid-default" = "is set by default";
+"diagnostics-rpuuid-custom" = "is set manually";
 "about-title" = "Info";
 "jailbreak-message" = "This app cannot be used in jailbroken device";
 "datafile-preview-failed" = "Error opening document for preview";
@@ -289,5 +347,9 @@
 "last-update-check" = "LAST CHECK:";
 "update-date" = "UPDATE DATE:";
 "refresh-configuration" = "REFRESH CONFIGURATION";
+"refresh-configuration-restart-message" = "Configuration and TSL updated successfully. Restart the application to complete the update";
+"refresh-configuration-updated" = "Configuration updated";
+"refresh-configuration-already-up-to-date" = "Configuration is already up-to-date";
+"save-diagnostics" = "SAVE DIAGNOSTICS";
 "success-notification-dialog-label" = "To share the container click the \"SHARE\" button and choose your preferred application. All containers can also be found in the application settings \"Recent Documents\" folder.";
 "success-notification-dialog-dont-show-again" = "Don't show again";

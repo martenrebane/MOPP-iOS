@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Riigi Infosüsteemide Amet
+ * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,14 +28,17 @@
 "tab-signature" = "ПОДПИСЬ";
 "tab-sign-button" = "ПОДПИСАТЬ";
 "tab-share-button" = "ПОДЕЛИТЬСЯ";
+"tab-share-button-accessibility" = "ПОДЕЛИТЬСЯ КОНТЕЙНЕРОМ";
 "tab-encrypt-button" = "ЗАШИФРОВАТЬ";
+"tab-encrypt-button-accessibility" = "ЗАШИФРОВАТЬ ДОКУМЕНТ";
 "tab-decrypt-button" = "ДЕШИФРОВАТЬ";
-"tab-confirm-button" = "ПОДВЕРДИТЬ ВЫБОР";
+"tab-confirm-button" = "ПОДТВЕРДИТЬ";
 
 "tab-selected" = "Выбрано, %@, вкладка %@ из %@";
 "tab-unselected" = "%@, вкладка %@ из %@";
 
 // Main menu
+"menu-close" = "ЗАКРЫТЬ МЕНЮ";
 "menu-help" = "ПОМОЩЬ";
 "menu-recent-containers" = "НЕДАВНИЕ ДОКУМЕНТЫ";
 "menu-settings" = "НАСТРОЙКИ";
@@ -46,9 +49,10 @@
 "language-estonian" = "Эстонский язык";
 "language-english" = "Английский язык";
 "language-russian" = "Русский язык";
+"language-changed" = "Язык изменён";
 
 // Signature view
-"signature-view-begin-label" = "Выберите файл для подписи или проверки";
+"signature-view-begin-label" = "Выберите файл для подписания или проверки";
 "signature-view-begin-button" = "ВЫБРАТЬ ФАЙЛ";
 "signature-details-title" = "Детали подписи";
 "menu-button" = "Меню";
@@ -60,14 +64,21 @@
 "crypto-ldap-search-placeholder" = "Введите личный код, код компании или регистра";
 "crypto-encryption-error-text" = "Что-то пошло не так с шифрованием";
 "crypto-encryption-success" = "ШИФРОВАНИЕ УДАЛОСЬ";
+"crypto-decryption-cancelled" = "Расшифровка файла прервана";
+"crypto-recipient-found" = "Получатель найден";
+"crypto-recipients-found" = "Получатели найдены";
+"crypto-recipient-added" = "Получатель добавлен";
+"crypto-recipient-removed" = "Получатель удален";
+"crypto-recipient-adding-cancelled" = "Добавление получателя отменено";
 "crypto-no-addressees-warning" = "Не добавлено ни одного получателя";
 "crypto-valid-to" = "действителен до";
 "crypto-type-id-card" = "ID-карта";
 "crypto-type-digi-id" = "Digi-ID";
-"crypto-type-eseal" = "e-Печать";
-"crypto-type-mobile-id" = "MOBIIL-ID";
-"crypto-type-unknown" = "НЕИЗВЕСТНО";
+"crypto-type-eseal" = "Сертификат шифрования";
+"crypto-type-mobile-id" = "Mobiil-ID";
+"crypto-type-unknown" = "Неизвестно";
 "crypto-add-addressee-button-title" = "ДОБАВИТЬ";
+"crypto-add-addressee-button-title-accessibility" = "ДОБАВИТЬ ПОЛУЧАТЕЛЯ";
 "crypto-addressee-added-button-title" = "ДОБАВЛЕН";
 
 // Signing view
@@ -80,9 +91,14 @@
 "crashlytics-action-always-send" = "Всегда отправлять";
 "crashlytics-action-do-not-send" = "Не отправлять";
 
+// SiVa consent
+"siva-send-message" = "Для проверки действительности электронно-цифровых подписей в форматах PDF и DDOC файл пересылается в службу проверки цифровых подписей SiVa. Подробнее о данных, переданных для проверки действительности электронно-цифровых подписей, можно прочитать на id.ee.\n Вы желаете продолжить? https://www.id.ee/ru/artikkel/usloviya-zashhity-dannyh-programmnogo-obespecheniya-id-karty-departamenta-gosudarstvennoj-infosistemy/";
+
 // *** Actions ***
 "action-ok" = "OK";
+"action-yes" = "ДА";
 "action-cancel" = "Отменить";
+"action-abort" = "ОТМЕНИТЬ";
 "action-delete" = "Удалить";
 "action-sign" = "Подписать";
 "action-decrypt" = "Дешифровать";
@@ -98,10 +114,13 @@
 "file-import-open-existing-failed-alert-message" = "Не удалось открыть контейнер %@";
 "file-import-create-new-failed-alert-title" = "Ошибка при создании контейнера";
 "file-import-create-new-failed-alert-message" = "Не удалось открыть контейнер %@";
+"file-import-new-file-opening-failed-alert-message" = "Не удалось открыть файл %@";
 "file-import-remove-file" = "Удалить Файл";
 "file-import-save-file" = "Сохраните файл";
 "file-import-file-saved" = "Файл сохранен";
 "file-import-failed-file-save" = "Не удалось сохранить файл";
+"file-import-failed-empty-file" = "Пустой файл нельзя добавить в контейнер.";
+"file-import-failed-empty-file-imported" = "В контейнер добавлен пустой файл. Для подписания удалите из контейнера пустой файл.";
 
 // Details
 "container-details-signing-success" = "ПОДПИСЬ ДОБАВЛЕНА";
@@ -109,9 +128,15 @@
 "container-details-file-already-exists" = "Файл уже существует в контейнере";
 "container-header-files-title" = "Файлы контейнера";
 "container-header-create-files-title" = "Файлы контейнера";
+"container-edit-name-button" = "Название контейнера";
+"container-error-message-failed-container-name-change" = "Не удалось изменить название контейнера";
+"container-name-changed" = "Название контейнера изменено";
+"container-name-change-cancelled" = "Изменение названия контейнера отменено";
+"container-header-files-add-file" = "Добавить файл";
 "container-header-create-addressee-title" = "Получатели";
 "container-header-timestamp-title" = "Временной штамп контейнера";
 "container-header-signatures-title" = "Подписи контейнера";
+"container-header-timestamps-title" = "Временные штампы контейнерa";
 "container-row-edit-remove" = "Удалить";
 "container-header-title" = "КОНТЕЙНЕР:";
 "container-error-message-invalid-signature" = "1 НЕВЕРНАЯ ПОДПИСЬ";
@@ -127,15 +152,16 @@
 "container-signature-status-invalid" = "Подпись недействительна";
 "container-signature-status-unknown" = "Подпись неизвестная";
 "crypto-remove-addressee-button" = "Удалить подпись";
-"container-signature-test-signature-title" = "Тестовая подпись";
+"container-timestamp-valid" = "Временной штамп действителен";
+"container-timestamp-unknown" = "Временной штамп неизвестный";
 "container-timestamp-invalid" = "Временной штамп недействителен";
 
 // *** Mobile ID Challenge View ***
 
-"challenge-code-label" = "Контрольный код: %@";
+"challenge-code-label" = "%@";
+"challenge-code-label-accessibility" = "Контрольный код: %@ %@ %@ %@";
 
-// Currently must be in English
-"sim-toolkit-sign-document-title" = "Sign document";
+"sim-toolkit-sign-document-title" = "Подписать документ";
 
 // *** Errors ***
 "mobile-id-timeout-message" = "Тайм-аут запроса Mobiil-ID";
@@ -146,13 +172,26 @@
 "share-extension-import-title" = "Импорт файла";
 "share-extension-import-message" = "Файл кэширован. Перейти к приложению RIA DigiDoc для завершения импорта";
 
+"datafile-added" = "Файл добавлен";
+"datafiles-added" = "Файлы добавлены";
+"signature-remove-button" = "Удалить подпись";
 "signature-remove-confirm-message" = "Удалить подпись из контейнера?";
 "datafile-remove-confirm-message" = "Удалить файл из контейнера?";
+"last-datafile-remove-confirm-message" = "Вы собираетесь удалить последний файл в контейнере, он удаляется вместе с контейнером.";
+"datafile-removed" = "Файл удален";
+"datafile-removal-failed" = "Не удалось удалить файл";
+"datafile-removal-cancelled" = "Удаление файла отменено";
+"general-signature-adding-message" = "Не удалось подписать контейнер";
+"general-signature-removal-message" = "Не удается удалить подпись из контейнера";
+"signature-removed" = "Подпись удалена";
+"signature-removal-cancelled" = "Удаление подписи отменено";
 
-"mobile-id-title" = "Введите свой телефонный номер и личный код для подписания с помощью Mobiil-ID";
+"signing-progress" = "Прогресс";
+"signing-remember-me" = "Запомни меня";
+"signing-cancelled" = "Подписание контейнера прервано";
+"mobile-id-title" = "Введите свой телефонный номер и личный код для подписания с помощью mobiil-ID";
 "mobile-id-phone-title" = "Код страны и телефонный номер";
 "mobile-id-idcode-title" = "Личный код";
-"mobile-id-remember-me" = "Запомни меня";
 "mobile-id-challenge-title" = "Подписать с помощью приложения Mobile-ID";
 "mobile-id-challenge-waiting-response" = "Жду ответа ...";
 "smart-id-title" = "Введите свой личный код для подписи с Smart-ID";
@@ -161,7 +200,7 @@
 "smart-id-country-lithuania" = "Литва";
 "smart-id-country-latvia" = "Латвия";
 "smart-id-challenge-title" = "Подписать с помощью приложения Smart-ID";
-"smart-id-sign-help-title" = "Убедитесь в правильности контрольного кодa и введите PIN2-код для Smart-ID";
+"smart-id-sign-help-title" = "Убедитесь в правильности контрольного кода и введите PIN2-код для Smart-ID";
 "container-sign-title" = "Подписание";
 "container-encryption-title" = "Шифрование";
 "container-decryption-title" = "Дешифрование";
@@ -169,23 +208,24 @@
 "container-validate-title" = "Проверка контейнера";
 "container-validating" = "Загрузка...";
 "importing-files-progress-message" = "Импорт файлов...";
-"mobile-id-sign-help-title" = "Убедитесь в правильности контрольного кодa и введите PIN2-код для Mobiil-ID";
+"mobile-id-sign-help-title" = "Убедитесь в правильности контрольного кода и введите PIN2-код для mobiil-ID";
 "done-button-title" = "Готово";
 "recent-containers-empty-list-title" = "Недавние документы отсутствуют";
 "recent-containers-empty-search-message" = "Документ не найден";
+"recent-document-removed" = "Документ удален";
 "search-container-file" = "Искать контейнер";
 "sign-title-mobile-id" = "Mobiil-ID";
 "sign-title-smart-id" = "Smart-ID";
 "sign-title-id-card" = "ID-карта";
-"card-reader-state-initial" = "Подключите считыватель карты к телефону и вставьте в него Вашу ID-карту.";
+"card-reader-state-initial" = "Подключите считыватель карты и вставьте в него Вашу ID-карту.";
 "card-reader-state-reader-not-found" = "Считыватель карты не обнаружен";
 "card-reader-state-id-card-not-found" = "Обнаружен считыватель карты.\nВставьте в него Вашу ID-карту.";
-"card-reader-state-id-card-connected" = "Обнаружена ID-карта.\nЗапрашивается информация.";
+"card-reader-state-id-card-connected" = "Обнаружена ID-карта.\nЗапрашивается информация...";
 "card-reader-state-ready-for-pin2" = "Готово к подписанию с использованием ID-карты.\n%@ (%@)";
 "card-reader-state-ready-for-pin1" = "Готово к дешифрованию с помощью ID-карты.\n%@ (%@)";
 "signing-in-progress" = "Происходит подписание.\nПожалуйста, подождите.";
 "decryption-in-progress" = "Происходит дешифрование. Пожалуйста, подождите.";
-"signing-error-too-many-requests" = "Предел для цифровых подписей в месяц был достигнут для этого IP-адреса. https://www.id.ee/index.php?id=39025";
+"signing-error-too-many-requests" = "Предел для цифровых подписей в месяц был достигнут для этого IP-адреса. https://www.id.ee/ru/artikkel/dlya-uchrezhdenij-v-kotoryh-v-bolshom-obeme-podpisyvayutsya-dokumenty-s-pomoshhyu-digidoc4-klienta/";
 "no-response-error" = "Пожалуйста проверьте подключение к интернету";
 "ocsp-invalid-time-slot" = "Пожалуйста, проверьте время на своем смарт-устройстве. https://www.id.ee/ru/artikkel/oshibka-ria-digidoc-pozhalujsta-proverte-vremya-na-svoem-smart-ustrojstve/";
 "wrong-pin2" = "Неверный PIN2. У Вас осталось %d попыток.";
@@ -199,9 +239,9 @@
 "generic-error-message" = "Что-то пошло не так. Пожалуйста, попробуйте снова.";
 "decryption-error-message" = "Что-то пошло не так с дешифрованием. Пожалуйста, попробуйте снова.";
 "signing-aborted-message" = "Процесс подписания прерван";
-"my-eid-status-reader-not-found" = "Подключите считыватель карты к телефону и вставьте в него Вашу ID-карту.";
+"my-eid-status-reader-not-found" = "Подключите считыватель карты и вставьте в него Вашу ID-карту.";
 "my-eid-status-card-not-found" = "Обнаружен считыватель карты.\nВставьте в него Вашу ID-карту.";
-"my-eid-status-requesting-data" = "Обнаружена ID-карта.\nЗапрашивается информация.";
+"my-eid-status-requesting-data" = "Обнаружена ID-карта.\nЗапрашивается информация...";
 "my-eid-cert-expired" = "недействителен";
 "my-eid-cert-valid" = "действителен";
 "my-eid-info-item-given-names" = "ИМЯ";
@@ -214,6 +254,7 @@
 "my-eid-info-my-eid-accessibility" = "МОЙ e-ID";
 "my-eid-info-my-eid-id-card" = "ID-КАРТА";
 "my-eid-info-my-eid-mobile-id" = "MOBIIL-ID";
+"my-eid-info-my-eid-smart-id" = "SMART-ID";
 "my-eid-info-my-eid-digi-id" = "DIGI-ID";
 "my-eid-info-my-eid-unknown" = "НЕИЗВЕСТНО";
 "my-eid-info-my-eid-e-resident" = "E-РЕЗИДЕНТ";
@@ -224,65 +265,81 @@
 "my-eid-cert-info-status-expired" = "истек";
 "my-eid-info-pin1-title" = "Идентификационный сертификат";
 "my-eid-info-pin2-title" = "Сертификат цифровой подписи";
-"my-eid-info-puk-title" = "PUK код";
+"my-eid-info-puk-title" = "PUK-код";
 "my-eid-info-pin1-link-text" = "Забыли PIN1?";
 "my-eid-info-pin2-link-text" = "Забыли PIN2?";
 "my-eid-info-puk-link-text" = "Забыли PUK-код?";
 "my-eid-info-pin1-button-title" = "ПОМЕНЯТЬ PIN1";
 "my-eid-info-pin2-button-title" = "ПОМЕНЯТЬ PIN2";
 "my-eid-info-puk-button-title" = "ПОМЕНЯТЬ PUK";
-"my-eid-info-puk-cert-info-text" = "PUK код в Вашем конверте кодов";
-"my-eid-info-pin-puk-segment-title" = "PIN/PUK КОДЫ И СЕРТИФИКАТЫ";
-"my-eid-info-pin1-blocked-message" = "PIN1 заблокирован, потому что был неверно введен 3 раза.";
-"my-eid-info-pin2-blocked-message" = "PIN2 заблокирован, потому что был неверно введен 3 раза.";
-"my-eid-info-puk-blocked-message" = "PUK заблокирован, потому что был неверно введен 3 раза. Здесь Вы можете найти инструкции о том, как получить новый документ.";
+"my-eid-info-pin1-change-cancelled" = "Изменение Pin1 прервано";
+"my-eid-info-pin2-change-cancelled" = "Изменение Pin2 прервано";
+"my-eid-info-pin1-unblock-cancelled" = "Аннулирование блокировки Pin1 прервано";
+"my-eid-info-pin2-unblock-cancelled" = "Аннулирование блокировки Pin2 прервано";
+"my-eid-info-puk-change-cancelled" = "Изменение PUK-кода прервано";
+"my-eid-info-puk-cert-info-text" = "PUK-код в Вашем конверте кодов";
+"my-eid-info-pin-puk-segment-title" = "PIN/PUK И СЕРТИФИКАТЫ";
+"my-eid-info-pin1-blocked-message" = "PIN1 заблокирован, потому что PIN1-код был введён неверно 3 раза. Разблокируйте, чтобы использовать PIN1.";
+"my-eid-info-pin2-blocked-message" = "PIN2 заблокирован, потому что PIN2-код был введён неверно 3 раза. Разблокируйте, чтобы использовать PIN2.";
+"my-eid-info-puk-blocked-message" = "PUK заблокирован, потому что PUK-код был введён неверно 3 раза. PUK невозможно разблокировать самому.";
 "my-eid-unblock-pin1-button-title" = "РАЗБЛОКИРОВАТЬ";
 "my-eid-unblock-pin2-button-title" = "РАЗБЛОКИРОВАТЬ";
-"my-eid-how-to-get-codes-message" = "Здесь Вы можете найти инструкции о том, как получить новый документ.";
+"my-eid-how-to-get-codes-message" = "Для получения нового PUK-кода для своей ID-карты, посетите центр обслуживания, где вы сможете получить конверт с кодами.";
 "my-eid-code-changed-success-message" = "%@ ИЗМЕНЕНО";
 "my-eid-code-unblocked-success-message" = "%@ РАЗБЛОКИРОВАН";
-"my-eid-wrong-code-message" = "Неверный %@ код. Вы можете попробовать ещё 2 раз.";
-"my-eid-wrong-code-message-singular" = "Неверный %@ код. Вы можете попробовать ещё 1 раз.";
-"my-eid-code-blocked-message" = "%1$@ заблокирован, потому что %1$@ код был введён неверно 3 раза. Разблокируйте, чтобы использовать %1$@.";
+"my-eid-wrong-code-message" = "Неверный %@-код. Вы можете попробовать ещё 2 раз.";
+"my-eid-wrong-code-message-singular" = "Неверный %@-код. Вы можете попробовать ещё 1 раз.";
+"my-eid-code-blocked-message" = "%1$@ заблокирован, потому что %1$@-код был введён неверно 3 раза. Разблокируйте, чтобы использовать %1$@.";
 // *** My eID info bullets ***
 "my-eid-info-bullet-same-codes-warning" = "Новый %1$@ должен отличаться от предыдущего %1$@.";
-"my-eid-info-bullet-auth-cert-info" = "PIN1 код используется для идентификации.";
-"my-eid-info-bullet-pin1-blocked-warning" = "Если PIN1 введен неверно 3 раза, сертификат индентификации будет заблокирован и станет невозможным использовать ID-карту для проверки идентификации до тех пор, пока PIN1 будет не разблокирован с помощью PUK кода.";
-"my-eid-info-bullet-forgot-code-note" = "Если Вы забыли %1$@ код, но Вы знаете Ваш PUK код, тогда Вы сможете поменять %1$@ с помощью PUK кода.";
-"my-eid-info-bullet-puk-envelope-info" = "PUK код написан в конверте, который прилагается к ID-карте.";
-"my-eid-info-bullet-sign-cert-info" = "PIN2 код используется для дигитальной подписи документа.";
-"my-eid-info-bullet-pin2-blocked-warning" = "Если PIN2 введен неверно 3 раза, сертификат подписи будет заблокирован и станет невозможным использовать ID-карту для дигитальной подписи до тех пор, пока PIN2 будет не разблокирован с помощью PUK кода.";
-"my-eid-info-bullet-puk-unblock-info" = "PUK код используется для разблокирования сертификатов, когда PIN1 или PIN2 были неверное введены 3 раза.";
-"my-eid-info-bullet-puk-blocked-warning" = "Если Вы забудете PUK код или сертификаты остануться заблокированными, необходимо посетить центр обслуживания для получения новых кодов.";
+"my-eid-info-bullet-auth-cert-info" = "PIN1-код используется для идентификации.";
+"my-eid-info-bullet-pin1-blocked-warning" = "Если PIN1 введен неверно 3 раза, сертификат индентификации будет заблокирован и станет невозможным использовать ID-карту для проверки идентификации до тех пор, пока PIN1 будет не разблокирован с помощью PUK-кода.";
+"my-eid-info-bullet-forgot-code-note" = "Если Вы забыли %1$@-код, но Вы знаете Ваш PUK-код, тогда Вы сможете поменять %1$@ с помощью PUK-кода.";
+"my-eid-info-bullet-puk-envelope-info" = "PUK-код написан в конверте, который прилагается к ID-карте.";
+"my-eid-info-bullet-sign-cert-info" = "PIN2-код используется для дигитальной подписи документа.";
+"my-eid-info-bullet-pin2-blocked-warning" = "Если PIN2 введён 3 раза неверно, тогда блокируется сертификат цифровой подписи и использовать ID-карту для цифровой подписи невозможно, пока блокировка не снята PUK-кодом.";
+"my-eid-info-bullet-puk-unblock-info" = "PUK-код используется для разблокирования сертификатов, когда PIN1 или PIN2 были неверно введены 3 раза.";
+"my-eid-info-bullet-puk-blocked-warning" = "Если Вы забудете PUK-код или сертификаты остануться заблокированными, необходимо посетить центр обслуживания для получения новых кодов.";
 "my-eid-change-code-title" = "Изменить %@";
 "my-eid-unblock-code-title" = "Разблокировать %@";
-"my-eid-current-code-label" = "ДЕЙСТВУЮЩИЙ %@ КОД";
-"my-eid-new-code-label" = "НОВЫЙ %@ КОД (не меньше %i символов)";
-"my-eid-new-code-again-label" = "ПОВТОРИТЬ НОВЫЙ %@ КОД";
+"my-eid-current-code-label" = "ДЕЙСТВУЮЩИЙ %@-КОД";
+"my-eid-new-code-label" = "НОВЫЙ %@-КОД (не меньше %i символов)";
+"my-eid-new-code-again-label" = "ПОВТОРИТЬ НОВЫЙ %@-КОД";
 "my-eid-discard-button-title" = "ОТМЕНИТЬ";
 "my-eid-confirm-change-button-title" = "ИЗМЕНИТЬ";
 "my-eid-confirm-unblock-button-title" = "РАЗБЛОКИРОВАТЬ";
-"my-eid-error-new-code-too-short" = "Новый %@ код должен быть не менее %i символов";
-"my-eid-error-current-code-too-short" = "Действующий %@ код должен быть не менее %i символов";
-"my-eid-error-codes-mismatch" = "Новые %@ коды должны совпадать";
+"my-eid-discard-pin1-button-title-accessibility" = "ПРЕРВАТЬ ПРОЦЕСС ИЗМЕНЕНИЯ PIN1";
+"my-eid-discard-pin2-button-title-accessibility" = "ПРЕРВАТЬ ПРОЦЕСС ИЗМЕНЕНИЯ PIN2";
+"my-eid-confirm-pin1-change-button-title-accessibility" = "ПОДТВЕРДИТЬ ИЗМЕНЕНИЕ PIN1";
+"my-eid-confirm-pin2-change-button-title-accessibility" = "ПОДТВЕРДИТЬ ИЗМЕНЕНИЕ PIN2";
+"my-eid-discard-pin1-unblock-button-title-accessibility" = "ПРЕРВАТЬ ПРОЦЕСС АННУЛИРОВАНИЯ БЛОКИРОВКИ PIN1";
+"my-eid-discard-pin2-unblock-button-title-accessibility" = "ПРЕРВАТЬ ПРОЦЕСС АННУЛИРОВАНИЯ БЛОКИРОВКИ PIN2";
+"my-eid-confirm-pin1-unblock-button-title-accessibility" = "ПОДТВЕРДИТЬ АННУЛИРОВАНИЕ БЛОКИРОВКИ PIN1";
+"my-eid-confirm-pin2-unblock-button-title-accessibility" = "ПОДТВЕРДИТЬ АННУЛИРОВАНИЕ БЛОКИРОВКИ PIN2";
+"my-eid-discard-puk-change-button-title-accessibility" = "ПРЕРВАТЬ ПРОЦЕСС ИЗМЕНЕНИЯ PUK-КОДА";
+"my-eid-confirm-puk-change-button-title-accessibility" = "ПОДТВЕРДИТЬ ИЗМЕНЕНИЕ PUK-КОД";
+"my-eid-error-new-code-too-short" = "Новый %@-код должен быть не менее %i символов";
+"my-eid-error-current-code-too-short" = "Действующий %@-код должен быть не менее %i символов";
+"my-eid-error-codes-mismatch" = "Новые %@-коды должны совпадать";
 "my-eid-error-codes-are-same" = "Старый и новый %@ должны быть разными";
-"my-eid-error-code-contained-in-personal-code" = "Новый %@ код не может быть частью Вашего личного кода";
-"my-eid-error-code-is-date-of-birth" = "Новый %@ код не может быть датой Вашего рождения";
-"my-eid-error-code-too-easy" = "Новый %@ код не может быть таким простым";
+"my-eid-error-code-contained-in-personal-code" = "Новый %@-код не может быть частью Вашего личного кода";
+"my-eid-error-code-is-date-of-birth" = "Новый %@-код не может быть датой Вашего рождения";
+"my-eid-error-code-too-easy" = "Новый %@-код не может быть таким простым";
 "settings-title" = "Настройки";
-"settings-phone-number-title" = "Код страны и телефонный номер";
 "settings-phone-number-placeholder" = "372XXXXXXXX";
-"settings-id-code-title" = "Личный код";
 "settings-id-code-placeholder" = "Личный код";
-"settings-rpuuid-title" = "Доступ к услуге Mobiil-ID и Smart-ID";
+"settings-rpuuid-title" = "Доступ к услуге mobiil-ID и Smart-ID";
 "settings-rpuuid-placeholder" = "00000000-0000-0000-0000-000000000000";
-"settings-timestamp-url-title" = "URL-адрес временного штампа";
+"settings-timestamp-url-title" = "Доступ к услугам отметки времени";
 "settings-timestamp-url-placeholder" = "";
 "settings-timestamp-use-default-title" = "Использовать значение по умолчанию";
+"settings-value-changed" = "Значение настройки изменено";
 "diagnostics-title" = "Диагностика";
 "diagnostics-app-version" = "Версия приложения";
 "diagnostics-ios-version" = "Операционная система";
 "diagnostics-libraries-label" = "Библиотеки";
+"diagnostics-rpuuid-default" = "назначено по умолчанию";
+"diagnostics-rpuuid-custom" = "назначено вручную";
 "about-title" = "Информация";
 "jailbreak-message" = "Данное приложение не может быть использовано на взломанном (джейлбрейк) устройстве";
 "datafile-preview-failed" = "Не удалось открыть документ для предварительного просмотра";
@@ -290,5 +347,9 @@
 "last-update-check" = "ПОСЛЕДНЯЯ ПРОВЕРКА:";
 "update-date" = "ДАТА ОБНОВЛЕНИЯ:";
 "refresh-configuration" = "ПРОВЕРЬТЕ ОБНОВЛЕНИЯ";
+"refresh-configuration-restart-message" = "Обновление конфигурации и TSL прошло успешно. Перезапустите приложение для завершения обновления";
+"refresh-configuration-updated" = "Конфигурация удачно обновлена";
+"refresh-configuration-already-up-to-date" = "У вас последняя версия конфигурации";
+"save-diagnostics" = "СОХРАНИТЬ ДИАГНОСТИКУ";
 "success-notification-dialog-label" = "Чтобы поделиться контейнером, нажмите кнопку «ПОДЕЛИТЬСЯ» и выберите нужное приложение. Все контейнеры можно найти в папке «Недавние документы» в настройках приложения.";
 "success-notification-dialog-dont-show-again" = "Больше не показывать";
