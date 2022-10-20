@@ -153,6 +153,8 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
 
             let notification = Notification(name: .configurationLoaded)
             NotificationCenter.default.post(notification)
+        
+            registerAccessoriesObservers()
 
             let initializationViewController = InitializationViewController()
             window?.rootViewController = initializationViewController
