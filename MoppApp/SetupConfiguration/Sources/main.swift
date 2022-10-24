@@ -149,7 +149,13 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             NSLog("Public key data: \(publicKeyData!)")
             NSLog("Signature data: \(signatureData!)")
             
-            let isVerified = try? CC.RSA.verify(configDataData!, derKey: publicKeyData!, padding: .pkcs15, digest: .sha512, saltLen: 0, signedData: signatureData!)
+            var isVerified = false
+            
+            do {
+                isVerified = try CC.RSA.verify(configDataData!, derKey: publicKeyData!, padding: .pkcs15, digest: .sha512, saltLen: 0, signedData: signatureData!)
+            } catch {
+                NSLog(error.localizedDescription)
+            }
             
             NSLog("isVerified: \(isVerified)")
             
