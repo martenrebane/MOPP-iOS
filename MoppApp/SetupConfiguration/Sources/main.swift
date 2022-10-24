@@ -51,6 +51,10 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             fatalError("Unable to get data from central configuration \(error.localizedDescription)")
         }
         
+        NSLog("1-1 Config Data: \(configData)")
+        NSLog("1-2 Public key: \(publicKey)")
+        NSLog("1-3 Signature: \(signature)")
+        
         NSLog("2 / 4 - Verifing configuration data...")
         
         verifySignature(configData: configData!, publicKey: publicKey!, signature: signature!)
@@ -141,7 +145,13 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             let publicKeyData = Data(base64Encoded: removeHeaderAndFooterFromRSACertificate(certificate: publicKey))
             let signatureData = Data(base64Encoded: trim(text: removeAllWhitespace(data: signature))!)
             
+            NSLog("Config Data: \(configDataData!)")
+            NSLog("Public key data: \(publicKeyData!)")
+            NSLog("Signature data: \(signatureData!)")
+            
             let isVerified = try? CC.RSA.verify(configDataData!, derKey: publicKeyData!, padding: .pkcs15, digest: .sha512, saltLen: 0, signedData: signatureData!)
+            
+            NSLog("isVerified: \(isVerified)")
             
             if isVerified == false || isVerified == nil {
                 fatalError("Signature verification unsuccessful")
