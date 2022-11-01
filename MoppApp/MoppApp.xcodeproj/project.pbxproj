@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -40,7 +40,7 @@
 		54825EF81E1D270F00253FF0 /* String+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54825EF71E1D270F00253FF0 /* String+Additions.swift */; };
 		54825EFB1E1D28E900253FF0 /* UIColor+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54825EFA1E1D28E900253FF0 /* UIColor+Additions.swift */; };
 		54A4182B1E83FAD200559E2B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54A418291E83FAD200559E2B /* MainInterface.storyboard */; };
-		54A4182F1E83FAD200559E2B /* shareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 54A418241E83FAD200559E2B /* shareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		54A4182F1E83FAD200559E2B /* shareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 54A418241E83FAD200559E2B /* shareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		54A5729F1E82AC760099BFAF /* AppStore.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54A5729E1E82AC760099BFAF /* AppStore.plist */; };
 		54DC0DBF1E0BC0CD00C62B3D /* Landing.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54DC0DBE1E0BC0CD00C62B3D /* Landing.storyboard */; };
 		A8396987106A0BBF27196838 /* Pods_MoppAppTestEnv.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9243254AA71C9AE306830EF1 /* Pods_MoppAppTestEnv.framework */; };
@@ -328,7 +328,7 @@
 		C5EA717B2176057A00440F4A /* CustomElements.xib in Resources */ = {isa = PBXBuildFile; fileRef = C50DCD211FD69A8500D48E16 /* CustomElements.xib */; };
 		C5EA71812176057A00440F4A /* CryptoLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 39852A6120AB2949004CB100 /* CryptoLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C5EA71822176057A00440F4A /* cdoc.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 393B66E120DB94CD001DC89B /* cdoc.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C5EA71852176057A00440F4A /* shareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 54A418241E83FAD200559E2B /* shareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C5EA71852176057A00440F4A /* shareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 54A418241E83FAD200559E2B /* shareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C5F462AA209C6B05001B7D59 /* NSMutableAttributedString+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F462A9209C6B05001B7D59 /* NSMutableAttributedString+Additions.swift */; };
 		C5F974D22176465400A167C7 /* MoppLibTestEnv.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5F974D12176465400A167C7 /* MoppLibTestEnv.framework */; };
 		C5F974E521773C7000A167C7 /* MoppLibTestEnv.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C5F974D12176465400A167C7 /* MoppLibTestEnv.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -403,15 +403,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		54A418331E83FAD200559E2B /* Embed App Extensions */ = {
+		54A418331E83FAD200559E2B /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				54A4182F1E83FAD200559E2B /* shareExtension.appex in Embed App Extensions */,
+				54A4182F1E83FAD200559E2B /* shareExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C5EA717F2176057A00440F4A /* Embed Frameworks */ = {
@@ -427,15 +427,15 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C5EA71842176057A00440F4A /* Embed App Extensions */ = {
+		C5EA71842176057A00440F4A /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C5EA71852176057A00440F4A /* shareExtension.appex in Embed App Extensions */,
+				C5EA71852176057A00440F4A /* shareExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E4250D081E0A911100530370 /* Embed Frameworks */ = {
@@ -1223,7 +1223,7 @@
 				C5EA717C2176057A00440F4A /* Set GH build number to plist */,
 				C5EA717F2176057A00440F4A /* Embed Frameworks */,
 				C5EA71832176057A00440F4A /* ShellScript */,
-				C5EA71842176057A00440F4A /* Embed App Extensions */,
+				C5EA71842176057A00440F4A /* Embed Foundation Extensions */,
 				C4D4387229B9DF8675645120 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
@@ -1249,7 +1249,7 @@
 				E4250D1B1E0AB34400530370 /* Set GH build number to plist */,
 				E4250D081E0A911100530370 /* Embed Frameworks */,
 				54415B641E52F23C00B66A89 /* ShellScript */,
-				54A418331E83FAD200559E2B /* Embed App Extensions */,
+				54A418331E83FAD200559E2B /* Embed Foundation Extensions */,
 				3587AFB7240E99D207629811 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
@@ -1268,7 +1268,7 @@
 		E4250CBB1E0968D200530370 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = "Riigi Infosüsteemi Amet";
 				TargetAttributes = {
 					54A418231E83FAD200559E2B = {
@@ -1296,7 +1296,7 @@
 				};
 			};
 			buildConfigurationList = E4250CBE1E0968D200530370 /* Build configuration list for PBXProject "MoppApp" */;
-			compatibilityVersion = "Xcode 12.0";
+			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
