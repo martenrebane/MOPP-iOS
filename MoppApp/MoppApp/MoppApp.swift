@@ -108,9 +108,13 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         window?.backgroundColor = UIColor.white
 
         // Check for min Xcode 11
-        #if compiler(>=5.1)
+        if #available(iOS 13.0, *) {
+#if compiler(>=5.1)
             window?.overrideUserInterfaceStyle = .light
-        #endif
+#endif
+        } else {
+            // Fallback on earlier versions
+        }
 
         UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().tintColor = UIColor.moppText
