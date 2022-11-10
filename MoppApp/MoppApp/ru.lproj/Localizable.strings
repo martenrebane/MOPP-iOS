@@ -373,8 +373,8 @@
 "accessibility-introduction-screen-magnification-introduction-header" = "Увеличение экрана и изменение цветов";
 "accessibility-introduction-screen-magnification-introduction" = "Если слабовидящий пользователь видит достаточно для чтения текста, для более удобного просмотра экрана можно использовать встроенные в смарт-устройство вспомогательные средства. При помощи вспомогательных средств можно изменять размеры текстов, основной тип шрифта, цветовые решения интерфейса пользователя, а также можно увеличивать экран при помощи экранной лупы.";
 "accessibility-introduction-screen-magnification-screen-tools" = "Вспомогательные средства для регулировки цвета экрана и размера текста:";
-"accessibility-introduction-screen-magnification-screen-tools-ios" = "iOS https://support.apple.com/et-ee/guide/iphone/iph3e2e1fb0/ios";
-"accessibility-introduction-screen-magnification-screen-tools-android" = "Android https://support.google.com/accessibility/android/answer/11183305?hl=en&ref_topic=9079043";
+"accessibility-introduction-screen-magnification-screen-tools-ios" = "iOS https://support.apple.com/ru-ru/guide/iphone/iph3e2e1fb0/ios";
+"accessibility-introduction-screen-magnification-screen-tools-android" = "Android https://support.google.com/accessibility/android/answer/11183305?hl=ru&ref_topic=9079043";
 "accessibility-introduction-screen-magnification-tools" = "Вспомогательные средства для увеличения экрана:";
-"accessibility-introduction-screen-magnification-tools-ios" = "Zoom (iOS, встроенный) https://support.apple.com/et-ee/guide/iphone/iph3e2e367e/ios";
-"accessibility-introduction-screen-magnification-tools-android" = "Magnification (Android, встроенный) https://support.google.com/accessibility/android/answer/6006949";
+"accessibility-introduction-screen-magnification-tools-ios" = "Zoom (iOS, встроенный) https://support.apple.com/ru-ru/guide/iphone/iph3e2e367e/ios";
+"accessibility-introduction-screen-magnification-tools-android" = "Magnification (Android, встроенный) https://support.google.com/accessibility/android/answer/6006949?hl=ru";
