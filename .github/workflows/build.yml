@@ -5,7 +5,7 @@ env:
 jobs:
   macos:
     name: Build on macOS
-    if: contains(github.repository, 'open-eid/MOPP-iOS') && contains(github.ref, 'master')
+    if: contains(github.repository, 'martenrebane/MOPP-iOS') && contains(github.ref, 'master')
     runs-on: macos-latest
     strategy:
       matrix:
