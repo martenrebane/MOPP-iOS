@@ -46,11 +46,17 @@ class IdCardViewController : MoppViewController {
     @IBOutlet weak var loadingSpinner: SpinnerView!
     @IBOutlet weak var titleLabelBottomToCancelButtonCSTR: NSLayoutConstraint!
     @IBOutlet weak var titleLabelBottomToPin2TextFieldCSTR: NSLayoutConstraint!
+    @IBOutlet weak var buttonsBottomConstraint: NSLayoutConstraint!
+    
     var isActionDecryption = false
     var containerPath: String!
     weak var signDelegate: IdCardSignViewControllerDelegate?
     weak var decryptDelegate: IdCardDecryptViewControllerDelegate?
     weak var keyboardDelegate: IdCardSignViewKeyboardDelegate? = nil
+    
+    lazy var buttonsBottomConstraintConstant = buttonsBottomConstraint.constant
+    
+    var selectedTextField = UITextField()
 
     enum State {
         case initial
@@ -427,7 +433,14 @@ class IdCardViewController : MoppViewController {
             })
 
         }
-
+    }
+    
+    override func keyboardWillShow(notification: NSNotification) {
+        showKeyboard(notification: notification, selectedTextField: selectedTextField, buttonsBottomConstraint: nil)
+    }
+    
+    override func keyboardWillHide(notification: NSNotification) {
+        hideKeyboard(view, buttonsBottomConstraint: nil, buttonsBottomConstraintConstant: nil)
     }
 }
 
@@ -486,6 +499,10 @@ extension IdCardViewController : UITextFieldDelegate {
         }
         let text = (textField.text ?? String()) + string
         return text.isNumeric && text.count <= 12
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        selectedTextField = textField
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {

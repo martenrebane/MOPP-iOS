@@ -59,8 +59,14 @@ class MobileIDEditViewController : MoppViewController {
     @IBOutlet weak var rememberLabel: UILabel!
     @IBOutlet weak var rememberSwitch: UISwitch!
 
+    @IBOutlet weak var buttonsBottomConstraint: NSLayoutConstraint!
+    
+    lazy var buttonsBottomConstraintConstant = buttonsBottomConstraint.constant
+
     weak var delegate: MobileIDEditViewControllerDelegate? = nil
     var tapGR: UITapGestureRecognizer!
+    
+    var selectedTextField = UITextField()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -210,6 +216,20 @@ class MobileIDEditViewController : MoppViewController {
             }
         }
     }
+    
+    override func keyboardWillShow(notification: NSNotification) {
+        showKeyboard(notification: notification, selectedTextField: selectedTextField, buttonsBottomConstraint: buttonsBottomConstraint)
+    }
+    
+    override func keyboardWillHide(notification: NSNotification) {
+        hideKeyboard(view, buttonsBottomConstraint: buttonsBottomConstraint, buttonsBottomConstraintConstant: buttonsBottomConstraintConstant)
+    }
+    
+    func setParentViewControllerOrigin<T: UIViewController>(_: T.Type, yOrigin: CGFloat) {
+        if let parentViewController = self.parent as? T {
+            parentViewController.view.frame.origin.y = yOrigin
+        }
+    }
 }
 
 extension MobileIDEditViewController : UITextFieldDelegate {
@@ -224,6 +244,10 @@ extension MobileIDEditViewController : UITextFieldDelegate {
             return textAfterUpdate.isNumeric || textAfterUpdate.isEmpty
         }
         return true
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        selectedTextField = textField
     }
 
     func textFieldDidEndEditing(_ textField: UITextField) {

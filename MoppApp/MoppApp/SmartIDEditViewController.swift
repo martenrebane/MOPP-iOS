@@ -58,10 +58,16 @@ class SmartIDEditViewController : MoppViewController {
     @IBOutlet weak var signButton: UIButton!
     @IBOutlet weak var rememberLabel: UILabel!
     @IBOutlet weak var rememberSwitch: UISwitch!
+    
+    @IBOutlet weak var buttonsBottomConstraint: NSLayoutConstraint!
+
+    lazy var buttonsBottomConstraintConstant = buttonsBottomConstraint.constant
 
     weak var delegate: SmartIDEditViewControllerDelegate? = nil
     var tapGR: UITapGestureRecognizer!
     var countryViewPicker = UIPickerView()
+    
+    var selectedTextField = UITextField()
     
     @IBAction func openCountryPicker(_ sender: Any) {
         UIAccessibility.post(notification: .layoutChanged, argument: countryViewPicker)
@@ -204,6 +210,14 @@ class SmartIDEditViewController : MoppViewController {
         idCodeTextField.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 14 : nil, .body)
         countryTextField.font = UIFont.setCustomFont(font: .regular, isNonDefaultPreferredContentSizeCategoryBigger() ? 14 : nil, .body)
     }
+    
+    override func keyboardWillShow(notification: NSNotification) {
+        showKeyboard(notification: notification, selectedTextField: selectedTextField, buttonsBottomConstraint: buttonsBottomConstraint)
+    }
+    
+    override func keyboardWillHide(notification: NSNotification) {
+        hideKeyboard(view, buttonsBottomConstraint: buttonsBottomConstraint, buttonsBottomConstraintConstant: buttonsBottomConstraintConstant)
+    }
 }
 
 extension SmartIDEditViewController: UIPickerViewDataSource, UIPickerViewDelegate {
@@ -253,6 +267,10 @@ extension SmartIDEditViewController : UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        selectedTextField = textField
     }
 
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {

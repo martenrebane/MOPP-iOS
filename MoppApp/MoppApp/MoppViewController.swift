@@ -23,6 +23,8 @@
 class MoppViewController : UIViewController {
     var lightContentStatusBarStyle : Bool = false
     
+    var isShowingKeyboard = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,6 +32,8 @@ class MoppViewController : UIViewController {
         navigationItem.titleView = titleImageView
         titleImageView.accessibilityElementsHidden = true
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     deinit {
@@ -126,4 +130,45 @@ class MoppViewController : UIViewController {
         view.layer.borderWidth = 0.2
     }
     
+    @objc func keyboardWillHide(notification: NSNotification) {}
+    
+    @objc func keyboardWillShow(notification: NSNotification) {}
+    
+    func showKeyboard(notification: NSNotification, selectedTextField: UITextField, buttonsBottomConstraint: NSLayoutConstraint?) {
+        if let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            
+            let keyboardHeight = keyboardFrame.height
+            let keyboardYOrigin = keyboardFrame.origin.y
+            
+            if selectedTextField.isFirstResponder {
+                if let bottomConstraint = buttonsBottomConstraint {
+                    bottomConstraint.constant += (keyboardHeight / 2 + selectedTextField.frame.height)
+                }
+                if !isShowingKeyboard && selectedTextField.frame.origin.y > keyboardYOrigin - keyboardHeight {
+                    if isDeviceOrientationLandscape() {
+                        setParentViewControllerFrameOrigin(TokenFlowSelectionViewController.self, yOrigin: -keyboardYOrigin)
+                        isShowingKeyboard = true
+                    } else {
+                        view.frame.origin.y -= (keyboardHeight / 2 - selectedTextField.frame.height)
+                        isShowingKeyboard = true
+                    }
+                }
+            }
+        }
+    }
+    
+    func hideKeyboard(_ uiView: UIView, buttonsBottomConstraint: NSLayoutConstraint?, buttonsBottomConstraintConstant: CGFloat?) {
+        if let bottomConstraint = buttonsBottomConstraint, let bottomConstraintConstant = buttonsBottomConstraintConstant {
+            bottomConstraint.constant = bottomConstraintConstant
+        }
+        setParentViewControllerFrameOrigin(TokenFlowSelectionViewController.self, yOrigin: 0)
+        uiView.frame.origin.y = 0
+        isShowingKeyboard = false
+    }
+    
+    private func setParentViewControllerFrameOrigin<T: UIViewController>(_: T.Type, yOrigin: CGFloat) {
+        if let parentViewController = self.parent as? T {
+            parentViewController.view.frame.origin.y = yOrigin
+        }
+    }
 }
