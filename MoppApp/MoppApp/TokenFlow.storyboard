@@ -38,7 +38,7 @@
                                     <containerView autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="pUF-he-w2e">
                                         <rect key="frame" x="0.0" y="56" width="343" height="470"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" priority="250" constant="470" id="r73-vf-B3d"/>
+                                            <constraint firstAttribute="height" relation="lessThanOrEqual" priority="250" constant="470" id="r73-vf-B3d"/>
                                         </constraints>
                                     </containerView>
                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mGO-3a-ojn" userLabel="Separator">
