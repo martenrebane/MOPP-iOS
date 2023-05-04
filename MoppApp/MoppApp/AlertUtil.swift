@@ -22,6 +22,7 @@
  */
 
 import Foundation
+import SkSigningLib
 
 class AlertUtil {
     
@@ -34,6 +35,43 @@ class AlertUtil {
         alert.addAction(UIAlertAction(title: okButtonTitle, style: .default, handler: alertAction))
         if let linkInUrl: String = message?.getFirstLinkInMessage() {
             if let alertActionUrl: UIAlertAction = UIAlertAction().getLinkAlert(title: additionalInfoButtonTitle, message: linkInUrl) {
+                alert.addAction(alertActionUrl)
+            }
+        }
+        
+        return alert
+    }
+    
+    static func errorMessageDialog(_ notification: Notification, topViewController: UIViewController) {
+        guard let userInfo = notification.userInfo else { return }
+        let error = userInfo[kErrorKey] as? NSError
+        let signingErrorMessage = (error as? SigningError)?.signingErrorDescription
+        let signingError = error?.userInfo[NSLocalizedDescriptionKey] as? SigningError
+        // Don't show an error when request is cancelled
+        if let err = error, ((err as? SigningError) == SigningError.cancelled) || signingError == .cancelled {
+            topViewController.dismiss(animated: true)
+            return
+        }
+        let signingStringError = error?.userInfo[NSLocalizedDescriptionKey] as? String
+        let detailedErrorMessage = error?.userInfo[NSLocalizedFailureReasonErrorKey] as? String
+        var errorMessage = userInfo[kErrorMessage] as? String ?? SkSigningLib_LocalizedString(signingError?.signingErrorDescription ?? signingErrorMessage ?? signingStringError ?? "")
+        if !detailedErrorMessage.isNilOrEmpty {
+            errorMessage = "\(userInfo[kErrorMessage] as? String ?? SkSigningLib_LocalizedString(signingError?.signingErrorDescription ?? signingErrorMessage ?? "")) \n\(detailedErrorMessage ?? "")"
+        }
+        
+        let errorDialog = errorDialog(errorMessage: errorMessage, topViewController: topViewController)
+        
+        if !(topViewController is UIAlertController) {
+            topViewController.present(errorDialog, animated: true, completion: nil)
+        }
+    }
+
+    static func errorDialog(title: String? = L(.generalSignatureAddingMessage), errorMessage: String, topViewController: UIViewController) -> UIAlertController {
+        let errorMessageNoLink = errorMessage.removeFirstLinkFromMessage()?.trimWhitespacesAndNewlines()
+        let alert = UIAlertController(title: title, message: errorMessageNoLink, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        if let linkInUrl = errorMessage.getFirstLinkInMessage() {
+            if let alertActionUrl = UIAlertAction().getLinkAlert(message: linkInUrl) {
                 alert.addAction(alertActionUrl)
             }
         }

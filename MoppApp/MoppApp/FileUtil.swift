@@ -3,7 +3,7 @@
 //  MoppApp
 //
 /*
- * Copyright 2017 - 2022 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2023 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,11 +24,14 @@
 import Foundation
 
 struct FileUtil {
+    
+    static let fileNamePrefix = "newFile"
+    
     static func getSignDocumentFileName(containerPath: String) -> String {
         guard !containerPath.isEmpty else { return "" }
         let fileURL: URL? = URL(fileURLWithPath: containerPath)
         if let fileURL = fileURL {
-            let fileName = fileURL.deletingPathExtension().lastPathComponent
+            let fileName = fileURL.deletingPathExtension().lastPathComponent.sanitize()
             let fileExtension = fileURL.pathExtension
             
             if fileName.count <= 6 {
@@ -38,5 +41,17 @@ struct FileUtil {
             return "\(fileName.prefix(3))...\(fileName.suffix(3)).\(fileExtension)"
         }
         return ""
+    }
+    
+    static func getFileName(currentFileName: String) -> String {
+        if currentFileName.isEmpty {
+            return fileNamePrefix
+        } else if currentFileName.starts(with: ".") {
+            let url = URL(string: currentFileName)
+            guard let fileExtension = url?.pathExtension else { return fileNamePrefix }
+            return fileNamePrefix + fileExtension
+        }
+        
+        return currentFileName
     }
 }

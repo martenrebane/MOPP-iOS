@@ -20,7 +20,7 @@
 
 import Foundation
 import SkSigningLib
-import SwiftyRSA.NSData_SHA
+import CryptoKit
 
 class SmartIDSignature {
 
@@ -56,14 +56,24 @@ class SmartIDSignature {
                 signparams = SIDSignatureRequestParametersV2(relyingPartyName: kRelyingPartyName, relyingPartyUUID: uuid, hash: hash, hashType: hashType, allowedInteractionsOrder: SIDSignatureRequestAllowedInteractionsOrder(type: "confirmationMessageAndVerificationCodeChoice", displayText: "\(L(.simToolkitSignDocumentTitle).asUnicode) \(FileUtil.getSignDocumentFileName(containerPath: containerPath).asUnicode)"))
             }
             self.getSignature(baseUrl: baseUrl, documentNumber: documentNumber, requestParameters: signparams as? SIDSignatureRequestParametersV1 ?? SIDSignatureRequestParametersV1(), allowedInteractionsOrder: signparams as? SIDSignatureRequestParametersV2 ?? SIDSignatureRequestParametersV2(), trustedCertificates: certBundle, errorHandler: errorHandler) { signatureValue in
-                self.validateSignature(cert: cert, signatureValue: signatureValue)
-                UIApplication.shared.endBackgroundTask(backgroundTask)
+                if !RequestCancel.shared.isRequestCancelled() {
+                    self.validateSignature(cert: cert, signatureValue: signatureValue)
+                    UIApplication.shared.endBackgroundTask(backgroundTask)
+                } else {
+                    UIApplication.shared.endBackgroundTask(backgroundTask)
+                    return CancelUtil.handleCancelledRequest(errorMessageDetails: "User cancelled Smart-ID signing")
+                }
             }
         }
     }
 
     private func getCertificate(baseUrl: String, country: String, nationalIdentityNumber: String, requestParameters: SIDCertificateRequestParameters, containerPath: String, trustedCertificates: [String]?, errorHandler: @escaping (SigningError, String) -> Void, completionHandler: @escaping (String, String, String) -> Void) {
         printLog("Getting certificate...")
+
+        if RequestCancel.shared.isRequestCancelled() {
+            return CancelUtil.handleCancelledRequest(errorMessageDetails: "User cancelled Smart-ID signing")
+        }
+
         self.selectAccount()
         SIDRequest.shared.getCertificate(baseUrl: baseUrl, country: country, nationalIdentityNumber: nationalIdentityNumber, requestParameters: requestParameters, trustedCertificates: trustedCertificates) { result in
             switch result {
@@ -94,6 +104,11 @@ class SmartIDSignature {
 
     private func getSignature(baseUrl: String, documentNumber: String, requestParameters: SIDSignatureRequestParametersV1, allowedInteractionsOrder: SIDSignatureRequestParametersV2, trustedCertificates: [String]?, errorHandler: @escaping (SigningError, String) -> Void, completionHandler: @escaping (String) -> Void) {
         printLog("Getting signature...")
+
+        if RequestCancel.shared.isRequestCancelled() {
+            return CancelUtil.handleCancelledRequest(errorMessageDetails: "User cancelled Smart-ID signing")
+        }
+
         SIDRequest.shared.getSignature(baseUrl: baseUrl, documentNumber: documentNumber, requestParameters: requestParameters, allowedInteractionsOrder: allowedInteractionsOrder, trustedCertificates: trustedCertificates) { result in
             switch result {
             case .success(let response):
@@ -117,6 +132,11 @@ class SmartIDSignature {
 
     private func getSessionStatus(baseUrl: String, sessionId: String, trustedCertificates: [String]?, completionHandler: @escaping (Result<SIDSessionStatusResponse, SigningError>) -> Void) {
         printLog("RIA.SmartID - Requesting session status...")
+
+        if RequestCancel.shared.isRequestCancelled() {
+            return CancelUtil.handleCancelledRequest(errorMessageDetails: "User cancelled Smart-ID signing")
+        }
+
         SIDRequest.shared.getSessionStatus(baseUrl: baseUrl, sessionId: sessionId, timeoutMs: kDefaultTimeoutMs, trustedCertificates: trustedCertificates) { result in
             switch result {
             case .success(let sessionStatus):
@@ -197,7 +217,10 @@ class SmartIDSignature {
         guard let hash = MoppLibManager.prepareSignature(certificateValue, containerPath: containerPath) else {
             return nil
         }
-        let digest = (Data(base64Encoded: hash)! as NSData).swiftyRSASHA256()
+        
+        guard let hashData = Data(base64Encoded: hash) else { return nil }
+        
+        let digest = sha256(data: hashData)
         let code = UInt16(digest[digest.count - 2]) << 8 | UInt16(digest[digest.count - 1])
         let challengeId = String(format: "%04d", (code % 10000))
         DispatchQueue.main.async {
@@ -208,5 +231,10 @@ class SmartIDSignature {
             )
         }
         return hash
+    }
+    
+    private func sha256(data: Data) -> Data {
+        let hashed = SHA256.hash(data: data)
+        return Data(hashed)
     }
 }
