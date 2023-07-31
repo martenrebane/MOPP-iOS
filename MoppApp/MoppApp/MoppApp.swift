@@ -396,12 +396,18 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
         #if !DEBUG
             ScreenDisguise.shared.show()
         #endif
+
+        print("willResignActive")
+        stopIdCardDiscovering()
     }
 
     func didEnterBackground() {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         MoppFileManager.shared.removeFilesFromSharedFolder()
+        
+        print("didEnterBackground")
+        stopIdCardDiscovering()
     }
 
 
@@ -510,6 +516,21 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
             for childViewController in topViewController.children {
                 if childViewController is IdCardViewController {
                     MoppLibCardReaderManager.sharedInstance().restartDiscoveringReaders(Float(2.0))
+                }
+            }
+        }
+    }
+    
+    private func stopIdCardDiscovering() {
+        DispatchQueue.main.async {
+            let topViewController = UIViewController().getTopViewController()
+
+            for childViewController in topViewController.children {
+                if childViewController is IdCardViewController {
+                    MoppLibCardReaderManager.sharedInstance()
+                        .stopPollingCardStatus()
+                    MoppLibCardReaderManager.sharedInstance()
+                        .stopDiscoveringReaders()
                 }
             }
         }
