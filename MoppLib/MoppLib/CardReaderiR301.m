@@ -33,6 +33,7 @@
 #import "MoppLibError.h"
 #import "MoppLibPrivateConstants.h"
 #import "CardActionsManager.h"
+#import <Dispatch/Dispatch.h>
 
 @interface CardReaderiR301() <ReaderInterfaceDelegate>
 @property (nonatomic, strong) DataSuccessBlock successBlock;
@@ -83,115 +84,89 @@
     [[MoppLibCardReaderManager sharedInstance] stopPollingCardStatus];
 
     NSData *apduData = [commandHex toHexData];
+    [self recursiveTransmitAPDUData:apduData responseData:[NSMutableData data] completion:^(NSData *responseData, NSError *error) {
+        if (error) {
+            [self respondWithError:error];
+        } else {
+            [self respondWithSuccess:responseData];
+        }
+    }];
+}
 
+- (void)recursiveTransmitAPDUData:(NSData *)apduData responseData:(NSMutableData *)responseData completion:(void (^)(NSData *responseData, NSError *error))completion {
+    [self transmitAPDUData:apduData completion:^(NSData *response, NSError *error) {
+        if (error) {
+            completion(nil, error);
+        } else {
+            unsigned char trailing0 = ((unsigned char *)[response bytes])[response.length - 2];
+            unsigned char trailing1 = ((unsigned char *)[response bytes])[response.length - 1];
+
+            BOOL needMoreData = trailing0 == 0x61;
+            BOOL reissueCommand = trailing0 == 0x6C; // Reissue command if SW1 == 6C
+
+            [responseData appendData:response];
+
+            if (needMoreData || reissueCommand) {
+                if (reissueCommand) {
+                    NSData *newCommandData = [self reissuedCommandDataForLe:trailing1 originalData:apduData];
+                    if (!newCommandData) {
+                        completion(nil, nil); // Empty response data indicates error
+                    } else {
+                        [self recursiveTransmitAPDUData:newCommandData responseData:responseData completion:completion];
+                    }
+                } else {
+                    // Need more data, send another APDU to get it
+                    unsigned char getResponseApdu[5] = { 0x00, 0xC0, 0x00, 0x00, 0x00 };
+                    getResponseApdu[4] = trailing1;
+
+                    [self recursiveTransmitAPDUData:[NSData dataWithBytes:&getResponseApdu[0] length:sizeof(getResponseApdu)]
+                                        responseData:responseData completion:completion];
+                }
+            } else {
+                completion(responseData, nil);
+            }
+        }
+    }];
+}
+
+- (void)transmitAPDUData:(NSData *)apduData completion:(void (^)(NSData *response, NSError *error))completion {
+    SCARD_IO_REQUEST pioSendPci;
     unsigned char response[512];
-    unsigned char apdu[512];
     unsigned int responseSize = sizeof(response);
+    unsigned char apdu[512];
     NSUInteger apduSize = [apduData length];
-
-    NSMutableData *responseData = [[NSMutableData alloc] init];
 
     [apduData getBytes:apdu length:apduSize];
 
-    SCARD_IO_REQUEST pioSendPci;
+    memset(&pioSendPci, 0, sizeof(SCARD_IO_REQUEST));
+    pioSendPci.cbPciLength = sizeof(pioSendPci);
+    pioSendPci.dwProtocol = SCARD_PROTOCOL_T1;
 
-    BOOL issueCommand = YES;
-    while (issueCommand) {
+    printLog(@"Sending APDU: %@", [apduData hexString]);
 
-        memset(&pioSendPci, 0, sizeof(SCARD_IO_REQUEST));
-        pioSendPci.cbPciLength = sizeof(pioSendPci);
-        pioSendPci.dwProtocol = SCARD_PROTOCOL_T1;
+    if (SCARD_S_SUCCESS == SCardTransmit(
+        _contextHandle,
+        &pioSendPci,
+        &apdu[0], (DWORD)apduSize,
+        NULL,
+        &response[0], &responseSize)) {
 
-        printLog(@"Sending APDU: %@", [apduData hexString]);
-
-        responseSize = sizeof( response );
-
-        printLog(@"ID-CARD: Transmitting APDU data");
-        if (SCARD_S_SUCCESS == SCardTransmit(
-            _contextHandle,
-            &pioSendPci,
-            &apdu[0], (DWORD)apduSize,
-            NULL,
-            &response[0], &responseSize)) {
-
-            NSData *respData = [NSData dataWithBytes:&response[0] length:responseSize];
-            printLog(@"IR301 Response: %@", [respData hexString]);
-
-            if ( [respData length] < 2 ) {
-                failure (nil);
-                return;
-            }
-
-            unsigned char trailing[2] = {
-                response[ responseSize - 2 ],
-                response[ responseSize - 1 ]
-            };
-
-            BOOL needMoreData = trailing[0] == 0x61;
-            BOOL issueCommand = trailing[0] == 0x6C; // Reissue command if SW1 == 6C
-
-            if (issueCommand) {
-                // set new Le byte
-                apdu[ apduSize - 1 ] = trailing[1];
-                continue;
-            }
-
-            issueCommand = NO;
-
-            [responseData appendBytes:&response[0] length: ( needMoreData ? responseSize - 2 : responseSize )];
-
-            // While there is additional response data in the chip card: 61 XX
-            // where XX defines the size of additional data in bytes)
-            while (needMoreData) {
-                unsigned char getResponseApdu[5] = { 0x00, 0xC0, 0x00, 0x00, 0x00 };
-
-                // Set the size of additional data to get from the chip
-                getResponseApdu[4] = trailing[1];
-
-                // (Re)set the response size
-                responseSize = sizeof(response);
-
-                printLog(@"ID-CARD: Transmitting APDU data to get more data");
-                if (SCARD_S_SUCCESS == SCardTransmit(
-                    _contextHandle,
-                    &pioSendPci,
-                    &getResponseApdu[0], sizeof(getResponseApdu),
-                    NULL,
-                    &response[0], &responseSize)) {
-                        printLog(@"ID-CARD: APDU data with more data sent successfully");
-
-                    NSData *respData = [NSData dataWithBytes:&response[0] length:responseSize];
-                        printLog(@"ID-CARD: IR301 Response: %@", [respData hexString]);
-
-                    if (responseSize < 2) {
-                        printLog(@"ID-CARD: Response size must be atleast 2. Response size: %u", responseSize);
-                        failure(nil);
-                        break;
-                    }
-
-                    trailing[0] = response[ responseSize - 2 ];
-                    trailing[1] = response[ responseSize - 1 ];
-
-                    needMoreData = ( trailing[0] == 0x61 );
-                    [responseData appendBytes:&response[0] length: ( needMoreData ? responseSize - 2 : responseSize )];
-
-                } else {
-                    printLog(@"ID-CARD: Failed to send APDU data to get more data");
-                    failure(nil);
-                    break;
-                }
-            }
-
-            printLog(@"------------ %@", [responseData hexString]);
-            [self respondWithSuccess:responseData];
-            break;
-        } else {
-            printLog(@"ID-CARD: Failed to send APDU data");
-            [self respondWithError:nil];
-            break;
-        }
+        NSData *responseData = [NSData dataWithBytes:&response[0] length:responseSize];
+        printLog(@"IR301 Response: %@", [responseData hexString]);
+        completion(responseData, nil);
+    } else {
+        printLog(@"ID-CARD: Failed to send APDU data");
+        NSError *error = [NSError errorWithDomain:@"MoppLib" code: -1 userInfo:nil];
+        completion(nil, error);
     }
 }
+
+- (NSData *)reissuedCommandDataForLe:(unsigned char)le originalData:(NSData *)originalAPDUData {
+    NSMutableData *apduData = [NSMutableData dataWithData:originalAPDUData];
+    ((unsigned char *)[apduData mutableBytes])[apduData.length - 1] = le;
+    return apduData;
+}
+
 
 - (void)powerOnCard:(DataSuccessBlock)success failure:(FailureBlock)failure  {
     self.successBlock = success;
