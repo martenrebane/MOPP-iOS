@@ -122,19 +122,19 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
              .font:UIFont(name: "RobotoCondensed-Regular", size: 10)!],
             for: .normal)
 
-        if isDeviceJailbroken {
-            window?.rootViewController = UIStoryboard.jailbreak.instantiateInitialViewController()
-        } else {
+//        if isDeviceJailbroken {
+//            window?.rootViewController = UIStoryboard.jailbreak.instantiateInitialViewController()
+//        } else {
             
-            #if !DEBUG
-                // Prevent screen recording
-                NotificationCenter.default.addObserver(self, selector: #selector(handleScreenRecording), name: UIScreen.capturedDidChangeNotification, object: nil)
-
-                // Give time to load before handling screen recording
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.handleScreenRecording()
-                }
-            #endif
+//            #if !DEBUG
+//                // Prevent screen recording
+//                NotificationCenter.default.addObserver(self, selector: #selector(handleScreenRecording), name: UIScreen.capturedDidChangeNotification, object: nil)
+//
+//                // Give time to load before handling screen recording
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                    self.handleScreenRecording()
+//                }
+//            #endif
         
             FileLogUtil.setupAppLogging()
 
@@ -150,7 +150,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
 
             let initializationViewController = InitializationViewController()
             window?.rootViewController = initializationViewController
-        }
+//        }
 
         window?.makeKeyAndVisible()
         return true
