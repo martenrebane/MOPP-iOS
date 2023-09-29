@@ -41,10 +41,12 @@ jobs:
         languages: ${{ matrix.language }}
         queries: +security-and-quality
 
-    - name: Build
-      run: |
-        cd ${{ github.workspace }}/MoppApp
-        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+#    - name: Build
+#      run: |
+#        cd ${{ github.workspace }}/MoppApp
+#        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    - name: Build automatically
+      uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
