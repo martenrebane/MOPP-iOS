@@ -1,0 +1,54 @@
+name: CodeQL iOS
+on: [push, pull_request]
+env:
+  BUILD_NUMBER: ${{ github.run_number }}
+jobs:
+  analyze:
+    name: CodeQL Analyze
+    runs-on: macos-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode:
+          - 15.0
+        platform:
+          - iOS
+        language: [ 'swift' ]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup CocoaPods
+      uses: maxim-lobanov/setup-cocoapods@v1
+      with:
+        podfile-path: ${{ github.workspace }}/MoppApp/Podfile.lock
+    - name: Install dependencies
+      run: |
+        cd ${{ github.workspace }}/MoppApp
+        pod install
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        queries: +security-and-quality
+
+    - name: Build
+      run: |
+        cd ${{ github.workspace }}/MoppApp
+        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{ matrix.language }}"
+        
+        
