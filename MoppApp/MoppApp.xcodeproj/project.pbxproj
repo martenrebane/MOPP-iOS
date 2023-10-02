@@ -1637,7 +1637,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${PODS_ROOT}/FirebaseCrashlytics/run\n";
+			shellScript = "if [ \"$GOOGLE_CONF_REQUIRED\" == \"YES\" ] && [ ! -f \"$GOOGLE_CONF_PATH\" ]; then\n    ${PODS_ROOT}/FirebaseCrashlytics/run\nfi\n";
 		};
 		A61DA2EE951A985EAE19BDEB /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
