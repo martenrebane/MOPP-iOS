@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0405692B25416E5500AF6E70 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0405692A25416E5500AF6E70 /* GoogleService-Info.plist */; };
-		0405692C25416E5500AF6E70 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0405692A25416E5500AF6E70 /* GoogleService-Info.plist */; };
 		39158A1920C6C49100B71DD6 /* AddresseeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39158A1820C6C49100B71DD6 /* AddresseeActions.swift */; };
 		3921CA9520B2D6D600BF3178 /* CryptoActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3921CA9420B2D6D600BF3178 /* CryptoActions.swift */; };
 		3921CA9720B2D8A600BF3178 /* SigningActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3921CA9620B2D8A600BF3178 /* SigningActions.swift */; };
@@ -367,6 +365,7 @@
 		DFA5821B264AAB6600564971 /* digidoc_1024.png in Resources */ = {isa = PBXBuildFile; fileRef = DFA58219264AAB6600564971 /* digidoc_1024.png */; };
 		DFAFD38629E8794200377EF5 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAFD38529E8794200377EF5 /* SearchField.swift */; };
 		DFB1A492283FB9AF000B578D /* CertificateDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB1A491283FB9AF000B578D /* CertificateDetailViewController.swift */; };
+		DFB1D5EB2ACAFE1B00FDC7B8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFB1D5EA2ACAFE1B00FDC7B8 /* GoogleService-Info.plist */; };
 		DFB970A32626136400464791 /* PreviewFileTapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB970A22626136300464791 /* PreviewFileTapGestureRecognizer.swift */; };
 		DFBA32A629A5A64000788A87 /* CancelUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBA32A529A5A64000788A87 /* CancelUtil.swift */; };
 		DFBEF9452434DD0C007A6762 /* UIAlertAction+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBEF9442434DD0C007A6762 /* UIAlertAction+Additions.swift */; };
@@ -489,7 +488,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0405692A25416E5500AF6E70 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		39158A1820C6C49100B71DD6 /* AddresseeActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddresseeActions.swift; sourceTree = "<group>"; };
 		3921CA9420B2D6D600BF3178 /* CryptoActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoActions.swift; sourceTree = "<group>"; };
 		3921CA9620B2D8A600BF3178 /* SigningActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningActions.swift; sourceTree = "<group>"; };
@@ -692,6 +690,7 @@
 		DFA58219264AAB6600564971 /* digidoc_1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = digidoc_1024.png; sourceTree = "<group>"; };
 		DFAFD38529E8794200377EF5 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
 		DFB1A491283FB9AF000B578D /* CertificateDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CertificateDetailViewController.swift; sourceTree = "<group>"; };
+		DFB1D5EA2ACAFE1B00FDC7B8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DFB5FF08289954F8006B3B8C /* TokenFlowUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenFlowUtil.swift; sourceTree = "<group>"; };
 		DFB970A22626136300464791 /* PreviewFileTapGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewFileTapGestureRecognizer.swift; sourceTree = "<group>"; };
 		DFBA32A529A5A64000788A87 /* CancelUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelUtil.swift; sourceTree = "<group>"; };
@@ -1174,7 +1173,7 @@
 		E4250CBA1E0968D200530370 = {
 			isa = PBXGroup;
 			children = (
-				0405692A25416E5500AF6E70 /* GoogleService-Info.plist */,
+				DFB1D5EA2ACAFE1B00FDC7B8 /* GoogleService-Info.plist */,
 				DFF3C3B92332355C0079458A /* config.json */,
 				DFF3C3BB2332355D0079458A /* defaultConfiguration.json */,
 				DFF3C3B82332355C0079458A /* publicKey.pub */,
@@ -1385,6 +1384,7 @@
 			buildConfigurationList = E4250CDA1E0968D200530370 /* Build configuration list for PBXNativeTarget "MoppApp" */;
 			buildPhases = (
 				A61DA2EE951A985EAE19BDEB /* [CP] Check Pods Manifest.lock */,
+				DFB1D5EC2ACAFE3700FDC7B8 /* Setup Google configuration */,
 				DFA4AF5C23C33DFC00E467F0 /* Create TSL Files bundle */,
 				DFF3C3AB233230490079458A /* Initialize default MOPP configuration setup */,
 				E4250CBF1E0968D200530370 /* Sources */,
@@ -1508,7 +1508,6 @@
 				C5EA71612176057A00440F4A /* Roboto-BoldCondensedItalic.ttf in Resources */,
 				C5EA71622176057A00440F4A /* Settings.storyboard in Resources */,
 				C5EA71632176057A00440F4A /* main_about_fonds_en.png in Resources */,
-				0405692C25416E5500AF6E70 /* GoogleService-Info.plist in Resources */,
 				C5EA71642176057A00440F4A /* about_ru.html in Resources */,
 				C5EA71652176057A00440F4A /* about_en.html in Resources */,
 				C5EA71662176057A00440F4A /* RobotoCondensed-Regular.ttf in Resources */,
@@ -1557,9 +1556,9 @@
 				C50DCCEB1FC5741900D48E16 /* Roboto-Light.ttf in Resources */,
 				C52E82761FC1D3DD0074B280 /* Menu.storyboard in Resources */,
 				C50DCCEF1FC5741900D48E16 /* Roboto-MediumItalic.ttf in Resources */,
+				DFB1D5EB2ACAFE1B00FDC7B8 /* GoogleService-Info.plist in Resources */,
 				C50DCCF11FC5741900D48E16 /* RobotoCondensed-LightItalic.ttf in Resources */,
 				C50DCCEA1FC5741900D48E16 /* Roboto-Thin.ttf in Resources */,
-				0405692B25416E5500AF6E70 /* GoogleService-Info.plist in Resources */,
 				C55BB1E02091FECD00618AC4 /* licenses.html in Resources */,
 				E4C53F371E2FAE6C00F209BE /* image.jpg in Resources */,
 				E43BD8111E3A121A00F6C39D /* ddocTest.ddoc in Resources */,
@@ -1737,6 +1736,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ ! -d \"MoppApp/tslFiles.bundle\" ] \nthen\n    echo \"Creating TSL Files bundle...\"\n    mkdir MoppApp/tslFiles.bundle \nfi\n";
+		};
+		DFB1D5EC2ACAFE3700FDC7B8 /* Setup Google configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Setup Google configuration";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GOOGLE_CONF_PATH=$(pwd)/GoogleService-Info.plist\n\nif [ \"$GOOGLE_CONF_REQUIRED\" == \"YES\" ] && [ ! -f \"$GOOGLE_CONF_PATH\" ]; then\n    echo \"Error: GoogleService-Info.plist is required but not found.\"\n    exit 1\nfi\n";
 		};
 		DFF3C3AB233230490079458A /* Initialize default MOPP configuration setup */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2381,6 +2398,7 @@
 					"DEFAULT_CENTRAL_CONFIGURATION_URL=$(DEFAULT_CENTRAL_CONFIGURATION_URL)",
 					"DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=$(DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL)",
 				);
+				GOOGLE_CONF_REQUIRED = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Headers/Public\"",
@@ -2430,6 +2448,7 @@
 					"DEFAULT_CENTRAL_CONFIGURATION_URL=$(DEFAULT_CENTRAL_CONFIGURATION_URL)",
 					"DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=$(DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL)",
 				);
+				GOOGLE_CONF_REQUIRED = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Headers/Public\"",

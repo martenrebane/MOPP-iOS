@@ -55,7 +55,7 @@ jobs:
     - name: Build
       run: |
         cd ${{ github.workspace }}/MoppApp
-        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release GOOGLE_CONF_REQUIRED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
