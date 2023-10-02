@@ -30,16 +30,6 @@ jobs:
       run: |
         cd ${{ github.workspace }}/MoppApp
         touch GoogleService-Info.plist
-        cat <<EOF > GoogleService-Info.plist
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-            <key>Key1</key>
-            <string>Value1</string>
-        </dict>
-        </plist>
-        EOF
         cd ${{ github.workspace }}/MoppApp/MoppApp
         touch config.json
         touch publicKey.pub

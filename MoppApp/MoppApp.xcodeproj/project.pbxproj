@@ -1392,7 +1392,7 @@
 				E4250CC11E0968D200530370 /* Resources */,
 				E4250D1B1E0AB34400530370 /* Set GH build number to plist */,
 				E4250D081E0A911100530370 /* Embed Frameworks */,
-				54415B641E52F23C00B66A89 /* ShellScript */,
+				54415B641E52F23C00B66A89 /* Setup Google configuration */,
 				54A418331E83FAD200559E2B /* Embed App Extensions */,
 				3587AFB7240E99D207629811 /* [CP] Embed Pods Frameworks */,
 			);
@@ -1626,13 +1626,14 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MoppApp/Pods-MoppApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		54415B641E52F23C00B66A89 /* ShellScript */ = {
+		54415B641E52F23C00B66A89 /* Setup Google configuration */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Setup Google configuration";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
