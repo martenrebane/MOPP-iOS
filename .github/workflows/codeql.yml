@@ -25,11 +25,19 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+        
+    - name: Create sample files
+      run: |
+        cd ${{ github.workspace }}/MoppApp
+        touch config.json
+        touch publicKey.pub
+        touch signature.rsa
 
     - name: Setup CocoaPods
       uses: maxim-lobanov/setup-cocoapods@v1
       with:
         podfile-path: ${{ github.workspace }}/MoppApp/Podfile.lock
+
     - name: Install dependencies
       run: |
         cd ${{ github.workspace }}/MoppApp
@@ -41,12 +49,10 @@ jobs:
         languages: ${{ matrix.language }}
         queries: +security-and-quality
 
-#    - name: Build
-#      run: |
-#        cd ${{ github.workspace }}/MoppApp
-#        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-    - name: Build automatically
-      uses: github/codeql-action/autobuild@v2
+    - name: Build
+      run: |
+        cd ${{ github.workspace }}/MoppApp
+        xcodebuild -workspace MoppApp.xcworkspace -scheme MoppApp -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
