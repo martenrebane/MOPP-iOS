@@ -28,7 +28,7 @@ jobs:
         
     - name: Create sample files
       run: |
-        cd ${{ github.workspace }}/MoppApp
+        cd ${{ github.workspace }}/MoppApp/MoppApp
         touch config.json
         touch publicKey.pub
         touch signature.rsa
@@ -58,5 +58,3 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:${{ matrix.language }}"
-        
-        
