@@ -32,6 +32,7 @@ jobs:
         touch config.json
         touch publicKey.pub
         touch signature.rsa
+        touch defaultConfiguration.json
 
     - name: Setup CocoaPods
       uses: maxim-lobanov/setup-cocoapods@v1
