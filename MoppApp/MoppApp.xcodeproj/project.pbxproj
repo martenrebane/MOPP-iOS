@@ -366,6 +366,7 @@
 		DFA5821B264AAB6600564971 /* digidoc_1024.png in Resources */ = {isa = PBXBuildFile; fileRef = DFA58219264AAB6600564971 /* digidoc_1024.png */; };
 		DFAFD38629E8794200377EF5 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAFD38529E8794200377EF5 /* SearchField.swift */; };
 		DFB1A492283FB9AF000B578D /* CertificateDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB1A491283FB9AF000B578D /* CertificateDetailViewController.swift */; };
+		DFB1D5EB2ACAFE1B00FDC7B8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFB1D5EA2ACAFE1B00FDC7B8 /* GoogleService-Info.plist */; };
 		DFB970A32626136400464791 /* PreviewFileTapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB970A22626136300464791 /* PreviewFileTapGestureRecognizer.swift */; };
 		DFBA32A629A5A64000788A87 /* CancelUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBA32A529A5A64000788A87 /* CancelUtil.swift */; };
 		DFBEF9452434DD0C007A6762 /* UIAlertAction+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBEF9442434DD0C007A6762 /* UIAlertAction+Additions.swift */; };
@@ -691,6 +692,7 @@
 		DFA58219264AAB6600564971 /* digidoc_1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = digidoc_1024.png; sourceTree = "<group>"; };
 		DFAFD38529E8794200377EF5 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
 		DFB1A491283FB9AF000B578D /* CertificateDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CertificateDetailViewController.swift; sourceTree = "<group>"; };
+		DFB1D5EA2ACAFE1B00FDC7B8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DFB5FF08289954F8006B3B8C /* TokenFlowUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenFlowUtil.swift; sourceTree = "<group>"; };
 		DFB970A22626136300464791 /* PreviewFileTapGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewFileTapGestureRecognizer.swift; sourceTree = "<group>"; };
 		DFBA32A529A5A64000788A87 /* CancelUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelUtil.swift; sourceTree = "<group>"; };
@@ -1173,7 +1175,7 @@
 		E4250CBA1E0968D200530370 = {
 			isa = PBXGroup;
 			children = (
-				DF7240002AD427910094E6A5 /* GoogleService-Info.plist */,
+				DFB1D5EA2ACAFE1B00FDC7B8 /* GoogleService-Info.plist */,
 				DFF3C3B92332355C0079458A /* config.json */,
 				DFF3C3BB2332355D0079458A /* defaultConfiguration.json */,
 				DFF3C3B82332355C0079458A /* publicKey.pub */,
@@ -1557,6 +1559,7 @@
 				DF7240012AD427910094E6A5 /* GoogleService-Info.plist in Resources */,
 				C52E82761FC1D3DD0074B280 /* Menu.storyboard in Resources */,
 				C50DCCEF1FC5741900D48E16 /* Roboto-MediumItalic.ttf in Resources */,
+				DFB1D5EB2ACAFE1B00FDC7B8 /* GoogleService-Info.plist in Resources */,
 				C50DCCF11FC5741900D48E16 /* RobotoCondensed-LightItalic.ttf in Resources */,
 				C50DCCEA1FC5741900D48E16 /* Roboto-Thin.ttf in Resources */,
 				C55BB1E02091FECD00618AC4 /* licenses.html in Resources */,
