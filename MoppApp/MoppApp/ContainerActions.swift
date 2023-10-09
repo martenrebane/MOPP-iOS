@@ -64,8 +64,10 @@ extension ContainerActions where Self: UIViewController {
                 if topSigningViewController.presentedViewController is FileImportProgressViewController {
                     self?.dismiss(animated: true, completion: {
                         if let nsError = error as NSError?, !nsError.userInfo.isEmpty, nsError.userInfo[NSLocalizedDescriptionKey] != nil {
+                            printLog("DIGIDOC: Unable to open container. \(nsError.localizedDescription). \(nsError)")
                             self?.showErrorMessage(title: L(.fileImportOpenExistingFailedAlertTitle), message: nsError.userInfo[NSLocalizedDescriptionKey] as? String ?? L(.fileImportOpenExistingFailedAlertMessage, [""]))
                         } else {
+                            printLog("DIGIDOC: Unable to open container. Unable to get error object.")
                             self?.showErrorMessage(title: L(.fileImportOpenExistingFailedAlertTitle), message: L(.fileImportOpenExistingFailedAlertMessage, [""]))
                         }
                     })
@@ -138,11 +140,13 @@ extension ContainerActions where Self: UIViewController {
                 }
                 
                 if err?.code == 10018 && (url.lastPathComponent.hasSuffix(ContainerFormatDdoc) || url.lastPathComponent.hasSuffix(ContainerFormatPDF)) {
+                    printLog("DIGIDOC: Unable to open container. No Internet connection")
                     let alert = AlertUtil.messageAlert(message: L(.noConnectionMessage), alertAction: nil)
 
                     navController?.viewControllers.last!.present(alert, animated: true)
                     return
                 } else {
+                    printLog("DIGIDOC: Unable to open container. \(err?.localizedDescription ?? "Unable to get openExistingContainer error description"). \(err)")
                     let alert = AlertUtil.messageAlert(message: L(.fileImportOpenExistingFailedAlertMessage, [fileName]), alertAction: nil)
                     navController?.viewControllers.last!.present(alert, animated: true)
                     return
@@ -355,7 +359,7 @@ extension ContainerActions where Self: UIViewController {
                         cleanUpDataFilesInDocumentsFolderCode()
                     }
                     if container == nil {
-
+                        printLog("DIGIDOC: Unable to create container. Container object is nil")
                         landingViewController.importProgressViewController.dismissRecursively(animated: false, completion: nil)
 
                         let alert = UIAlertController(title: L(.fileImportCreateNewFailedAlertTitle), message: L(.fileImportCreateNewFailedAlertMessage, [fileName]), preferredStyle: .alert)
@@ -386,6 +390,7 @@ extension ContainerActions where Self: UIViewController {
                     })
 
             }, failure: { error in
+                printLog("DIGIDOC: Unable to create container. \(error?.localizedDescription). \(error)")
                 if cleanUpDataFilesInDocumentsFolder {
                     cleanUpDataFilesInDocumentsFolderCode()
                 }

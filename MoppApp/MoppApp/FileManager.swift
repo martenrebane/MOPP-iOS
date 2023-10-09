@@ -396,6 +396,7 @@ class MoppFileManager {
         var mutableURLs: [URL] = urls
         
         guard let url: URL = mutableURLs.first else {
+            printLog("DIGIDOC: Unable to import container. No URLs")
             completion?(nil, importedPaths)
             return
         }
@@ -461,6 +462,7 @@ class MoppFileManager {
                 
                 self?.importFiles_recursive(with: mutableURLs, importedPaths: modifiedImportedPaths, completion: completion)
             } else {
+                printLog("DIGIDOC: Unable to import container. \(error?.localizedDescription). \(error)")
                 completion?(error, [])
             }
         }

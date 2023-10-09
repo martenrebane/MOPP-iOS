@@ -310,7 +310,7 @@ extension SigningContainerViewController : ContainerViewControllerDelegate {
             }
             
             }, failure: { [weak self] error in
-                
+                printLog("DIGIDOC: Unable to open container. \(error?.localizedDescription ?? "Unable to get signing openContainer error description"). \(error)")
                 let nserror = error! as NSError
                 var message = nserror.domain
                 if nserror.code == Int(MoppLibErrorCode.moppLibErrorGeneral.rawValue) {

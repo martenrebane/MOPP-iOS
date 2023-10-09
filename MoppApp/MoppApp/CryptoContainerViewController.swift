@@ -238,8 +238,9 @@ extension CryptoContainerViewController : ContainerViewControllerDelegate {
                     self.isDecrypted = false
                     self.reloadCryptoData()
             },
-                failure: { _ in
+                failure: { err in
                     DispatchQueue.main.async {
+                        printLog("DIGIDOC: Unable to open container. \(err?.localizedDescription ?? "Unable to get crypto openContainer afterSignatureCreated error description"). \(err)")
                         self.infoAlert(message: L(.fileImportOpenExistingFailedAlertMessage, [filePath.lastPathComponent]))
                     }
                 }

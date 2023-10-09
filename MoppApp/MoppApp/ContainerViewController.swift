@@ -667,7 +667,7 @@ extension ContainerViewController : UITableViewDataSource {
             }
 
         } failure: { error in
-            printLog("Unable to get file from container \(error?.localizedDescription ?? "Unable to get error description")")
+            printLog("Unable to get file from container \(error?.localizedDescription ?? "Unable to get openNestedContaienr error description"), \(error)")
             let nserror = error as NSError?
             if nserror != nil && nserror?.code == Int(MoppLibErrorCode.moppLibErrorNoInternetConnection.rawValue) {
                 let pathExtension = URL(string: containerFilePath)?.pathExtension

@@ -239,7 +239,8 @@ extension RecentContainersViewController : UITableViewDelegate {
                             navController = (LandingViewController.shared.viewController(for: .cryptoTab) as? UINavigationController)!
                             navController.pushViewController(cryptoContainer, animated: true)
                     },
-                        failure: { _ in
+                        failure: { err in
+                            printLog("DIGIDOC: Unable to open container. \(err?.localizedDescription ?? "Unable to get parseCdocInfo error description"). \(err)")
                             failure()
                         }
                     )
