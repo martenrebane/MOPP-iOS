@@ -28,8 +28,6 @@ jobs:
         
     - name: Create sample files
       run: |
-        cd ${{ github.workspace }}/MoppApp
-        touch GoogleService-Info.plist
         cd ${{ github.workspace }}/MoppApp/MoppApp
         touch config.json
         touch publicKey.pub
