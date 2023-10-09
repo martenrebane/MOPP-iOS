@@ -356,7 +356,6 @@
 		DF5BE6D229C8AE5200331609 /* SignatureWarningsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5BE6D129C8AE5200331609 /* SignatureWarningsCell.swift */; };
 		DF5BE6D429C8BD5600331609 /* WarningDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5BE6D329C8BD5600331609 /* WarningDetail.swift */; };
 		DF6299122664FEFE00E6C55E /* UrlSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6299112664FEFE00E6C55E /* UrlSchemeHandler.swift */; };
-		DF7240012AD427910094E6A5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DF7240002AD427910094E6A5 /* GoogleService-Info.plist */; };
 		DF7F611926399B5400747B7D /* ContainerRemovalActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F611826399B5400747B7D /* ContainerRemovalActions.swift */; };
 		DF8A948A29AFD11A004F6E4B /* CharacterSet+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8A948929AFD11A004F6E4B /* CharacterSet+Additions.swift */; };
 		DF8EFB1A287498B900A96DE3 /* SettingsDefaultValueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8EFB19287498B900A96DE3 /* SettingsDefaultValueCell.swift */; };
@@ -682,7 +681,6 @@
 		DF5BE6D129C8AE5200331609 /* SignatureWarningsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureWarningsCell.swift; sourceTree = "<group>"; };
 		DF5BE6D329C8BD5600331609 /* WarningDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningDetail.swift; sourceTree = "<group>"; };
 		DF6299112664FEFE00E6C55E /* UrlSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlSchemeHandler.swift; sourceTree = "<group>"; };
-		DF7240002AD427910094E6A5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DF7F611826399B5400747B7D /* ContainerRemovalActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerRemovalActions.swift; sourceTree = "<group>"; };
 		DF8A948929AFD11A004F6E4B /* CharacterSet+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterSet+Additions.swift"; sourceTree = "<group>"; };
 		DF8EFB19287498B900A96DE3 /* SettingsDefaultValueCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDefaultValueCell.swift; sourceTree = "<group>"; };
