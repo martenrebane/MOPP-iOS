@@ -26,14 +26,28 @@
 @implementation OpenLdap
 
 - (NSArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *)moppLdapConfiguration {
-    NSArray *result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPPERSONURL];
-    if (result == nil || [result count] == 0) {
-        result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPCORPURL];
+    
+    NSArray *result = nil;
+
+    NSArray *ldapURLs = @[moppLdapConfiguration.LDAPPERSONURL, moppLdapConfiguration.LDAPCORPURL];
+    NSArray *certificateOptions = @[@(YES), @(NO)];
+
+    for (NSNumber *useNewCertificate in certificateOptions) {
+        for (NSString *url in ldapURLs) {
+            result = [self searchWith:identityCode andUrl:url useNewCertificate:[useNewCertificate boolValue]];
+            if (result != nil && [result count] > 0) {
+                NSString *certificateType = ([useNewCertificate boolValue]) ? @"NEW" : @"OLD";
+                NSLog(@"Found results with %@ CA certificate. URL: %@", certificateType, url);
+                return result;
+            }
+        }
     }
+
+    NSLog(@"LDAP did not find any results");
     return result;
 }
 
-- (NSArray*)searchWith:(NSString*)identityCode andUrl:(NSString*)url {
+- (NSArray*)searchWith:(NSString*)identityCode andUrl:(NSString*)url useNewCertificate:(BOOL)useNewCertificate {
 
     LDAP *ldap;
     LDAPMessage *msg;
@@ -55,16 +69,22 @@
         filter = [NSString stringWithFormat:@"(cn=*%@*)", identityCode];
     }
 
-    NSString *certificate = [[NSBundle bundleForClass:[self class]] pathForResource:@"ldapca" ofType:@"pem"];
+    NSString *oldCertificate = [[NSBundle bundleForClass:[self class]] pathForResource:@"ldapca" ofType:@"pem"];
+    NSString *newCertificate = [[NSBundle bundleForClass:[self class]] pathForResource:@"ldapca2" ofType:@"pem"];
     
-    //int debugLevel = -1;
-    //ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, &debugLevel);
-    
+//    int debugLevel = -1;
+//    ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, &debugLevel);
+
     int ldapReturnCode;
     if (secureLdap) {
-        ldapReturnCode = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, (void *)[certificate cStringUsingEncoding:NSUTF8StringEncoding]);
-        if (ldapReturnCode != LDAP_SUCCESS)
-        {
+        const char *certificatePath = (useNewCertificate) ? [newCertificate cStringUsingEncoding:NSUTF8StringEncoding] : [oldCertificate cStringUsingEncoding:NSUTF8StringEncoding];
+        
+        NSString *certificateType = (useNewCertificate) ? @"NEW" : @"OLD";
+        NSLog(@"Trying %@ CA certificate. URL: %@", certificateType, url);
+        
+        ldapReturnCode = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, (void *)certificatePath);
+        
+        if (ldapReturnCode != LDAP_SUCCESS) {
             fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_CACERTFILE): %s\n", ldap_err2string(ldapReturnCode));
             return @[];
         };
@@ -73,18 +93,16 @@
     const char *formattedFilter = [filter UTF8String];
     ldapReturnCode = ldap_initialize(&ldap, [url cStringUsingEncoding:NSUTF8StringEncoding]);
     NSDictionary *ldapResponse;
-    
     if (secureLdap) {
         int ldap_version = LDAP_VERSION3;
         ldapReturnCode = ldap_set_option(ldap, LDAP_OPT_PROTOCOL_VERSION, &ldap_version);
-        if (ldapReturnCode != LDAP_SUCCESS)
-        {
+        if (ldapReturnCode != LDAP_SUCCESS) {
             fprintf(stderr, "ldap_set_option(PROTOCOL_VERSION): %s\n", ldap_err2string(ldapReturnCode));
             ldap_unbind_ext_s(ldap, NULL, NULL);
         };
     }
     
-    if (ldapReturnCode == LDAP_SUCCESS){
+    if (ldapReturnCode == LDAP_SUCCESS) {
         ldap_search_ext_s(ldap, base, LDAP_SCOPE_SUBTREE, formattedFilter, nil, 0, 0, 0, 0, 0, &msg);
         if (msg != NULL){
             ResultSet *resultSet = [[ResultSet alloc] initWithParser:ldap chain:msg];
@@ -92,6 +110,13 @@
         }
         ldap_msgfree(msg);
     }
+    
+    int ldapConnectionReset = 0;
+    ldap_set_option(NULL, LDAP_OPT_X_TLS_NEWCTX, &ldapConnectionReset);
+    if (ldapConnectionReset != LDAP_SUCCESS) {
+        fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_NEWCTX): %s\n", ldap_err2string(ldapConnectionReset));
+        return @[];
+    };
     
     NSMutableArray *response = [NSMutableArray new];
     for (NSString* key in ldapResponse) {
