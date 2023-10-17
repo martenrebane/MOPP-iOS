@@ -26,28 +26,14 @@
 @implementation OpenLdap
 
 - (NSArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *)moppLdapConfiguration {
-    
-    NSArray *result = nil;
-
-    NSArray *ldapURLs = @[moppLdapConfiguration.LDAPPERSONURL, moppLdapConfiguration.LDAPCORPURL];
-    NSArray *certificateOptions = @[@(YES), @(NO)];
-
-    for (NSNumber *useNewCertificate in certificateOptions) {
-        for (NSString *url in ldapURLs) {
-            result = [self searchWith:identityCode andUrl:url useNewCertificate:[useNewCertificate boolValue]];
-            if (result != nil && [result count] > 0) {
-                NSString *certificateType = ([useNewCertificate boolValue]) ? @"NEW" : @"OLD";
-                NSLog(@"Found results with %@ CA certificate. URL: %@", certificateType, url);
-                return result;
-            }
+    NSArray *result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPPERSONURL];
+        if (result == nil || [result count] == 0) {
+            result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPCORPURL];
         }
-    }
-
-    NSLog(@"LDAP did not find any results");
-    return result;
+        return result;
 }
 
-- (NSArray*)searchWith:(NSString*)identityCode andUrl:(NSString*)url useNewCertificate:(BOOL)useNewCertificate {
+- (NSArray*)searchWith:(NSString*)identityCode andUrl:(NSString*)url {
 
     LDAP *ldap;
     LDAPMessage *msg;
@@ -68,21 +54,15 @@
     } else {
         filter = [NSString stringWithFormat:@"(cn=*%@*)", identityCode];
     }
-
-    NSString *oldCertificate = [[NSBundle bundleForClass:[self class]] pathForResource:@"ldapca" ofType:@"pem"];
-    NSString *newCertificate = [[NSBundle bundleForClass:[self class]] pathForResource:@"ldapca2" ofType:@"pem"];
+    
+    NSString *bundlePath = [[NSBundle bundleForClass:[self class]] resourcePath];
     
 //    int debugLevel = -1;
 //    ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, &debugLevel);
 
     int ldapReturnCode;
     if (secureLdap) {
-        const char *certificatePath = (useNewCertificate) ? [newCertificate cStringUsingEncoding:NSUTF8StringEncoding] : [oldCertificate cStringUsingEncoding:NSUTF8StringEncoding];
-        
-        NSString *certificateType = (useNewCertificate) ? @"NEW" : @"OLD";
-        NSLog(@"Trying %@ CA certificate. URL: %@", certificateType, url);
-        
-        ldapReturnCode = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, (void *)certificatePath);
+        ldapReturnCode = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTDIR, (void *)[bundlePath cStringUsingEncoding:NSUTF8StringEncoding]);
         
         if (ldapReturnCode != LDAP_SUCCESS) {
             fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_CACERTFILE): %s\n", ldap_err2string(ldapReturnCode));
