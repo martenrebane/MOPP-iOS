@@ -54,21 +54,11 @@
     } else {
         filter = [NSString stringWithFormat:@"(cn=*%@*)", identityCode];
     }
-
-    NSString *certificate = [[NSBundle bundleForClass:[self class]] pathForResource:@"ldapca" ofType:@"pem"];
     
     //int debugLevel = -1;
     //ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, &debugLevel);
     
     int ldapReturnCode;
-    if (secureLdap) {
-        ldapReturnCode = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, (void *)[certificate cStringUsingEncoding:NSUTF8StringEncoding]);
-        if (ldapReturnCode != LDAP_SUCCESS)
-        {
-            fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_CACERTFILE): %s\n", ldap_err2string(ldapReturnCode));
-            return @[];
-        };
-    }
     
     const char *formattedFilter = [filter UTF8String];
     ldapReturnCode = ldap_initialize(&ldap, [url cStringUsingEncoding:NSUTF8StringEncoding]);

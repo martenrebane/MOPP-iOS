@@ -37,7 +37,6 @@
 		39E2B4DD20AD7A3400CA74A8 /* Attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 39E2B4D320AD7A3400CA74A8 /* Attribute.h */; };
 		39E2B4DE20AD7A3400CA74A8 /* OpenLdap.h in Headers */ = {isa = PBXBuildFile; fileRef = 39E2B4D420AD7A3400CA74A8 /* OpenLdap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		39E2B4DF20AD7A3400CA74A8 /* Addressee.h in Headers */ = {isa = PBXBuildFile; fileRef = 39E2B4D520AD7A3400CA74A8 /* Addressee.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C5B7957B21BABD8300DC2C59 /* ldapca.pem in Resources */ = {isa = PBXBuildFile; fileRef = C5B7957A21BABD8300DC2C59 /* ldapca.pem */; };
 		C5B7958221BEA74800DC2C59 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5B7957721BABCA800DC2C59 /* libssl.a */; };
 		C5B7958321BEA76300DC2C59 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5B7957621BABCA800DC2C59 /* libcrypto.a */; };
 		C5B7958421BEA78200DC2C59 /* liblber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 390C016020AC3DE000827230 /* liblber.a */; };
@@ -289,7 +288,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C5B7957B21BABD8300DC2C59 /* ldapca.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
