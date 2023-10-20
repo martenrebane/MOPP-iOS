@@ -111,7 +111,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             setMoppConfiguration(configuration: decodedData)
             
             setupMoppLDAPConfiguration(ldapCerts: decodedData.LDAPCERTS, ldapPersonUrl: decodedData.LDAPPERSONURL, ldapCorpUrl: decodedData.LDAPCORPURL)
-
+            printLog("DIGIDOC: Saving LDAP CERTS")
             saveLdapCerts(ldapCerts: decodedData.LDAPCERTS, overwrite: false)
         } catch {
             printLog("Unable to read file: \(error.localizedDescription)")
@@ -342,28 +342,36 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     }
     
     
-    func saveLdapCerts(ldapCerts: [String], overwrite: Bool) {
+    func saveLdapCerts(ldapCerts: [String]?, overwrite: Bool) {
+        guard let ldapCertList = ldapCerts, !ldapCertList.isEmpty else { print("No LDAP certs found"); return }
+        print("DIGIDOC: LDAPCerts \(ldapCertList)")
+        print("DIGIDOC: Getting library directory")
         if let libraryDirectory = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first {
+            print("DIGIDOC: Getting LDAPCerts directory")
             let ldapCertsDirectory = libraryDirectory.appendingPathComponent("LDAPCerts")
-            
+            print("DIGIDOC: Checking LDAPCerts directory exists")
             let directoryExists = MoppFileManager.shared.directoryExists(ldapCertsDirectory.path)
-            
+            print("DIGIDOC: LDAPCerts directory exists: \(directoryExists)")
             if !directoryExists {
                 do {
                     try FileManager.default.createDirectory(at: ldapCertsDirectory, withIntermediateDirectories: true, attributes: nil)
                 } catch {
-                    printLog("Error creating LDAP certificates directory: \(error.localizedDescription)")
+                    print("Error creating LDAP certificates directory: \(error.localizedDescription)")
                     return
                 }
             }
             
-            for (index, cert) in ldapCerts.enumerated() {
+            print("DIGIDOC: Adding LDAP certs to app")
+            for (index, cert) in ldapCertList.enumerated() {
+                guard !cert.isEmpty else { continue }
+
+                print("DIGIDOC: LDAP cert: \(index). Cert: \(cert)")
                 let fileName = "ldapCert\(index).pem"
-                
+                print("DIGIDOC: LDAP cert filename: \(fileName)")
                 let ldapFilePath = ldapCertsDirectory.appendingPathComponent(fileName)
-                
+                print("DIGIDOC: LDAP cert filepath: \(ldapFilePath)")
                 let fileExists = MoppFileManager.shared.fileExists(ldapFilePath.path)
-                
+                print("DIGIDOC: LDAP cert exists: \(fileExists)")
                 if !fileExists || overwrite {
                     if overwrite {
                         MoppFileManager.shared.removeFile(withPath: ldapFilePath.path)
@@ -371,12 +379,12 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
 
                     let pemCert = "-----BEGIN CERTIFICATE-----\n" + cert.trimWhitespacesAndNewlines() + "\n" + "-----END CERTIFICATE-----"
                     
+                    print("DIGIDOC: Writing LDAP cert")
                     do {
                         try pemCert.write(to: ldapFilePath, atomically: true, encoding: .utf8)
-                        printLog("LDAP certificate file saved to \(ldapFilePath)")
-                        
+                        print("LDAP certificate file saved to \(ldapFilePath)")
                     } catch {
-                        printLog("Error writing LDAP certificate to file: \(error.localizedDescription)")
+                        print("Error writing LDAP certificate to file: \(error.localizedDescription)")
                         return
                     }
                 }
