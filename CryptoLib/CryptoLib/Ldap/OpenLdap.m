@@ -26,31 +26,27 @@
 
 @implementation OpenLdap
 
-- (NSArray*)search:(NSString*)identityCode configuration:(MoppLdapConfiguration *)moppLdapConfiguration {
-    NSString *certsPath = [self getLibraryCertsFolderPath];
-    NSArray *result = nil;
-    if (moppLdapConfiguration.LDAPCERTS != nil && [moppLdapConfiguration.LDAPCERTS count] > 0) {
-        NSArray *ldapURLs = @[moppLdapConfiguration.LDAPPERSONURL, moppLdapConfiguration.LDAPCORPURL];
-        NSArray<NSString*>* certs = [self getFilesInDirectory:certsPath];
-        for (NSString *cert in certs) {
-            for (NSString *url in ldapURLs) {
-                result = [self searchWith:identityCode andUrl:url certificatePath:cert];
-                if (result != nil && [result count] > 0) {
-                    return result;
-                }
-            }
-        }
-    } else {
-        result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPPERSONURL certificatePath:nil];
-        if (result == nil || [result count] == 0) {
+- (NSArray *)search:(NSString *)identityCode configuration:(MoppLdapConfiguration *)moppLdapConfiguration withCertificate:(NSString *)cert {
+    if (moppLdapConfiguration.LDAPCERTS == nil || [moppLdapConfiguration.LDAPCERTS count] == 0) {
+        NSArray *result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPPERSONURL certificatePath:nil];
+        if ([result count] == 0) {
             result = [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPCORPURL certificatePath:nil];
         }
+        return result;
     }
-    return result;
+    
+    if (isPersonalCode(identityCode)) {
+        NSLog(@"Searching with personal code from LDAP");
+        return [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPPERSONURL certificatePath:cert];
+    } else {
+        NSLog(@"Searching with corporation keyword from LDAP");
+        return [self searchWith:identityCode andUrl:moppLdapConfiguration.LDAPCORPURL certificatePath:cert];
+    }
 }
 
-- (NSArray*)searchWith:(NSString*)identityCode andUrl:(NSString*)url certificatePath:(NSString*)certificatePath {
 
+- (NSArray*)searchWith:(NSString*)identityCode andUrl:(NSString*)url certificatePath:(NSString*)certificatePath {
+    
     LDAP *ldap;
     LDAPMessage *msg;
     const char *base = "c=EE";
@@ -89,7 +85,7 @@
             ldapReturnCode = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, (void *)[certificatePath cStringUsingEncoding:NSUTF8StringEncoding]);
             
             if (ldapReturnCode != LDAP_SUCCESS) {
-                fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_CACERTDIR): %s\n", ldap_err2string(ldapReturnCode));
+                fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_CACERTFILE): %s\n", ldap_err2string(ldapReturnCode));
                 return @[];
             };
         }
@@ -108,20 +104,23 @@
     }
     
     if (ldapReturnCode == LDAP_SUCCESS) {
+        NSLog(@"Searching from LDAP. Url: %@", url);
         ldap_search_ext_s(ldap, base, LDAP_SCOPE_SUBTREE, formattedFilter, nil, 0, 0, 0, 0, 0, &msg);
-        if (msg != NULL){
+        
+        int ldapConnectionReset = 0;
+        ldap_set_option(NULL, LDAP_OPT_X_TLS_NEWCTX, &ldapConnectionReset);
+        if (ldapConnectionReset != LDAP_SUCCESS) {
+            fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_NEWCTX): %s\n", ldap_err2string(ldapConnectionReset));
+            return @[];
+        };
+        
+        if (msg != NULL) {
             ResultSet *resultSet = [[ResultSet alloc] initWithParser:ldap chain:msg];
             ldapResponse = [resultSet getResult];
+            ldap_msgfree(msg);
+            ldap_unbind_ext_s(ldap, NULL, NULL);
         }
-        ldap_msgfree(msg);
     }
-    
-    int ldapConnectionReset = 0;
-    ldap_set_option(NULL, LDAP_OPT_X_TLS_NEWCTX, &ldapConnectionReset);
-    if (ldapConnectionReset != LDAP_SUCCESS) {
-        fprintf(stderr, "ldap_set_option(LDAP_OPT_X_TLS_NEWCTX): %s\n", ldap_err2string(ldapConnectionReset));
-        return @[];
-    };
     
     NSMutableArray *response = [NSMutableArray new];
     for (NSString* key in ldapResponse) {
@@ -162,59 +161,9 @@
     
 }
 
-- (NSString*) getLibraryCertsFolderPath {
-    NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    if ([libraryPaths count] > 0) {
-        NSString *libraryPath = libraryPaths[0];
-        NSString *certsPath = [libraryPath stringByAppendingPathComponent:@"LDAPCerts"];
-        return certsPath;
-    }
-    return nil;
-}
-
-- (BOOL)isDirectoryEmpty:(NSString *)directoryPath {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    BOOL isDirectory;
-    BOOL directoryExists = [fileManager fileExistsAtPath:directoryPath isDirectory:&isDirectory];
-
-    if (directoryExists) {
-        NSError *error;
-        NSArray *contents = [fileManager contentsOfDirectoryAtPath:directoryPath error:&error];
-        
-        if (!error) {
-            return ([contents count] == 0);
-        } else {
-            NSLog(@"Error accessing directory: %@", [error localizedDescription]);
-            return TRUE;
-        }
-    } else {
-        NSLog(@"Directory %@ does not exist", directoryPath);
-        return TRUE;
-    }
-}
-
-- (NSArray<NSString*>*) getFilesInDirectory:(NSString *)directoryPath {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error;
-    NSArray<NSString *>* fileList = [fileManager contentsOfDirectoryAtPath:directoryPath error:&error];
-    
-    if (error) {
-        NSLog(@"Error getting files in directory %@: %@", directoryPath, [error localizedDescription]);
-        return @[];
-    } else {
-        NSMutableArray<NSString *> *certFileList = [NSMutableArray array];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self ENDSWITH %@", @".pem"];
-        
-        for (NSString *fileName in fileList) {
-            if ([predicate evaluateWithObject:fileName]) {
-                NSString *fullPath = [directoryPath stringByAppendingPathComponent:fileName];
-                [certFileList addObject:fullPath];
-            }
-        }
-        
-        return [certFileList copy];
-    }
+BOOL isPersonalCode(NSString *inputString) {
+    NSCharacterSet *numericCharacterSet = [NSCharacterSet decimalDigitCharacterSet];
+    return ([inputString length] == 11 && [inputString rangeOfCharacterFromSet:[numericCharacterSet invertedSet]].location == NSNotFound);
 }
 
 @end

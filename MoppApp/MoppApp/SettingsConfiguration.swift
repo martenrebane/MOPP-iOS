@@ -343,51 +343,59 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     
     
     func saveLdapCerts(ldapCerts: [String]?, overwrite: Bool) {
-        guard let ldapCertList = ldapCerts, !ldapCertList.isEmpty else { print("No LDAP certs found"); return }
-        print("DIGIDOC: LDAPCerts \(ldapCertList)")
-        print("DIGIDOC: Getting library directory")
+        guard let ldapCertList = ldapCerts, !ldapCertList.isEmpty else { printLog("No LDAP certs found (central configuration)"); return }
         if let libraryDirectory = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first {
-            print("DIGIDOC: Getting LDAPCerts directory")
             let ldapCertsDirectory = libraryDirectory.appendingPathComponent("LDAPCerts")
-            print("DIGIDOC: Checking LDAPCerts directory exists")
             let directoryExists = MoppFileManager.shared.directoryExists(ldapCertsDirectory.path)
-            print("DIGIDOC: LDAPCerts directory exists: \(directoryExists)")
             if !directoryExists {
                 do {
                     try FileManager.default.createDirectory(at: ldapCertsDirectory, withIntermediateDirectories: true, attributes: nil)
                 } catch {
-                    print("Error creating LDAP certificates directory: \(error.localizedDescription)")
+                    printLog("Error creating LDAP certificates directory: \(error.localizedDescription)")
                     return
                 }
             }
             
-            print("DIGIDOC: Adding LDAP certs to app")
+            let combinedCertsName = "ldapCerts.pem"
+            
+            let combinedCertsPath = ldapCertsDirectory.appendingPathComponent(combinedCertsName)
+            
+            let fileExists = MoppFileManager.shared.fileExists(combinedCertsPath.path)
+            printLog("LDAP certs file exists: \(fileExists). Overwrite: \(overwrite)")
+            if !fileExists || overwrite {
+                if overwrite {
+                    printLog("Removing existing LDAP certs file")
+                    MoppFileManager.shared.removeFile(withPath: combinedCertsPath.path)
+                }
+            } else {
+                printLog("No need to update LDAP certs")
+                return
+            }
+            
+            let isEmptyFileCreated = FileManager.default.createFile(atPath: combinedCertsPath.path, contents: nil, attributes: nil)
+            
+            printLog("Is empty file created: \(isEmptyFileCreated)")
+            
             for (index, cert) in ldapCertList.enumerated() {
                 guard !cert.isEmpty else { continue }
 
-                print("DIGIDOC: LDAP cert: \(index). Cert: \(cert)")
-                let fileName = "ldapCert\(index).pem"
-                print("DIGIDOC: LDAP cert filename: \(fileName)")
-                let ldapFilePath = ldapCertsDirectory.appendingPathComponent(fileName)
-                print("DIGIDOC: LDAP cert filepath: \(ldapFilePath)")
-                let fileExists = MoppFileManager.shared.fileExists(ldapFilePath.path)
-                print("DIGIDOC: LDAP cert exists: \(fileExists)")
-                if !fileExists || overwrite {
-                    if overwrite {
-                        MoppFileManager.shared.removeFile(withPath: ldapFilePath.path)
-                    }
-
-                    let pemCert = "-----BEGIN CERTIFICATE-----\n" + cert.trimWhitespacesAndNewlines() + "\n" + "-----END CERTIFICATE-----"
+                let pemCert = "-----BEGIN CERTIFICATE-----\n" + cert.trimWhitespacesAndNewlines() + "\n" + "-----END CERTIFICATE-----\n"
+                
+                printLog("Writing LDAP cert \(index + 1)")
+                do {
+                    let fileHandle = try FileHandle(forWritingTo: combinedCertsPath)
                     
-                    print("DIGIDOC: Writing LDAP cert")
-                    do {
-                        try pemCert.write(to: ldapFilePath, atomically: true, encoding: .utf8)
-                        print("LDAP certificate file saved to \(ldapFilePath)")
-                    } catch {
-                        print("Error writing LDAP certificate to file: \(error.localizedDescription)")
-                        return
+                    if let stringData = pemCert.data(using: .utf8) {
+                        fileHandle.seekToEndOfFile()
+                        fileHandle.write(stringData)
                     }
+                    
+                    fileHandle.closeFile()
+                } catch {
+                    printLog("Error writing to LDAP certs file: \(error.localizedDescription)")
+                    continue
                 }
+                printLog("LDAP certificate file written to \(combinedCertsPath)")
             }
         }
     }
