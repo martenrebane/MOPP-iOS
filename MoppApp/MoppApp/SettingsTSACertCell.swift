@@ -26,6 +26,8 @@ import ASN1Decoder
 
 class SettingsTSACertCell: UITableViewCell {
     
+    static let tsaFileFolder = "tsa-cert"
+    
     @IBOutlet weak var tsaCertStackView: UIStackView!
     @IBOutlet weak var tsaDataStackView: UIStackView!
     @IBOutlet weak var tsaCertLabelStackView: UIStackView!
@@ -62,6 +64,8 @@ class SettingsTSACertCell: UITableViewCell {
     weak var topViewController: UIViewController?
     
     private var certificate: X509Certificate?
+    
+    var elements = [Any]()
 
     override func awakeFromNib() {
         updateUI()
@@ -69,10 +73,12 @@ class SettingsTSACertCell: UITableViewCell {
         guard let titleUILabel = titleLabel, let issuedToUILabel = issuedToLabel, let validUntilUILabel = validUntilLabel, let addCertificateUIButton = addCertificateButton, let showCertificateUIButton = showCertificateButton else { return }
         
         self.accessibilityElements = [titleUILabel, issuedToUILabel, validUntilUILabel, addCertificateUIButton, showCertificateUIButton]
+        
+        elements = self.accessibilityElements ?? []
     }
     
     func populate() {
-        self.certificate = TSACertUtil.getCertificate()
+        self.certificate = CertUtil.getCertificate(folder: SettingsTSACertCell.tsaFileFolder, fileName: DefaultsHelper.tsaCertFileName ?? "")
         if let _ = certificate {
             updateUI()
         }
@@ -103,7 +109,7 @@ class SettingsTSACertCell: UITableViewCell {
             
             guard let cert = self.certificate else { return }
             
-            self.issuedToLabel.text = "\(self.issuedToLabel.text ?? L(.settingsTimestampCertIssuedToLabel)) \(cert.issuer(oid: .organizationName) ?? cert.issuer(oid: OID(rawValue: "2.5.4.97") ?? .subjectAltName) ?? cert.issuer(oid: .issuerAltName) ?? "-")"
+            self.issuedToLabel.text = "\(self.issuedToLabel.text ?? L(.settingsTimestampCertIssuedToLabel)) \(cert.issuer(oid: .organizationName) ?? cert.issuer(oid: .subjectAltName) ?? cert.issuer(oid: .issuerAltName) ?? "-")"
             self.validUntilLabel.text = "\(self.validUntilLabel.text ?? L(.settingsTimestampCertValidToLabel)) \(MoppDateFormatter().dateToString(date: cert.notAfter, false))"
         }
     }
@@ -124,7 +130,7 @@ class SettingsTSACertCell: UITableViewCell {
 extension SettingsTSACertCell: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if !urls.isEmpty {
-            MoppFileManager.shared.saveFile(fileURL: urls[0], TSACertUtil.tsaFileFolder) { isSaved, savedFileURL in
+            MoppFileManager.shared.saveFile(fileURL: urls[0], SettingsTSACertCell.tsaFileFolder) { isSaved, savedFileURL in
                 
                 guard let savedFile = savedFileURL else {
                     printLog("Failed to get saved TSA cert file")
@@ -134,7 +140,7 @@ extension SettingsTSACertCell: UIDocumentPickerDelegate {
                 
                 do {
                     if try savedFile.checkResourceIsReachable() {
-                        self.certificate = try TSACertUtil.openCertificate(savedFile)
+                        self.certificate = try CertUtil.openCertificate(savedFile)
                         DefaultsHelper.tsaCertFileName = savedFile.lastPathComponent
                         self.updateUI()
                     }

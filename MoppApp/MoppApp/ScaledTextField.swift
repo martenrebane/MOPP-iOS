@@ -55,7 +55,7 @@ class ScaledTextField: UITextField {
     }
     
     override func accessibilityElementDidBecomeFocused() {
-        NotificationCenter.default.post(name: .hideKeyboardAccessibility, object: nil, userInfo: ["view": self])
+        NotificationCenter.default.post(name: .focusedAccessibilityElement, object: nil, userInfo: ["view": self])
     }
     
     override func deleteBackward() {

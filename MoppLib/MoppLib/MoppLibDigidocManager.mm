@@ -93,7 +93,9 @@ public:
   }
 
   std::string verifyServiceUri() const override {
-      return moppLibConfiguration.SIVAURL.UTF8String;
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *sivaUrl = [defaults stringForKey:@"kSivaUrl"];
+      return [sivaUrl length] != 0 ? sivaUrl.UTF8String : moppLibConfiguration.SIVAURL.UTF8String;
   }
 
   std::vector<digidoc::X509Cert> TSLCerts() const override {
@@ -112,9 +114,27 @@ public:
       return stringsToX509Certs(certBundle);
   }
 
-  virtual std::vector<digidoc::X509Cert> verifyServiceCerts() const override {
-      return stringsToX509Certs(moppLibConfiguration.CERTBUNDLE);
-  }
+    virtual std::vector<digidoc::X509Cert> verifyServiceCerts() const override {
+        NSMutableArray<NSString*> *certs = [NSMutableArray arrayWithArray:moppLibConfiguration.CERTBUNDLE];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *sivaFileName = [defaults stringForKey:@"kSivaFileCertName"];
+        if (!(sivaFileName == nil || [sivaFileName isEqualToString:@""])) {
+            NSString *sivaCert = getSivaCert(sivaFileName);
+            
+            if (!(sivaCert == nil || [sivaCert isEqualToString:@""])) {
+                // Remove certificate header, footer, whitespaces and newlines
+                NSCharacterSet *characterSetToRemove = [NSCharacterSet characterSetWithCharactersInString:@" \n\r\t"];
+                
+                NSString * formattedSivaCert = [sivaCert stringByReplacingOccurrencesOfString:@"-----BEGIN CERTIFICATE-----" withString:@""];
+                formattedSivaCert = [formattedSivaCert stringByReplacingOccurrencesOfString:@"-----END CERTIFICATE-----" withString:@""];
+                formattedSivaCert = [[formattedSivaCert componentsSeparatedByCharactersInSet:characterSetToRemove] componentsJoinedByString:@""];
+                
+                [certs addObject:formattedSivaCert];
+            }
+        }
+        
+        return stringsToX509Certs(certs);
+    }
 
   virtual std::string ocsp(const std::string &issuer) const override {
     NSString *ocspIssuer = [NSString stringWithCString:issuer.c_str() encoding:[NSString defaultCStringEncoding]];
@@ -219,7 +239,32 @@ public:
     std::string logFileLocation(NSURL *logsFolderUrl) const {
         return std::string([[[logsFolderUrl URLByAppendingPathComponent: @"libdigidocpp.log"] path] UTF8String]);
     }
-
+    
+    NSString* getSivaCert(NSString *fileName) const {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *subfolderName = @"siva-cert";
+        
+        NSString *subfolderPath = [documentsDirectory stringByAppendingPathComponent:subfolderName];
+        
+        NSString *filePath = [subfolderPath stringByAppendingPathComponent:fileName];
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+            NSError *error = nil;
+            NSString *fileContents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
+            
+            if (fileContents) {
+                return fileContents;
+            } else {
+                NSLog(@"Error reading file '%@': %@", fileName, [error localizedDescription]);
+                return nil;
+            }
+        } else {
+            NSLog(@"File '%@' not found at path: %@", fileName, filePath);
+            return nil;
+        }
+        return nil;
+    }
 };
 
 
@@ -535,7 +580,12 @@ static std::string profile = "time-stamp";
       if (e.code() == 63) {
           *error = [MoppLibError fileNameTooLongError];
       } else if (e.code() == digidoc::Exception::NetworkError) {
-          *error = [MoppLibError noInternetConnectionError];
+          NSString *message = [NSString stringWithUTF8String:e.msg().c_str()];
+          if ([message hasPrefix:@"Failed to create ssl connection with host"]) {
+              *error = [MoppLibError sslHandshakeError];
+          } else {
+              *error = [MoppLibError noInternetConnectionError];
+          }
       } else {
           *error = [NSError errorWithDomain:[NSString stringWithUTF8String:e.msg().c_str()] code:e.code() userInfo:@{}];
       }

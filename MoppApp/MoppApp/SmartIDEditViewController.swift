@@ -123,7 +123,7 @@ class SmartIDEditViewController : MoppViewController, TokenFlowSigning {
             self.view.accessibilityElements = [titleUILabel, countryUILabel, countryUITextField, idCodeUILabel, idCodeUITextField, personalCodeErrorUILabel, rememberUILabel, rememberUISwitch, cancelUIButton, signUIButton]
         }
 
-        NotificationCenter.default.addObserver(self, selector: #selector(handleAccessibilityKeyboard), name: .hideKeyboardAccessibility, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAccessibilityKeyboard), name: .focusedAccessibilityElement, object: nil)
     }
 
     @objc func dismissKeyboard(_ notification: NSNotification) {
