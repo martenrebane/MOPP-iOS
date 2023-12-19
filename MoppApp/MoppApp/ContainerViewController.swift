@@ -57,7 +57,7 @@ protocol CryptoContainerViewControllerDelegate: AnyObject {
     func startDecrypting()
 }
 
-class ContainerViewController : MoppViewController, ContainerActions, PreviewActions, ContainerFileUpdatedDelegate {
+class ContainerViewController : MoppViewController, InvisibleElementTableView, ContainerActions, PreviewActions, ContainerFileUpdatedDelegate {
 
     weak var containerViewDelegate: ContainerViewControllerDelegate!
     weak var cryptoContainerViewDelegate: CryptoContainerViewControllerDelegate!
@@ -81,6 +81,8 @@ class ContainerViewController : MoppViewController, ContainerActions, PreviewAct
     var isAsicsInitialLoadingDone = false
     var isLoadingNestedAsicsDone = false
     var isSendingToSivaAgreed = true
+    
+    var isInvisibleElementAdded = false
     
     private var isFileSaveableCache: [IndexPath: Bool] = [:]
     private var isDatafileReloaded = false
@@ -156,6 +158,8 @@ class ContainerViewController : MoppViewController, ContainerActions, PreviewAct
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: OperationQueue.main) { [weak self]_ in
             self?.refreshLoadingAnimation()
         }
+        
+        
         
         guard let leftBarUIButton = self.navigationItem.leftBarButtonItem, let bottomUIButtons = LandingViewController.shared.buttonsStackView, let tableUIView = tableView else {
             printLog("Unable to get leftBarButtonItem, LandingViewController buttonsStackView or tableView")
@@ -357,6 +361,10 @@ class ContainerViewController : MoppViewController, ContainerActions, PreviewAct
         signatureDetailsViewController.moppLibSignature = moppLibSignatureDetails
         signatureDetailsViewController.signatureKind = kind
         self.navigationController?.pushViewController(signatureDetailsViewController, animated: true)
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollViewScrolled(scrollView)
     }
 }
 
@@ -682,6 +690,10 @@ extension ContainerViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if !isAsicsInitialLoadingDone && isAsicsContainer() && isDeviceOrientationLandscape() {
             scrollTableView(indexPath)
+        }
+        
+        if isScrollingNecessary(tableView: tableView) && !isInvisibleElementAdded {
+            removeDefaultElement()
         }
     }
     
