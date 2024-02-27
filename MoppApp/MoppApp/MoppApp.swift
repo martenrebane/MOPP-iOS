@@ -135,7 +135,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
             window?.rootViewController = UIStoryboard.jailbreak.instantiateInitialViewController()
         } else {
             
-            #if !DEBUG
+            if !isUsingTestMode() {
                 // Prevent screen recording
                 NotificationCenter.default.addObserver(self, selector: #selector(handleScreenRecording), name: UIScreen.capturedDidChangeNotification, object: nil)
 
@@ -143,7 +143,7 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     self.handleScreenRecording()
                 }
-            #endif
+            }
         
             FileLogUtil.setupAppLogging()
 
@@ -400,9 +400,9 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
     func willResignActive() {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        #if !DEBUG
+        if !isUsingTestMode() {
             ScreenDisguise.shared.show()
-        #endif
+        }
     }
 
     func didEnterBackground() {
@@ -414,16 +414,16 @@ class MoppApp: UIApplication, URLSessionDelegate, URLSessionDownloadDelegate {
 
     func willEnterForeground() {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-        #if DEBUG
+        if isUsingTestMode() {
             ScreenDisguise.shared.hide()
-        #endif
+        }
     }
 
     func didBecomeActive() {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        #if DEBUG
+        if isUsingTestMode() {
             ScreenDisguise.shared.hide()
-        #endif
+        }
 
         if UIViewController().getTopViewController() is InitializationViewController || UIViewController().getTopViewController() is LandingViewController {
             let sharedFiles: [URL] = MoppFileManager.shared.sharedDocumentPaths().compactMap { URL(fileURLWithPath: $0) }
