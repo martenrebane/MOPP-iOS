@@ -104,10 +104,13 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
 
         let urlSession: URLSession
         if let trustedCerts = trustedCertificates, !trustedCerts.isEmpty {
+            ProxyUtil.configureURLSessionWithProxy(urlSessionConfiguration: &config, manualProxyConf: manualProxyConf)
+            ProxyUtil.setProxyAuthorizationHeader(request: &request, urlSessionConfiguration: config, manualProxyConf: manualProxyConf)
             urlSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
         } else {
             urlSession = URLSession.shared
         }
+
         let sessionTask: URLSessionTask? = urlSession.dataTask(with: request) { data, response, error in
                 
             let isRequestCancelled = CancelRequestUtil.isRequestCancellationHandled(urlSession: urlSession, urlSessionTask: self.urlTask, methodDescription: "RIA.SmartID - exec - \(method)")
