@@ -60,8 +60,6 @@ class SivaCategoryCell: UITableViewCell {
         
         self.accessToSivaButton.text = L(.settingsSivaServiceTitle)
         self.accessToSivaButton.accessibilityLabel = self.accessToSivaButton.text?.lowercased()
-        self.accessToSivaButton.font = .moppMedium
-        self.accessToSivaButton.textColor = .systemBlue
         self.accessToSivaButton.isUserInteractionEnabled = true
         self.accessToSivaButton.resetLabelProperties()
         

@@ -25,10 +25,10 @@ import UIKit
 
 class ProxyCategoryCell: UITableViewCell {
     
+    @IBOutlet weak var accessToProxyView: UIView!
+    @IBOutlet weak var accessToProxySettings: ScaledLabel!
     
-    @IBOutlet weak var accessToProxySettings: ScaledButton!
-    
-    @IBAction func openAccessToProxySettings(_ sender: ScaledButton) {
+    @objc func openAccessToProxySettings() {
         openAccessToProxyView()
     }
     
@@ -37,7 +37,7 @@ class ProxyCategoryCell: UITableViewCell {
     override func awakeFromNib() {
         updateUI()
         
-        guard let accessToProxyUISettings: ScaledButton = accessToProxySettings else {
+        guard let accessToProxyUISettings: ScaledLabel = accessToProxySettings else {
             printLog("Unable to get accessToProxySettings")
             return
         }
@@ -52,9 +52,18 @@ class ProxyCategoryCell: UITableViewCell {
     }
     
     func updateUI() {
-        self.accessToProxySettings.setTitle(L(.settingsProxyTitle))
-        self.accessToProxySettings.accessibilityLabel = self.accessToProxySettings.titleLabel?.text?.lowercased()
-        self.accessToProxySettings.mediumFont()
+        if !(self.accessToProxySettings.gestureRecognizers?.contains(where: { $0 is UITapGestureRecognizer }) ?? false) {
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.openAccessToProxySettings))
+            self.accessToProxySettings.addGestureRecognizer(tapGesture)
+            self.accessToProxySettings.isUserInteractionEnabled = true
+        }
+        
+        self.accessToProxySettings.text = L(.settingsProxyTitle)
+        self.accessToProxySettings.accessibilityLabel = self.accessToProxySettings.text?.lowercased()
+        self.accessToProxySettings.isUserInteractionEnabled = true
+        self.accessToProxySettings.resetLabelProperties()
+        
+        self.accessToProxyView.accessibilityUserInputLabels = [L(.voiceControlSivaCategory)]
     }
     
     private func openAccessToProxyView() {
