@@ -127,6 +127,9 @@ public class SIDRequest: NSObject, URLSessionDelegate, SIDRequestProtocol {
             case let nsError as NSError where nsError.code == NSURLErrorNotConnectedToInternet:
                 Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .noResponseError, extraInfo: "Error getting response. No Internet connection")
                 return completionHandler(.failure(.noResponseError))
+            case let nsError as NSError where nsError.code == 310:
+                Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .invalidProxySettings, extraInfo: "Unable to connect with current proxy settings")
+                return completionHandler(.failure(.invalidProxySettings))
             default:
                 Logging.errorLog(forMethod: "RIA.SmartID - \(method)", httpResponse: nil, error: .generalError, extraInfo: error!.localizedDescription)
                 return completionHandler(.failure(.generalError))

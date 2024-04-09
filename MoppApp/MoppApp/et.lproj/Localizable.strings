@@ -409,6 +409,7 @@
 "settings-proxy-username" = "Kasutajanimi";
 "settings-proxy-password" = "Parool";
 "settings-reset-button" = "TAASTA ALGSEADED";
+"proxy-unable-to-connect-to-service" = "Teenuse serveriga ühendus ebaõnnestus. Palun kontrolli võrgu sätteid või proovi hiljem uuesti.";
 "diagnostics-title" = "Diagnostika";
 "diagnostics-activate-one-time-logging" = "Aktiveeri ühekordne logifaili genereerimine";
 "diagnostics-save-log" = "SALVESTA LOGIFAIL";

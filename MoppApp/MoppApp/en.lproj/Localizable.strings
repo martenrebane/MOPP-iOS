@@ -408,6 +408,7 @@
 "settings-proxy-username" = "Username";
 "settings-proxy-password" = "Password";
 "settings-reset-button" = "USE DEFAULT SETTINGS";
+"proxy-unable-to-connect-to-service" = "Failed to connect with service server. Please check your network settings or try again later.";
 "diagnostics-title" = "Diagnostics";
 "diagnostics-activate-one-time-logging" = "Enable one-time log generation";
 "diagnostics-save-log" = "SAVE LOG";

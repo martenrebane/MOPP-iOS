@@ -139,7 +139,13 @@ extension ContainerActions where Self: UIViewController {
                 }
                 
                 if err?.code == 10018 && (url.lastPathComponent.hasSuffix(ContainerFormatDdoc) || url.lastPathComponent.hasSuffix(ContainerFormatPDF)) {
-                    let alert = AlertUtil.messageAlert(message: L(.noConnectionMessage), alertAction: nil)
+                    let proxySetting = ProxyUtil.getProxySetting()
+                    
+                    var alert = AlertUtil.messageAlert(message: L(.noConnectionMessage), alertAction: nil)
+                    
+                    if proxySetting != .noProxy {
+                        alert = AlertUtil.messageAlert(message: L(.proxyUnableToConnectToService), alertAction: nil)
+                    }
 
                     navController?.viewControllers.last!.present(alert, animated: true)
                     return

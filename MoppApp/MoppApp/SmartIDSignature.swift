@@ -35,6 +35,10 @@ class SmartIDSignature {
         let errorHandler: (SigningError, String) -> Void = { error, log in
             UIApplication.shared.endBackgroundTask(backgroundTask)
             printLog("\(log): \(SkSigningLib_LocalizedString(error.errorDescription ?? "Not available"))")
+            if error == .invalidProxySettings {
+                ErrorUtil.generateError(signingError: error)
+                return
+            }
             ErrorUtil.generateError(signingError: error, details: MessageUtil.errorMessageWithDetails(details: log))
         }
 

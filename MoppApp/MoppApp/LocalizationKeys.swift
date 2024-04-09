@@ -345,6 +345,7 @@ enum LocKey : String
     case settingsSivaDefaultManualAccessTitle = "settings-siva-default-manual-access-title"
     case settingsSivaDefaultCertificateTitle = "settings-siva-default-certificate-title"
     case settingsResetButton = "settings-reset-button"
+    case proxyUnableToConnectToService = "proxy-unable-to-connect-to-service"
     case diagnosticsTitle = "diagnostics-title"
     case diagnosticsActivateOneTimeLogging = "diagnostics-activate-one-time-logging"
     case diagnosticsSaveLog = "diagnostics-save-log"

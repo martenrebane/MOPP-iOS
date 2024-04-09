@@ -96,6 +96,9 @@ public class RequestSignature: NSObject, URLSessionDelegate, CertificateRequest 
                 if responseError?.code == -999 || responseError?.code == -1200 {
                     Logging.errorLog(forMethod: "RIA.MobileID - Certificate", httpResponse: response as? HTTPURLResponse ?? nil, error: .invalidSSLCert, extraInfo: "Certificate pinning failed")
                     return completionHandler(.failure(.invalidSSLCert))
+                } else if responseError?.code == 310 {
+                    Logging.errorLog(forMethod: "RIA.MobileID - Certificate", httpResponse: response as? HTTPURLResponse ?? nil, error: .invalidProxySettings, extraInfo: "Unable to connect with current proxy settings")
+                    return completionHandler(.failure(.invalidProxySettings))
                 }
                 Logging.errorLog(forMethod: "RIA.MobileID - Certificate", httpResponse: response as? HTTPURLResponse ?? nil, error: .noResponseError, extraInfo: "")
                 return completionHandler(.failure(.noResponseError))
