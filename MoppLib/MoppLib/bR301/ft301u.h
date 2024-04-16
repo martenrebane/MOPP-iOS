@@ -92,6 +92,18 @@ extern "C"
      */
     LONG FtReadFlash(SCARDCONTEXT hContext,unsigned int bOffset, unsigned char* blength,unsigned char *buffer);
     
+    /*
+     Function: FTGetBluetoothVersion
+     
+     Parameters:
+     hContext               IN        Connection context to the PC/SC Resource Manager
+     bluetoothVersion       OUT       The version of bluetooth;
+     
+     Description:
+     This function used to get bluetooth version.
+     */
+    LONG FTGetBluetoothFWVer(SCARDCONTEXT hContext,char *bluetoothVersion);
+    
 //======================================================================================
 //=============================ir301 function===========================================
 //======================================================================================
@@ -286,7 +298,7 @@ extern "C"
      Description:
      This function used to get reader name
      */
-    LONG FtGetReaderName(SCARDCONTEXT hContext, unsigned int * length,char * buffer);
+    LONG FtGetReaderName(SCARDCONTEXT hContext,unsigned int * length,char * buffer);
     
 #ifdef __cplusplus
 }
