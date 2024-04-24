@@ -171,7 +171,7 @@ class SettingsConfiguration: NSObject, URLSessionDelegate, URLSessionTaskDelegat
             getFetchedData(fromUrl: "\(getDefaultMoppConfiguration().CENTRALCONFIGURATIONSERVICEURL)/config.rsa") { (centralSignature, signatureError) in
                 if let error = signatureError {
                     printLog(error.localizedDescription)
-                    completionHandler(error)
+                    return completionHandler(error)
                 }
                 guard let centralSignature = centralSignature else {
                     self.handleCacheConfiguration()
