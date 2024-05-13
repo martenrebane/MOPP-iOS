@@ -1,0 +1,43 @@
+workflows:
+  ria-digidoc-ios:
+    name: RIA DigiDoc iOS
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      xcode: 15.3
+    scripts:
+      - name: Create sample files
+        script: |
+          cd ./MoppApp
+          touch GoogleService-Info.plist
+          cat <<EOF > GoogleService-Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>Sample key</key>
+              <string>Sample value</string>
+          </dict>
+          </plist>
+          EOF
+
+          cd ./MoppApp
+          touch config.json
+          touch publicKey.pub
+          touch signature.rsa
+          touch defaultConfiguration.json
+      - name: Get RIA DigiDoc version
+        script: |
+          cd ./MoppApp
+          echo "APP_VERSION=$('/usr/bin/xcodebuild' -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =')" >> $CM_ENV
+      - name: Build
+        script: |
+          cd ./MoppApp
+          xcodebuild -scheme MoppApp -configuration Release GOOGLE_CONF_REQUIRED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    publishing:
+      email:
+        recipients:
+          - marten.rebane@nortal.com
+        notify:
+          success: true
+          failure: true
