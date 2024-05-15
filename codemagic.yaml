@@ -36,7 +36,10 @@ workflows:
         script: |
           cd ./MoppApp
           echo $APP_VERSION
-          xcodebuild build archive -archivePath ./build/RIA_DigiDoc_$APP_VERSION.$PROJECT_BUILD_NUMBER.xcarchive -configuration Release -scheme "MoppApp" CODE_SIGN_INDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO GOOGLE_CONF_REQUIRED=NO
+          xcodebuild build archive -archivePath "./build/RIA_DigiDoc_$APP_VERSION.$PROJECT_BUILD_NUMBER.xcarchive" -configuration Release -scheme "MoppApp" CODE_SIGN_INDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO GOOGLE_CONF_REQUIRED=NO
+          echo $APP_VERSION
+          echo "RIA_DigiDoc_$APP_VERSION.$PROJECT_BUILD_NUMBER.xcarchive"
+          ls -lahtR
     artifacts:
       - ./MoppApp/build/*.xcarchive
     publishing:
