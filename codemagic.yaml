@@ -35,7 +35,9 @@ workflows:
           cd ./MoppApp
           xcodebuild build -configuration Release -scheme "MoppApp" CODE_SIGN_INDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO GOOGLE_CONF_REQUIRED=NO
       - name: Generate IPA
-        script: xcode-project build-ipa --project "MoppApp.xcodeproj" --scheme "MoppApp"
+        script: |
+          cd ./MoppApp
+          xcode-project build-ipa --project "MoppApp.xcodeproj" --scheme "MoppApp"
     publishing:
       email:
         recipients:
