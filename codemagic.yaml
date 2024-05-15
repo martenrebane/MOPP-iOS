@@ -29,19 +29,13 @@ workflows:
       - name: Get RIA DigiDoc version
         script: |
           cd ./MoppApp
-          echo "APP_VERSION=$('/usr/bin/xcodebuild' -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =')"
           echo "APP_VERSION=$('/usr/bin/xcodebuild' -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =')" >> $CM_ENV
-          echo $APP_VERSION
       - name: Build
         script: |
           cd ./MoppApp
-          echo $APP_VERSION
           xcodebuild build archive -archivePath "./build/RIA_DigiDoc_$APP_VERSION.$PROJECT_BUILD_NUMBER.xcarchive" -configuration Release -scheme "MoppApp" CODE_SIGN_INDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO GOOGLE_CONF_REQUIRED=NO
-          echo $APP_VERSION
-          echo "RIA_DigiDoc_$APP_VERSION.$PROJECT_BUILD_NUMBER.xcarchive"
-          ls -lahtR
     artifacts:
-      - ./MoppApp/build/*.xcarchive
+      - ./MoppApp/build/RIA_DigiDoc_$APP_VERSION.$PROJECT_BUILD_NUMBER.xcarchive
     publishing:
       email:
         recipients:
