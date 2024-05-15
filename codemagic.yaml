@@ -33,11 +33,9 @@ workflows:
       - name: Build
         script: |
           cd ./MoppApp
-          xcodebuild build archive -configuration Release -scheme "MoppApp" CODE_SIGN_INDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO GOOGLE_CONF_REQUIRED=NO
-      - name: Generate IPA
-        script: |
-          cd ./MoppApp
-          xcodebuild -exportArchive -exportFormat ipa -archivePath MoppApp.xcarchive -exportPath MoppApp.ipa
+          xcodebuild build -exportArchive -archivePath ./build/MoppApp.xcarchive -configuration Release -scheme "MoppApp" CODE_SIGN_INDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO GOOGLE_CONF_REQUIRED=NO
+    artifacts:
+      - ./MoppApp/build/*.xcarchive
     publishing:
       email:
         recipients:
