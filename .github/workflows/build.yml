@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - 15.4
+          - 16.2
         platform:
           - iOS
     env:
@@ -24,7 +24,7 @@ jobs:
       with:
         submodules: recursive
     - name: Download Libdigidocpp iOS artifact
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@v8
       with:
         workflow: build.yml
         branch: master
@@ -32,7 +32,7 @@ jobs:
         path: libdigidocpp-ios
         repo: open-eid/libdigidocpp
     - name: Download Libdigidocpp iOS Simulator artifact
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@v8
       with:
         workflow: build.yml
         branch: master
@@ -148,5 +148,3 @@ jobs:
         then
             rm $MOBILEPROVISIONING_SHARE_EXTENSION_PATH
         fi
-        
-        
